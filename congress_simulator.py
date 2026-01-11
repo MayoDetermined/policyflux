@@ -9,7 +9,7 @@ Exposes a Keras-style interface:
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, Optional, Callable
+from typing import Any, Dict, Optional, Callable, TYPE_CHECKING
 
 import numpy as np
 
@@ -20,6 +20,9 @@ from data_collectors.actors_architectural_bureau import CongressMenBuilder
 from engine.symulations import CongressEngine
 from models.dbn import DBCongressModel
 from public_opinion.regime import PublicRegime
+
+if TYPE_CHECKING:
+    from policyflux.core.model import Model
 
 logger = logging.getLogger(__name__)
 
@@ -32,10 +35,12 @@ class CongressSimulator:
         scenario: Optional[str] = None,
         use_gpu: bool = True,
         use_hmm_state: bool = True,
+        actor_model: Optional['Model'] = None,
     ) -> None:
         self.scenario = scenario or config.SCENARIO
         self.use_gpu = use_gpu
         self.use_hmm_state = use_hmm_state
+        self.actor_model = actor_model
 
         self.regime = PublicRegime(self.scenario)
         self.builder: Optional[CongressMenBuilder] = None
@@ -63,6 +68,7 @@ class CongressSimulator:
         dbn_params: Optional[Dict[str, Any]] = None,
         lstm_params: Optional[Dict[str, Any]] = None,
         use_hmm_state: Optional[bool] = None,
+        actor_model: Optional['Model'] = None,
     ) -> "CongressSimulator":
         """Configure hyperparameters and regime scenario."""
         if scenario:
@@ -70,6 +76,8 @@ class CongressSimulator:
             self.regime = PublicRegime(scenario)
         if use_hmm_state is not None:
             self.use_hmm_state = use_hmm_state
+        if actor_model is not None:
+            self.actor_model = actor_model
 
         self.dqn_params = {
             "state_dim": config.DQN_STATE_DIM,

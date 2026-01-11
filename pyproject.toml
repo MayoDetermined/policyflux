@@ -8,8 +8,7 @@ version = "0.1.0"
 description = "PolicyFlux: congressional dynamics simulator with a compile/run workflow"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
-license-files = ["LICENSE"]
+license = { file = "LICENSE" }
 keywords = ["congress", "simulation", "rl", "dbn", "politics"]
 dependencies = [
     "numpy>=1.24",
