@@ -141,11 +141,23 @@ class Layer(ABC):
             return np.ones(shape, dtype=np.float32)
         elif initializer == 'glorot_uniform':
             # Xavier/Glorot uniform initialization
-            limit = np.sqrt(6.0 / (shape[0] + shape[-1]))
+            # For 2D tensors: fan_in = shape[0], fan_out = shape[-1]
+            # For other tensors: use first and last dimensions
+            if len(shape) < 2:
+                # For 1D tensors (e.g., bias), use uniform distribution
+                limit = np.sqrt(3.0)
+            else:
+                fan_in = shape[0]
+                fan_out = shape[-1]
+                limit = np.sqrt(6.0 / (fan_in + fan_out))
             return np.random.uniform(-limit, limit, shape).astype(np.float32)
         elif initializer == 'he_normal':
             # He normal initialization
-            std = np.sqrt(2.0 / shape[0])
+            if len(shape) < 2:
+                # For 1D tensors, use standard normal
+                std = 1.0
+            else:
+                std = np.sqrt(2.0 / shape[0])
             return np.random.normal(0, std, shape).astype(np.float32)
         else:
             raise ValueError(f"Unknown initializer: {initializer}")

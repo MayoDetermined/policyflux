@@ -238,8 +238,10 @@ class Model(ABC):
     ) -> None:
         """Update model weights (simplified gradient descent).
         
-        Note: This is a simplified implementation. A full implementation
-        would use automatic differentiation.
+        Note: This is a simplified implementation using numerical differentiation.
+        For production use, this should be replaced with automatic differentiation
+        (e.g., using JAX or PyTorch). The current O(n²) complexity makes it slow
+        for models with many parameters.
         
         Args:
             x_batch: Input batch
@@ -247,17 +249,17 @@ class Model(ABC):
             y_pred: Predictions
         """
         # Simplified gradient computation
-        # In practice, use automatic differentiation
+        # TODO: Replace with automatic differentiation for production use
         gradients_and_weights = []
         
         for layer in self.layers:
             for weight in layer.trainable_weights:
-                # Simplified: use small random perturbation as gradient approximation
-                # Real implementation would compute true gradients
+                # Use finite differences for gradient approximation
+                # NOTE: This is O(n²) and very slow - use for prototyping only
                 grad = np.zeros_like(weight)
                 epsilon = 1e-7
                 
-                # Central difference approximation (simplified)
+                # Central difference approximation
                 for idx in np.ndindex(weight.shape):
                     weight[idx] += epsilon
                     loss_plus = self.loss_fn(y_batch, self(x_batch, training=False))

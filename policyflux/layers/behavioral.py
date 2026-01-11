@@ -25,8 +25,16 @@ class ActorLayer(Layer):
         use_ideology: Whether to incorporate ideology features
         ideology_dim: Dimension of ideology features
         
+    Note:
+        When use_ideology=True, the layer assumes the first `ideology_dim`
+        features in the input represent ideology scores. These features
+        receive additional weighting through a separate ideology kernel.
+        Structure your input data accordingly: [ideology_features, other_features].
+        
     Example:
-        >>> layer = ActorLayer(units=64, activation='tanh', use_ideology=True)
+        >>> layer = ActorLayer(units=64, activation='tanh', use_ideology=True, ideology_dim=2)
+        >>> # Input shape: (batch_size, features) where first 2 features are ideology
+        >>> inputs = np.random.randn(10, 20)  # 2 ideology + 18 other features
         >>> output = layer(inputs)
     """
     
@@ -242,10 +250,21 @@ class NetworkInfluenceLayer(Layer):
             
         Returns:
             Output tensor with network influence applied
+            
+        Raises:
+            ValueError: If batch size doesn't match adjacency matrix dimensions
         """
         if self.normalized_adjacency is None:
             # No adjacency matrix set, return inputs unchanged
             return inputs
+        
+        # Validate batch size matches adjacency matrix
+        if inputs.shape[0] != self.normalized_adjacency.shape[0]:
+            raise ValueError(
+                f"Batch size ({inputs.shape[0]}) must match adjacency matrix size "
+                f"({self.normalized_adjacency.shape[0]}). When using NetworkInfluenceLayer, "
+                f"set batch_size equal to the total number of actors in your dataset."
+            )
         
         # Apply network influence
         neighbor_influence = self.normalized_adjacency @ inputs
