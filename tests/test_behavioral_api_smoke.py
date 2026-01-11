@@ -1,12 +1,12 @@
 import pytest
-import torch
 import numpy as np
+import tensorflow as tf
 
-from behavioral_sim.agents.congressman import CongressAgent
-from behavioral_sim.engine.compiler import CompiledSystem
-from behavioral_sim.engine.runner import CongressRunner
-from behavioral_sim.network import DynamicNetwork, HomophilyInfluence, LeaderBoostInfluence, CommitteeInfluence
-from behavioral_sim.context import PublicRegime
+from policyflux.behavioral_sim.agents.congressman import CongressAgent
+from policyflux.behavioral_sim.engine.compiler import CompiledSystem
+from policyflux.behavioral_sim.engine.runner import CongressRunner
+from policyflux.behavioral_sim.network import DynamicNetwork, HomophilyInfluence, LeaderBoostInfluence, CommitteeInfluence
+from policyflux.behavioral_sim.context import PublicRegime
 
 
 class _StubEngine:
@@ -24,12 +24,13 @@ class _StubCongress:
         self.adj_matrix = self.base_adj_matrix.copy()
 
 
-def _make_compiled(device: torch.device) -> CompiledSystem:
+def _make_compiled(device: str) -> CompiledSystem:
     actors = [
         CongressAgent(1, {"ideology_multidim": [0.1], "party": "A"}),
         CongressAgent(2, {"ideology_multidim": [-0.2], "party": "B"}),
     ]
-    base_adj = torch.zeros((2, 2), dtype=torch.float32, device=device)
+    with tf.device(device):
+        base_adj = tf.zeros((2, 2), dtype=tf.float32)
     dyn = DynamicNetwork(
         base_adj=base_adj,
         influence_functions=[HomophilyInfluence(beta=1.0)],
@@ -48,16 +49,16 @@ def _make_compiled(device: torch.device) -> CompiledSystem:
 
 
 def test_runner_smoke_cpu():
-    compiled = _make_compiled(torch.device("cpu"))
+    compiled = _make_compiled("/CPU:0")
     runner = CongressRunner(compiled)
     result = runner.run_monte_carlo(n_simulations=1, steps=1, show_tqdm=False)
     assert isinstance(result, dict)
     assert "probability_of_passing" in result
 
 
-@pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
-def test_runner_smoke_gpu():
-    compiled = _make_compiled(torch.device("cuda"))
+def test_runner_smoke_gpu_or_skip():
+    has_gpu = bool(tf.config.list_physical_devices("GPU"))
+    compiled = _make_compiled("/GPU:0" if has_gpu else "/CPU:0")
     runner = CongressRunner(compiled)
     result = runner.run_monte_carlo(n_simulations=1, steps=1, show_tqdm=False)
     assert isinstance(result, dict)
@@ -65,11 +66,12 @@ def test_runner_smoke_gpu():
 
 
 def test_influence_functions_chain():
-    device = torch.device("cpu")
-    base = torch.ones((3, 3), dtype=torch.float32, device=device)
-    X = torch.tensor([[0.0], [0.5], [-0.5]], device=device)
-    committee = torch.zeros_like(base)
-    committee[0, 1] = 1.0
+    device = "/CPU:0"
+    with tf.device(device):
+        base = tf.ones((3, 3), dtype=tf.float32)
+        X = tf.constant([[0.0], [0.5], [-0.5]], dtype=tf.float32)
+        committee = tf.zeros_like(base)
+        committee = tf.tensor_scatter_nd_update(committee, indices=[[0, 1]], updates=[1.0])
     dyn = DynamicNetwork(
         base_adj=base,
         influence_functions=[
@@ -81,5 +83,10 @@ def test_influence_functions_chain():
     )
     G = dyn.compute(X)
     assert G.shape == base.shape
-    assert torch.allclose(torch.diag(G), torch.zeros(3, device=device))
-    assert torch.isfinite(G).all()
+    diag_zero = tf.reduce_all(tf.equal(tf.linalg.diag_part(G), 0.0))
+    assert bool(diag_zero.numpy())
+    assert bool(tf.reduce_all(tf.math.is_finite(G)).numpy())
+
+
+
+

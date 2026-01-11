@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 
-import config
-from congress.actors import CongressMan
-from congress.law import Law
+from policyflux import config
+from policyflux.congress.actors import CongressMan
+from policyflux.congress.law import Law
 
 
 def make_actor() -> CongressMan:
@@ -57,3 +57,7 @@ def test_decide_vote_uses_mixed_logit_if_enabled(monkeypatch):
     vote = actor.decide_vote(law, influence_effect=0.0, regime_pressure=0.2)
     assert called["hit"]
     assert vote is True or vote is False
+
+
+
+

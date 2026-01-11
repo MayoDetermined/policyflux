@@ -1,8 +1,8 @@
 import numpy as np
-from congress.actors import CongressMan
-from congress.congress import TheCongress
-from congress.law import Law
-from public_opinion.regime import PublicRegime
+from policyflux.congress.actors import CongressMan
+from policyflux.congress.congress import TheCongress
+from policyflux.congress.law import Law
+from policyflux.public_opinion.regime import PublicRegime
 
 
 def make_sample_congress(n=6):
@@ -48,3 +48,7 @@ def test_contextual_influence_increases_intraparty_with_pressure():
     assert W_low.shape == W_high.shape
     assert not np.isnan(W_low).any()
     assert not np.isnan(W_high).any()
+
+
+
+

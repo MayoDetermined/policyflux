@@ -336,3 +336,7 @@ def test_sequential_verbose_modes():
     # Test verbose=1 (progress)
     history2 = model.fit(X, y, epochs=1, verbose=1)
     assert 'loss' in history2
+
+
+
+

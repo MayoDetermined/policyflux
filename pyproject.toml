@@ -16,7 +16,7 @@ dependencies = [
     "networkx>=3.0",
     "scikit-learn>=1.3",
     "joblib>=1.2",
-    "torch>=2.2",
+    "tensorflow>=2.15",
     "pyvoteview>=2.2",
     "requests>=2.31",
     "tqdm>=4.65",
@@ -38,20 +38,9 @@ dev = [
 policyflux = "policyflux.cli:main"
 
 [tool.setuptools]
-package-dir = {"" = "."}
+package-dir = {"" = "src"}
 include-package-data = true
 
 [tool.setuptools.packages.find]
-include = [
-    "behavioral_sim*",
-    "congress*",
-    "data_collectors*",
-    "engine*",
-    "models*",
-    "public_opinion*",
-    "policyflux*",
-]
+include = ["policyflux*"]
 exclude = ["tests*", "cache*", "results*", "scripts*", "__pycache__"]
-
-[tool.setuptools.py-modules]
-py-modules = ["config", "congress_simulator", "main", "gpu_utils", "utils", "demo_ipm_voting"]

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from public_opinion.regime import PublicRegime, _HAS_HMMLEARN
+from policyflux.public_opinion.regime import PublicRegime, _HAS_HMMLEARN
 
 
 def test_update_regime_state_failure_and_escalation():
@@ -80,7 +80,7 @@ def test_update_hmm_with_observation_no_hmmlearn_keeps_scenario():
 
 def test_hmm_fit_is_throttled(monkeypatch):
     # Ensure we only call fit_hmm at the configured interval
-    from public_opinion import regime as regime_mod
+    from policyflux.public_opinion import regime as regime_mod
 
     monkeypatch.setattr(regime_mod, "_HAS_HMMLEARN", True)
     reg = PublicRegime(scenario='stable')
@@ -105,3 +105,7 @@ def test_hmm_fit_is_throttled(monkeypatch):
 
     # Expect fits at buffer lengths 5 and 10 => 2 calls
     assert len(calls) == 2
+
+
+
+

@@ -1,6 +1,6 @@
 import numpy as np
 
-from engine.symulations import CongressEngine
+from engine.simulations import CongressEngine
 from congress.actors import CongressMan
 from congress.congress import TheCongress
 from public_opinion.regime import PublicRegime

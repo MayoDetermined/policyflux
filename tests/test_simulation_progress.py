@@ -1,9 +1,9 @@
 import numpy as np
 
-from engine.symulations import CongressEngine
-from congress.actors import CongressMan
-from congress.congress import TheCongress
-from public_opinion.regime import PublicRegime
+from policyflux.engine.symulations import CongressEngine
+from policyflux.congress.actors import CongressMan
+from policyflux.congress.congress import TheCongress
+from policyflux.public_opinion.regime import PublicRegime
 
 
 def make_minimal_engine():
@@ -50,7 +50,7 @@ def test_show_tqdm_flag_does_not_raise():
 
 
 def test_slow_step_reports():
-    import config as cfg
+    from policyflux import config as cfg
 
     old = getattr(cfg, "SLOW_STEP_THRESHOLD_SECONDS", None)
     # Force threshold to zero so any non-zero step time is reported
@@ -74,7 +74,7 @@ def test_slow_step_reports():
 
 def test_show_small_steps_reports():
     # Avoid expensive community detection on larger graphs by patching a fast stub
-    from congress import congress as cong_mod
+    from policyflux.congress import policyflux.congress as cong_mod
     cong_mod.TheCongress.detect_communities = lambda self, method="louvain": np.zeros(len(self.actors), dtype=int)
 
     engine = make_minimal_engine()
@@ -89,7 +89,7 @@ def test_show_small_steps_reports():
 
 
 def test_show_step_and_component_tqdm_does_not_raise():
-    from congress import congress as cong_mod
+    from policyflux.congress import policyflux.congress as cong_mod
     cong_mod.TheCongress.detect_communities = lambda self, method="louvain": np.zeros(len(self.actors), dtype=int)
 
     engine = make_minimal_engine()
@@ -98,3 +98,7 @@ def test_show_step_and_component_tqdm_does_not_raise():
     rpt = engine.run_monte_carlo(n_simulations=1, steps=1, show_tqdm=True, show_step_tqdm=True, show_component_tqdm=True)
     assert isinstance(rpt, dict)
     assert "probability_of_passing" in rpt
+
+
+
+
