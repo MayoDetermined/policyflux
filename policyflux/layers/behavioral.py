@@ -159,6 +159,11 @@ class NetworkInfluenceLayer(Layer):
         influence_strength: Strength of network influence (0 to 1)
         normalization: Type of adjacency normalization ('symmetric', 'row', 'none')
         
+    Note:
+        The adjacency matrix must match the batch size during training.
+        When using this layer, set batch_size equal to the total number of actors
+        in your dataset, or use batch_size=len(dataset) during fit().
+        
     Example:
         >>> layer = NetworkInfluenceLayer(influence_strength=0.5)
         >>> layer.set_adjacency(adjacency_matrix)
@@ -394,11 +399,13 @@ class RegimeContextLayer(Layer):
             input_shape: Shape of input tensor
         """
         input_dim = input_shape[-1]
+        # Actor features dimension (excluding context)
+        actor_dim = input_dim - self.context_dim
         
         if self.fusion_mode == 'add':
-            # Project context to input dimension
+            # Project context to actor dimension
             self.context_projection = self.add_weight(
-                shape=(self.context_dim, input_dim),
+                shape=(self.context_dim, actor_dim),
                 initializer='glorot_uniform',
                 trainable=True,
                 name='context_projection'
@@ -406,7 +413,7 @@ class RegimeContextLayer(Layer):
         elif self.fusion_mode == 'multiply':
             # Gating mechanism
             self.gate_weight = self.add_weight(
-                shape=(self.context_dim, input_dim),
+                shape=(self.context_dim, actor_dim),
                 initializer='glorot_uniform',
                 trainable=True,
                 name='gate_weight'
