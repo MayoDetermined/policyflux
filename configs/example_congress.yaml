@@ -1,0 +1,26 @@
+# Minimal example config for a PolicyFlux experiment
+seed: 1337
+experiment_name: example_congress
+
+data:
+  cache_dir: "./cache/external_signals"
+  use_cache: true
+  congress_number: 118
+
+simulation:
+  simulations: 5
+  steps: 3
+  scenario: "stable"
+
+agents:
+  default:
+    type: "behavioral"
+    params:
+      ideology_dim: 3
+      learning_rate: 0.001
+
+models:
+  ipm:
+    latent_dim: 3
+  autoencoder:
+    latent_dim: 8
