@@ -3,11 +3,7 @@ from ..core.layer_template import Layer
 
 utilitySpace = List[float]
 
-class MediaPressureLayer(Layer):
-    pass
-
-class RandomEventLayer(Layer):
-    pass
+## TO DO: Complete implementation
 
 class PublicOpinionLayer(Layer):
     """Models public opinion influence on voting decision."""

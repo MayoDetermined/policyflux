@@ -1,0 +1,2 @@
+class SequentialWhip:
+    pass

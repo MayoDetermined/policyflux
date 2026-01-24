@@ -3,6 +3,8 @@ from ..core.layer_template import Layer
 
 utilitySpace: TypeAlias = List[float]
 
+## TO DO: Complete implementation
+
 class LobbyingLayer(Layer):
     """Models external lobbying influence on voting decision."""
     

@@ -1,6 +1,10 @@
 from typing import List, Optional
 from random import randint
 
+from policyflux.models.advanced_actors.lobby import SequentialLobbyer
+from policyflux.models.advanced_actors.speaker import SequentialSpeaker
+from policyflux.models.advanced_actors.whips import SequentialWhip
+
 from ..core.layer_template import Layer
 from ..core.congress_model_template import CongressModel
 from .actors import SequentialVoter
@@ -17,7 +21,10 @@ class SequentialCongressModel(CongressModel):
             id = get_id_generator().generate_model_id()
                 
         super().__init__(id)
+        self.lobbysts: List[SequentialLobbyer] = []
         self.congressmen: List[SequentialVoter] = []
+        self.whips: List[SequentialWhip] = []
+        self.speaker: Optional[SequentialSpeaker] = None
     
     def cast_votes(self, bill: Bill, bill_space=None, **context) -> int:
         """
@@ -65,6 +72,24 @@ class SequentialCongressModel(CongressModel):
         for congressman in self.congressmen:
             congressman.add_layer(layer)
         return True
+    
+    def delete_layer_from_congressmen(self, layer_id: int) -> bool:
+        """Delete a layer by ID from all congressmen."""
+        if not self.congressmen:
+            return False
+        for congressman in self.congressmen:
+            congressman.remove_layer(layer_id)
+        return True
+    
+    def add_n_congressmen(self, n: int, layers: list[Layer] = None) -> None:
+        """Add n congressmen with unique IDs."""
+        for _ in range(n):
+            new_id = get_id_generator().generate_actor_id()
+            congressman = SequentialVoter(id=new_id)
+            if layers:
+                for layer in layers:
+                    congressman.add_layer(layer)
+            self.add_congressman(congressman)
 
     def compile(self) -> None:
         """Compile/validate the model structure."""
@@ -79,3 +104,9 @@ class SequentialCongressModel(CongressModel):
         report += f"Total Congressmen: {len(self.congressmen)}\n"
         report += f"Congressmen: {[c.name for c in self.congressmen]}\n"
         return report
+
+    def print_layers_summary(self) -> None:
+        """Print a summary of layers for each congressman."""
+        for congressman in self.congressmen:
+            layer_names = [layer.name for layer in congressman.layers]
+            print(f"{congressman.name} Layers: {layer_names}")

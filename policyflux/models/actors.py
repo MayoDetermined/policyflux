@@ -79,15 +79,3 @@ class SequentialVoter(CongressMan):
         
         decision_prob = self.compute_layers(bill_space, **context)
         return random.random() < decision_prob
-
-class SequentialLobbyer:
-    pass
-
-class SequentialWhip:
-    pass
-
-class SequentialPresident:
-    pass
-
-class SequentialSpeaker:
-    pass

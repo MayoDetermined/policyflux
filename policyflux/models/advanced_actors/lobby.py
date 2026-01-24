@@ -1,0 +1,2 @@
+class SequentialLobbyer:
+    pass

@@ -4,6 +4,8 @@ from ..core.layer_template import Layer
 from ..core.id_generator import get_id_generator
 from ..core.types import UtilitySpace
 
+## TO DO: Train functionality to be implemented
+
 class IdealPointEncoder(Layer):
     def __init__(self, id: Optional[int] = None, space: Optional[UtilitySpace] = None, status_quo: Optional[UtilitySpace] = None, name: str = "IdealPoint"):
         if id is None:

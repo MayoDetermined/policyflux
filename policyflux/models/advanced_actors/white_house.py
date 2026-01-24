@@ -1,0 +1,2 @@
+class SequentialPresident:
+    pass
