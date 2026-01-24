@@ -15,6 +15,9 @@ class PublicOpinionLayer(Layer):
     def set_support(self, support_level: float) -> None:
         """Update public support level for a bill."""
         self.support_level = max(0.0, min(1.0, support_level))
+
+    def compile(self) -> None:
+        pass
     
     def call(self, bill_space: utilitySpace, **kwargs) -> float:
         """

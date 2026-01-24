@@ -17,6 +17,9 @@ class IdealPointEncoder(Layer):
     def train(self) -> None:
         pass
 
+    def compile(self):
+        pass
+
     def _sq_distance(self, a: UtilitySpace, b: UtilitySpace) -> float:
         if len(a) != len(b):
             raise ValueError(f"Dimension mismatch: {len(a)} != {len(b)}")

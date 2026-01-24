@@ -91,12 +91,37 @@ class SequentialCongressModel(CongressModel):
                     congressman.add_layer(layer)
             self.add_congressman(congressman)
 
+    def set_speaker(self, speaker: SequentialSpeaker) -> None:
+        """Add a Speaker to the Congress."""
+        self.speaker = speaker
+
+    def add_whip(self, whip: SequentialWhip) -> None:
+        """Add a Whip to the Congress."""
+        self.whips.append(whip)
+    
+    def delete_whip(self, whip_id: int) -> bool:
+        """Delete a Whip by ID from the Congress."""
+        for i, whip in enumerate(self.whips):
+            if whip.id == whip_id:
+                del self.whips[i]
+                return True
+        return False
+
+    def pop_whip(self) -> Optional[SequentialWhip]:
+        """Remove and return the last added Whip."""
+        if self.whips:
+            return self.whips.pop()
+        return None 
+
     def compile(self) -> None:
         """Compile/validate the model structure."""
         # Validate all congressmen have at least one layer
         for congressman in self.congressmen:
             if not congressman.layers:
                 print(f"Warning: {congressman.name} has no decision layers")
+            else:
+                for layer in congressman.layers:
+                    layer.compile()
 
     def make_report(self) -> str:
         """Generate a report about the Congress model."""

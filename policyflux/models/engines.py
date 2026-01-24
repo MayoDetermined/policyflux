@@ -1,8 +1,13 @@
 from dataclasses import dataclass
 from typing import List
-import random
+
+from policyflux.utils.reports import craft_a_bar
 from ..core.bill_template import Bill
 from ..core.congress_model_template import CongressModel
+#import importlib
+#pfrandom = importlib.import_module("policyflux.random")
+from policyflux import pfrandom
+from policyflux.logging_config import logger
 
 @dataclass(frozen=True)
 class Session:
@@ -22,11 +27,22 @@ class SequentialMonteCarlo:
 
     def run_simulation(self) -> List[int]:
         # Ensure deterministic randomness for voting across runs
-        random.seed(self.seed)
+        # Use package RNG manager so all modules draw from the same source.
+        pfrandom.set_seed(self.seed)
         for _ in range(self.n_simulations):
             result = self.congress_model.cast_votes(self.bill)
             self.results.append(result)
         return self.results
+    
+    def get_pretty_votes(self) -> None:
+        avg_votes_for = sum(self.results) / len(self.results)
+        craft_a_bar(
+            data = [avg_votes_for, len(self.congress_model.congressmen) - avg_votes_for],
+            labels = ['Votes For', 'Votes Against'],
+            title = 'Average Voting Results',
+            xlabel = 'Vote Type',
+            ylabel = 'Number of Votes'
+        )
 
     def __str__(self):
         if not self.results:

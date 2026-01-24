@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Simple Congress Simulation
-Demonstrates basic usage of the Congress refactor library
+Prosty przykład użycia policyflux
+Uruchom: python examples/simple_example.py
 """
 
 import random
@@ -12,69 +12,59 @@ from policyflux.models import (
     Session,
     SequentialMonteCarlo,
 )
-from policyflux.layers import IdealPointEncoder, LobbyingLayer, PublicOpinionLayer
+from policyflux.layers import IdealPointEncoder, PublicOpinionLayer
 
-# Configuration
-SEED = 42
-NUM_ACTORS = 461
-POLICY_SPACE_DIM = 3
+SEED = 123
+NUM_ACTORS = 50
+POLICY_DIM = 2
+ITERATIONS = 300
 
-# Set random seed for reproducibility
 random.seed(SEED)
 
-print("=" * 60)
-print("Congressional Voting Simulation")
-print("=" * 60)
+def build_congress(num_actors: int, dim: int) -> SequentialCongressModel:
+    congress = SequentialCongressModel(id=1)
+    for i in range(1, num_actors + 1):
+        actor = SequentialVoter(
+            id=i,
+            name=f"Rep-{i}",
+            layers=[
+                IdealPointEncoder(
+                    id=1000 + i,
+                    space=[random.random() for _ in range(dim)],
+                    status_quo=[0.5] * dim,
+                ),
+                PublicOpinionLayer(id=2000 + i, support_level=random.random()),
+            ],
+        )
+        congress.add_congressman(actor)
+    congress.compile()
+    return congress
 
-# Step 1: Create Congress
-print(f"\n[1] Creating Congress with {NUM_ACTORS} members...")
-congress = SequentialCongressModel(id=1)
 
-# Step 2: Add representatives with layers
-print(f"[2] Adding representatives with behavior layers...")
-for i in range(1, NUM_ACTORS + 1):
-    actor = SequentialVoter(
-        id=i,
-        name=f"Rep. #{i}",
-        layers=[
-            IdealPointEncoder(
-                id=1000 + i,
-                space=[random.random() for _ in range(POLICY_SPACE_DIM)],
-                status_quo=[0.5] * POLICY_SPACE_DIM
-            ),
-            LobbyingLayer(id=2000 + i, intensity=random.uniform(0.0, 0.3)),
-            PublicOpinionLayer(id=3000 + i, support_level=random.random())
-        ]
+def make_bill(dim: int) -> SequentialBill:
+    bill = SequentialBill(id=1)
+    bill.make_random_position(dim=dim)
+    return bill
+
+
+def run_example():
+    congress = build_congress(NUM_ACTORS, POLICY_DIM)
+    bill = make_bill(POLICY_DIM)
+
+    session = Session(
+        n=ITERATIONS,
+        seed=SEED,
+        bill=bill,
+        description="Prosty przykład policyflux",
+        congress_model=congress,
     )
-    congress.add_congressman(actor)
-    if (i) % 50 == 0:
-        print(f"   Added {i} representatives...")
 
-congress.compile()
-print(f"   Congress compiled successfully with {NUM_ACTORS} members")
+    engine = SequentialMonteCarlo(session_params=session)
+    engine.run_simulation()
 
-# Step 3: Create a bill
-print(f"\n[3] Creating bill for voting...")
-bill = SequentialBill(id=1)
-bill.make_random_position(dim=POLICY_SPACE_DIM)
-print(f"   Bill position: {bill.position if hasattr(bill, 'position') else 'Random 3D'}")
+    print("\nWynik symulacji:")
+    print(engine)
 
-# Step 4: Run simulation
-print(f"\n[4] Running Monte Carlo simulation...")
-engine_params = Session(
-    n=500,  # Number of simulation iterations
-    seed=SEED,
-    bill=bill,
-    description="Simple Congress Voting Simulation",
-    congress_model=congress
-)
 
-engine = SequentialMonteCarlo(session_params=engine_params)
-engine.run_simulation()
-
-# Step 5: Print results
-print(f"\n[5] Simulation Results:")
-print("=" * 60)
-print(engine)
-print("=" * 60)
-print("\nSimulation completed successfully!")
+if __name__ == "__main__":
+    run_example()

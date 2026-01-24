@@ -23,3 +23,8 @@ class Layer(ABC):
             Float between 0 and 1 representing likelihood of support
         """
         pass
+
+    @abstractmethod
+    def compile(self) -> None:
+        """Prepare layer for use (e.g., precompute values)."""
+        pass

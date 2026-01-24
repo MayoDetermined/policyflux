@@ -1,11 +1,13 @@
 from typing import List, Optional
-import random
 from ..core.actors_template import CongressMan
 from ..core.bill_template import Bill
 from ..core.layer_template import Layer
 from ..core.types import UtilitySpace
 from ..core.id_generator import get_id_generator
 from ..core.aggregation_strategy import AggregationStrategy, SequentialAggregation
+import importlib
+import policyflux.pfrandom as pfrandom
+from policyflux.logging_config import logger
 
 class SequentialVoter(CongressMan):
     """
@@ -78,4 +80,5 @@ class SequentialVoter(CongressMan):
             bill_space = [0.0]  # Dummy space if not provided
         
         decision_prob = self.compute_layers(bill_space, **context)
-        return random.random() < decision_prob
+        # Use package RNG for deterministic behaviour when seeded
+        return pfrandom.random() < decision_prob

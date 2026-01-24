@@ -1,4 +1,6 @@
 from typing import List, TypeAlias
+
+from policyflux.models.advanced_actors.lobby import SequentialLobbyer
 from ..core.layer_template import Layer
 
 utilitySpace: TypeAlias = List[float]
@@ -13,10 +15,40 @@ class LobbyingLayer(Layer):
         if not 0.0 <= intensity <= 1.0:
             raise ValueError(f"Intensity must be in [0, 1], got {intensity}")
         self.intensity = intensity  # [0, 1] intensity of lobbying pressure
+        
+        self.lobbysts: list[SequentialLobbyer] = []
     
     def set_intensity(self, intensity: float) -> None:
         """Update lobbying intensity for a bill."""
         self.intensity = max(0.0, min(1.0, intensity))
+
+    def add_lobbyst(self, lobbyst: SequentialLobbyer) -> None:
+        """
+        Docstring for add_lobbyst
+        
+        :param self: Description
+        :param lobbyst: Description
+        :type lobbyst: SequentialLobbyer
+        """
+        self.lobbysts.append(lobbyst)
+
+    def delete_lobbyst(self) -> None:
+        pass
+
+    def pop_lobbyst(self) -> SequentialLobbyer:
+        """
+        Docstring for pop_lobbyst
+        
+        :param self: Description
+        :return: Description
+        :rtype: SequentialLobbyer
+        """
+        if self.lobbysts:
+            return self.lobbysts.pop()
+        return None
+
+    def compile(self) -> None:
+        pass
     
     def call(self, bill_space: utilitySpace, **kwargs) -> float:
         """
