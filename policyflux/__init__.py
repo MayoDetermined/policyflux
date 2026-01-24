@@ -24,3 +24,16 @@ def import_models():
 	import importlib
 
 	return importlib.import_module("policyflux.models")
+
+
+def import_integration():
+	"""Import `policyflux.integration` on demand and return the module."""
+	import importlib
+
+	return importlib.import_module("policyflux.integration")
+
+
+def get_layer_registry():
+	"""Return the layer registry from policyflux.integration."""
+	integration = import_integration()
+	return integration.LAYER_REGISTRY

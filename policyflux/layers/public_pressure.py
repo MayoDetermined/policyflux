@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from ..core.layer_template import Layer
 
 utilitySpace = List[float]
@@ -8,7 +8,7 @@ utilitySpace = List[float]
 class PublicOpinionLayer(Layer):
     """Models public opinion influence on voting decision."""
     
-    def __init__(self, id: int, support_level: float = 0.5, name: str = "PublicOpinion"):
+    def __init__(self, id: Optional[int] = None, support_level: float = 0.5, name: str = "PublicOpinion"):
         super().__init__(id, name)
         self.support_level = max(0.0, min(1.0, support_level))  # [0, 1] public support
     
@@ -26,5 +26,9 @@ class PublicOpinionLayer(Layer):
         Public opinion shifts the vote probability toward the support level.
         """
         base_prob = kwargs.get('base_prob', 0.5)
+        president_approval = kwargs.get("president_approval")
+        support = self.support_level
+        if president_approval is not None:
+            support = 0.7 * support + 0.3 * max(0.0, min(1.0, president_approval))
         # Blend base probability with public support (50/50 weight)
-        return 0.5 * base_prob + 0.5 * self.support_level
+        return 0.5 * base_prob + 0.5 * support

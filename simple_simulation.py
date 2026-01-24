@@ -4,66 +4,56 @@ Prosty przykład użycia policyflux
 Uruchom: python examples/simple_example.py
 """
 
-import random
-from policyflux.models import (
-    SequentialCongressModel,
-    SequentialVoter,
-    SequentialBill,
-    Session,
-    SequentialMonteCarlo,
+from policyflux.integration import (
+    AdvancedActorsConfig,
+    IntegrationConfig,
+    LayerConfig,
+    build_engine,
 )
-from policyflux.layers import IdealPointEncoder, PublicOpinionLayer
 
-SEED = 123
-NUM_ACTORS = 50
-POLICY_DIM = 2
+SEED = 12345
+NUM_ACTORS = 100
+POLICY_DIM = 4  # Econ, Social, Foreign, Emotions
 ITERATIONS = 300
-
-random.seed(SEED)
-
-def build_congress(num_actors: int, dim: int) -> SequentialCongressModel:
-    congress = SequentialCongressModel(id=1)
-    for i in range(1, num_actors + 1):
-        actor = SequentialVoter(
-            id=i,
-            name=f"Rep-{i}",
-            layers=[
-                IdealPointEncoder(
-                    id=1000 + i,
-                    space=[random.random() for _ in range(dim)],
-                    status_quo=[0.5] * dim,
-                ),
-                PublicOpinionLayer(id=2000 + i, support_level=random.random()),
-            ],
-        )
-        congress.add_congressman(actor)
-    congress.compile()
-    return congress
-
-
-def make_bill(dim: int) -> SequentialBill:
-    bill = SequentialBill(id=1)
-    bill.make_random_position(dim=dim)
-    return bill
 
 
 def run_example():
-    congress = build_congress(NUM_ACTORS, POLICY_DIM)
-    bill = make_bill(POLICY_DIM)
-
-    session = Session(
-        n=ITERATIONS,
+    config = IntegrationConfig(
+        num_actors=NUM_ACTORS,
+        policy_dim=POLICY_DIM,
+        iterations=ITERATIONS,
         seed=SEED,
-        bill=bill,
         description="Prosty przykład policyflux",
-        congress_model=congress,
+        layer_config=LayerConfig(
+            include_ideal_point=True,
+            include_public_opinion=True,
+            include_lobbying=True,
+            include_media_pressure=True,
+            include_party_discipline=True,
+            public_support=0.55,
+            lobbying_intensity=0.15,
+            media_pressure=0.1,
+            party_line_support=0.6,
+            party_discipline_strength=0.4,
+        ),
+        actors_config=AdvancedActorsConfig(
+            n_lobbyists=3,
+            lobbyist_strength=0.4,
+            lobbyist_stance=1.0,
+            n_whips=2,
+            whip_discipline_strength=0.6,
+            whip_party_line_support=0.65,
+            speaker_agenda_support=0.55,
+            president_approval_rating=0.52,
+        ),
     )
-
-    engine = SequentialMonteCarlo(session_params=session)
+    engine = build_engine(config)
     engine.run_simulation()
 
     print("\nWynik symulacji:")
     print(engine)
+
+    engine.get_pretty_votes()
 
 
 if __name__ == "__main__":

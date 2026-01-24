@@ -4,6 +4,7 @@ from random import randint
 from policyflux.models.advanced_actors.lobby import SequentialLobbyer
 from policyflux.models.advanced_actors.speaker import SequentialSpeaker
 from policyflux.models.advanced_actors.whips import SequentialWhip
+from policyflux.models.advanced_actors.white_house import SequentialPresident
 
 from ..core.layer_template import Layer
 from ..core.congress_model_template import CongressModel
@@ -25,6 +26,7 @@ class SequentialCongressModel(CongressModel):
         self.congressmen: List[SequentialVoter] = []
         self.whips: List[SequentialWhip] = []
         self.speaker: Optional[SequentialSpeaker] = None
+        self.president: Optional[SequentialPresident] = None
     
     def cast_votes(self, bill: Bill, bill_space=None, **context) -> int:
         """
@@ -59,6 +61,14 @@ class SequentialCongressModel(CongressModel):
                                 f"but {congressman.name} has ideal point with {voter_dim} dimensions"
                             )
         
+        context = dict(context)
+        if self.speaker is not None:
+            context.setdefault("speaker", self.speaker)
+            context.setdefault("speaker_agenda_support", getattr(self.speaker, "agenda_support", 0.5))
+        if self.president is not None:
+            context.setdefault("president", self.president)
+            context.setdefault("president_approval", getattr(self.president, "approval_rating", 0.5))
+
         votes_for = 0
         for congressman in self.congressmen:
             if congressman.vote(bill, bill_space, **context):
@@ -94,6 +104,10 @@ class SequentialCongressModel(CongressModel):
     def set_speaker(self, speaker: SequentialSpeaker) -> None:
         """Add a Speaker to the Congress."""
         self.speaker = speaker
+
+    def set_president(self, president: SequentialPresident) -> None:
+        """Add a President to the Congress context."""
+        self.president = president
 
     def add_whip(self, whip: SequentialWhip) -> None:
         """Add a Whip to the Congress."""
