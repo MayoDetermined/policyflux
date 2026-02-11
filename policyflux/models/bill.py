@@ -12,6 +12,10 @@ class SequentialBill(Bill):
         self.n_passed: int = 0
         self.n_failed: int = 0
 
+        self.is_government_bill: bool = False
+        self.is_confidence_vote: bool = False
+        #self.sponsor: Optional[str] = None
+
     def record_pass(self) -> None:
         self.n_passed += 1
 

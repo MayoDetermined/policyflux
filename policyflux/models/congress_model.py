@@ -1,6 +1,8 @@
 from typing import List, Optional
 from random import randint
 
+from policyflux.core.executive import Executive
+from policyflux.core.types import PolicySpace
 from policyflux.models.advanced_actors.lobby import SequentialLobbyer
 from policyflux.models.advanced_actors.speaker import SequentialSpeaker
 from policyflux.models.advanced_actors.whips import SequentialWhip
@@ -20,7 +22,6 @@ class SequentialCongressModel(CongressModel):
     def __init__(self, id: Optional[int] = None) -> None:
         if id is None:
             id = get_id_generator().generate_model_id()
-                
         super().__init__(id)
         self.lobbysts: List[SequentialLobbyer] = []
         self.congressmen: List[SequentialVoter] = []
@@ -28,6 +29,10 @@ class SequentialCongressModel(CongressModel):
         self.speaker: Optional[SequentialSpeaker] = None
         self.president: Optional[SequentialPresident] = None
     
+    def set_executive(self, executive: Executive) -> None:
+        """Set the executive branch (Presidential/Parliamentary/Semi-Presidential)."""
+        self.executive = executive
+
     def cast_votes(self, bill: Bill, bill_space: Optional[List[float]] = None, **context) -> int:
         """
         Cast votes from all congressmen on a bill.
@@ -54,7 +59,11 @@ class SequentialCongressModel(CongressModel):
                 # Check if congressman has IdealPointEncoder layer
                 for layer in congressman.layers:
                     if hasattr(layer, 'space') and layer.space:
-                        voter_dim = len(layer.space)
+                        # Handle both PolicySpace objects and lists
+                        if isinstance(layer.space, PolicySpace):
+                            voter_dim = layer.space.dimensions
+                        else:
+                            voter_dim = len(layer.space)
                         if voter_dim != bill_dim:
                             raise ValueError(
                                 f"Dimension mismatch: bill has {bill_dim} dimensions, "
@@ -69,10 +78,19 @@ class SequentialCongressModel(CongressModel):
             context.setdefault("president", self.president)
             context.setdefault("president_approval", getattr(self.president, "approval_rating", 0.5))
 
+        # Inject executive context before voting
+        if hasattr(self, 'executive') and self.executive is not None:
+            context = self.executive.inject_context(context)
+
         votes_for: int = 0
         for congressman in self.congressmen:
             if congressman.vote(bill, bill_space, **context):
                 votes_for += 1
+
+        # Process through executive (veto, confidence votes, etc.)
+        if hasattr(self, 'executive') and self.executive is not None:
+            votes_for = self.executive.process_bill_result(bill, votes_for, len(self.congressmen))
+
         return votes_for
     
     def add_layer_to_congressmen(self, layer: Layer) -> bool:

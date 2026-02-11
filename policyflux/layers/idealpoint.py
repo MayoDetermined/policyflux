@@ -35,12 +35,27 @@ class IdealPointLayer(Layer, PolicySpace):
     def compile(self) -> None:
         pass
 
-    def _sq_distance(self, a: PolicySpace, b: PolicySpace) -> float:
-        if a.dimensions != b.dimensions:
-            raise ValueError(f"Dimension mismatch: {a.dimensions} != {b.dimensions}")
-        return sum((x - y) ** 2 for x, y in zip(a.get_position(), b.get_position()))
+    def _sq_distance(self, a: Union[PolicySpace, List[float]], b: Union[PolicySpace, List[float]]) -> float:
+        # Handle both PolicySpace objects and lists
+        if isinstance(a, PolicySpace):
+            a_pos = a.get_position()
+            a_dim = a.dimensions
+        else:
+            a_pos = a
+            a_dim = len(a)
 
-    def _delta_utility(self, bill_space: PolicySpace) -> float:
+        if isinstance(b, PolicySpace):
+            b_pos = b.get_position()
+            b_dim = b.dimensions
+        else:
+            b_pos = b
+            b_dim = len(b)
+
+        if a_dim != b_dim:
+            raise ValueError(f"Dimension mismatch: {a_dim} != {b_dim}")
+        return sum((x - y) ** 2 for x, y in zip(a_pos, b_pos))
+
+    def _delta_utility(self, bill_space: Union[PolicySpace, List[float]]) -> float:
         return (
             self._sq_distance(self.space, self.status_quo)
             - self._sq_distance(self.space, bill_space)

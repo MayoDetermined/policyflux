@@ -17,6 +17,10 @@ class Session:
     description: str
     congress_model: CongressModel
 
+# TO DO
+class SequentialDeterministic:
+    pass
+
 class SequentialMonteCarlo:
     def __init__(self, session_params: Session) -> None:
         self.n_simulations: int = session_params.n
