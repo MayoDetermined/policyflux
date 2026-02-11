@@ -1,16 +1,15 @@
 from typing import List, Optional
 from ..core.layer_template import Layer
-
-utilitySpace = List[float]
+from ..core.types import UtilitySpace
 
 ## TO DO: Complete implementation
 
 class PublicOpinionLayer(Layer):
     """Models public opinion influence on voting decision."""
     
-    def __init__(self, id: Optional[int] = None, support_level: float = 0.5, name: str = "PublicOpinion"):
-        super().__init__(id, name)
-        self.support_level = max(0.0, min(1.0, support_level))  # [0, 1] public support
+    def __init__(self, id: Optional[int] = None, support_level: float = 0.5, name: str = "PublicOpinion", input_dim: int = 2, output_dim: int = 2) -> None:
+        super().__init__(id, name, input_dim, output_dim)
+        self.support_level: float = max(0.0, min(1.0, support_level))  # [0, 1] public support
     
     def set_support(self, support_level: float) -> None:
         """Update public support level for a bill."""
@@ -19,7 +18,7 @@ class PublicOpinionLayer(Layer):
     def compile(self) -> None:
         pass
     
-    def call(self, bill_space: utilitySpace, **kwargs) -> float:
+    def call(self, bill_space: UtilitySpace, **kwargs) -> float:
         """
         Apply public opinion influence on the vote.
         

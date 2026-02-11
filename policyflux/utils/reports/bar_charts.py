@@ -1,6 +1,7 @@
+from typing import List, Union
 import matplotlib.pyplot as plt
 
-def craft_a_bar(data: list[float, int], labels: list[str], title: str, xlabel: str, ylabel: str) -> None:
+def craft_a_bar(data: List[Union[float, int]], labels: List[str], title: str, xlabel: str, ylabel: str) -> None:
     """
     Generate and display a bar chart.
     

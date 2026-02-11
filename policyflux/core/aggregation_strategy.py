@@ -43,7 +43,7 @@ class SequentialAggregation(AggregationStrategy):
             return 0.5  # Neutral default
         
         # Start with first layer
-        decision_prob = layers[0].call(bill_space, **context)
+        decision_prob: float = layers[0].call(bill_space, **context)
         
         # Apply subsequent layers sequentially
         for layer in layers[1:]:
@@ -65,7 +65,7 @@ class AverageAggregation(AggregationStrategy):
         if not layers:
             return 0.5
         
-        total = sum(layer.call(bill_space, **context) for layer in layers)
+        total: float = sum(layer.call(bill_space, **context) for layer in layers)
         avg = total / len(layers)
         
         return max(0.0, min(1.0, avg))
@@ -79,7 +79,7 @@ class WeightedAggregation(AggregationStrategy):
     Weights must sum to 1.0.
     """
     
-    def __init__(self, weights: List[float]):
+    def __init__(self, weights: List[float]) -> None:
         """
         Initialize with layer weights.
         
@@ -88,7 +88,7 @@ class WeightedAggregation(AggregationStrategy):
         """
         if abs(sum(weights) - 1.0) > 1e-6:
             raise ValueError(f"Weights must sum to 1.0, got {sum(weights)}")
-        self.weights = weights
+        self.weights: List[float] = weights
     
     def aggregate(self, layers: List[Layer], bill_space: UtilitySpace, **context) -> float:
         if not layers:
@@ -97,12 +97,31 @@ class WeightedAggregation(AggregationStrategy):
         if len(layers) != len(self.weights):
             raise ValueError(f"Number of layers ({len(layers)}) must match number of weights ({len(self.weights)})")
         
-        total = sum(
+        total: float = sum(
             weight * layer.call(bill_space, **context)
             for weight, layer in zip(self.weights, layers)
         )
         
         return max(0.0, min(1.0, total))
+
+
+class MultiplicativeAggregation(AggregationStrategy):
+    """
+    Multiplicative aggregation: multiply all layer outputs.
+    
+    This creates a "veto" effect where low probability from any layer
+    significantly reduces the final probability.
+    """
+    
+    def aggregate(self, layers: List[Layer], bill_space: UtilitySpace, **context) -> float:
+        if not layers:
+            return 0.5
+        
+        result: float = 1.0
+        for layer in layers:
+            result *= layer.call(bill_space, **context)
+        
+        return max(0.0, min(1.0, result))
 
 
 class MultiplicativeAggregation(AggregationStrategy):

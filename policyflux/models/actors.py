@@ -27,9 +27,9 @@ class SequentialVoter(CongressMan):
         if id is None:
             id = get_id_generator().generate_actor_id()
         super().__init__(id)
-        self.name = name or f"Voter_{id}"
+        self.name: str = name or f"Voter_{id}"
         self.layers: List[Layer] = layers if layers is not None else []
-        self.aggregation_strategy = aggregation_strategy or SequentialAggregation()
+        self.aggregation_strategy: AggregationStrategy = aggregation_strategy or SequentialAggregation()
     
     def add_layer(self, layer: Layer) -> None:
         """Inject a new layer into the voter."""

@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Type
 
 import torch
 import torch.nn as nn
@@ -7,6 +7,7 @@ from typing_extensions import Self
 
 from ..core.id_generator import get_id_generator
 from ..core.layer_template import Layer
+from ..core.types import UtilitySpace
 
 class SequentialNeuralLayer(Layer, nn.Sequential):
     def __init__(
@@ -23,7 +24,7 @@ class SequentialNeuralLayer(Layer, nn.Sequential):
         Layer.__init__(self, id, name, input_size, output_size)
         nn.Sequential.__init__(self, *(architecture or []))
 
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.optimizer: Optional[torch.optim.Optimizer] = None
         self.loss_fn: Optional[nn.Module] = None
         self.train_loader: Optional[DataLoader] = None
@@ -34,7 +35,7 @@ class SequentialNeuralLayer(Layer, nn.Sequential):
         # ensure model parameters live on the chosen device
         self.to(self.device)
 
-    def call(self, bill_space: List[float], **kwargs) -> float:
+    def call(self, bill_space: UtilitySpace, **kwargs) -> float:
         tensor_input = torch.tensor(bill_space, dtype=torch.float32, device=self.device)
         output = self.forward(tensor_input)
         return float(output.squeeze().item())
@@ -83,8 +84,8 @@ class SequentialNeuralLayer(Layer, nn.Sequential):
         if self.train_loader is None:
             return
         for epoch in range(1, self.epochs + 1):
-            epoch_loss = 0.0
-            batch_count = 0
+            epoch_loss: float = 0.0
+            batch_count: int = 0
             for batch in self.train_loader:
                 loss = self._run_train_step(batch)
                 epoch_loss += loss
@@ -103,8 +104,8 @@ class SequentialNeuralLayer(Layer, nn.Sequential):
             return 0.0
 
         self.eval()
-        total_loss = 0.0
-        batch_count = 0
+        total_loss: float = 0.0
+        batch_count: int = 0
         with torch.no_grad():
             for batch in self.val_loader:
                 inputs, targets = batch
@@ -119,7 +120,7 @@ class SequentialNeuralLayer(Layer, nn.Sequential):
 
     def compile(
         self,
-        optimizer_cls=torch.optim.SGD,
+        optimizer_cls: Type[torch.optim.Optimizer] = torch.optim.SGD,
         lr: float = 1e-3,
         loss_fn: Optional[nn.Module] = None,
         epochs: int = 10,
@@ -139,4 +140,3 @@ class SequentialNeuralLayer(Layer, nn.Sequential):
             self.val_loader = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
 
         self.to(self.device)
-        return None

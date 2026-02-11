@@ -1,6 +1,7 @@
+from typing import List, Union
 import matplotlib.pyplot as plt
 
-def bake_a_pie(data: list[float, int], labels: list[str], title: str) -> None:
+def bake_a_pie(data: List[Union[float, int]], labels: List[str], title: str) -> None:
     """
     Generate and display a pie chart.
     

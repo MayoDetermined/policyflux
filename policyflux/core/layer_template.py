@@ -7,13 +7,13 @@ class Layer(ABC):
     def __init__(self, id: Optional[int] = None,
                 name: str = "",
                 input_dim: int = 2,
-                output_dim: int = 2,) -> None:
+                output_dim: int = 2) -> None:
         if id is None:
             id = get_id_generator().generate_layer_id()
-        self.id = id
-        self.input_dim = input_dim
-        self.output_dim = output_dim
-        self.name = name or self.__class__.__name__
+        self.id: int = id
+        self.input_dim: int = input_dim
+        self.output_dim: int = output_dim
+        self.name: str = name or self.__class__.__name__
 
     @abstractmethod
     def call(self, bill_space: UtilitySpace, **kwargs) -> float:

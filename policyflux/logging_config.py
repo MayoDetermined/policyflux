@@ -3,7 +3,7 @@ import logging
 from .config import get_settings
 
 
-def configure_logging():
+def configure_logging() -> None:
     settings = get_settings()
     level = getattr(logging, settings.log_level.upper(), logging.INFO)
     logging.basicConfig(level=level, format="%(asctime)s %(name)s %(levelname)s: %(message)s")
@@ -12,4 +12,4 @@ def configure_logging():
 configure_logging()
 
 # Export a package logger
-logger = logging.getLogger("policyflux")
+logger: logging.Logger = logging.getLogger("policyflux")

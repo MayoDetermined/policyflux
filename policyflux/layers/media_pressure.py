@@ -23,7 +23,7 @@ class MediaPressureLayer(Layer):
         if id is None:
             id = get_id_generator().generate_layer_id()
         super().__init__(id, name, input_dim, output_dim)
-        self.pressure = max(-1.0, min(1.0, pressure))
+        self.pressure: float = max(-1.0, min(1.0, pressure))
 
     def set_pressure(self, pressure: float) -> None:
         self.pressure = max(-1.0, min(1.0, pressure))
@@ -41,7 +41,7 @@ class MediaPressureLayer(Layer):
         speaker_agenda = kwargs.get("speaker_agenda_support")
         president_approval = kwargs.get("president_approval")
 
-        adjustment = 0.0
+        adjustment: float = 0.0
         if speaker_agenda is not None:
             adjustment += 0.2 * (max(0.0, min(1.0, speaker_agenda)) - 0.5)
         if president_approval is not None:

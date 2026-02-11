@@ -1,70 +1,46 @@
 from math import exp
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Any
 
-import torch
-from torch.nn import nn
+try:
+    import torch
+    import torch.nn as nn
+    HAS_TORCH = True
+except ImportError:
+    torch = None
+    nn = None
+    HAS_TORCH = False
 
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 from ..core.layer_template import Layer
 from ..core.id_generator import get_id_generator
-from ..core.types import UtilitySpace
+from ..core.types import PolicyPosition, PolicySpace, UtilitySpace
 
-## TO DO: Train functionality to be implemented
-
-class IdealPointLayer(Layer):
+class IdealPointLayer(Layer, PolicySpace):
     def __init__(self, 
                 id: Optional[int] = None,
                 input_dim: int = 2,
                 output_dim: int = 2,
-                space: Optional[UtilitySpace] = None,
-                status_quo: Optional[UtilitySpace] = None,
+                space: Optional[PolicySpace] = None,
+                status_quo: Optional[PolicySpace] = None,
                 name: str = "IdealPoint") -> None:
         if id is None:
             id = get_id_generator().generate_layer_id()
         super().__init__(id, name, input_dim, output_dim)
-        self.space = space if space is not None else []
-        self.status_quo = status_quo if status_quo is not None else []
-
-    # def train(self, data: Optional[List[UtilitySpace]] = None) -> None:
-    #     """Train the encoder by creating the `space` from provided data.
-
-    #     The `space` is set to the centroid (element-wise mean) of the
-    #     list of utility-space vectors in `data`. If `status_quo` is empty,
-    #     it will be initialized to the same centroid.
-
-    #     Args:
-    #         data: A list of utility-space vectors (each a sequence of numbers).
-
-    #     Raises:
-    #         ValueError: If no data is provided or input dimensions mismatch.
-    #     """
-    #     if not data:
-    #         raise ValueError("No data provided to train IdealPointEncoder")
-
-    #     # Validate consistent dimensions
-    #     first_len = len(data[0])
-    #     if any(len(d) != first_len for d in data):
-    #         raise ValueError("All samples in data must have the same dimensionality")
-
-    #     # Compute centroid (element-wise mean)
-    #     centroid = [sum(values) / len(data) for values in zip(*data)]
-
-    #     # Assign the learned space and (optionally) initialize status quo
-    #     self.space = centroid
-    #     if not self.status_quo:
-    #         self.status_quo = centroid.copy()
+        PolicySpace.__init__(self, input_dim)
+        self.space: PolicySpace = space if space is not None else PolicySpace(input_dim)
+        self.status_quo: PolicySpace = status_quo if status_quo is not None else PolicySpace(input_dim)
 
     def compile(self) -> None:
         pass
 
-    def _sq_distance(self, a: UtilitySpace, b: UtilitySpace) -> float:
-        if len(a) != len(b):
-            raise ValueError(f"Dimension mismatch: {len(a)} != {len(b)}")
-        return sum((x - y) ** 2 for x, y in zip(a, b))
+    def _sq_distance(self, a: PolicySpace, b: PolicySpace) -> float:
+        if a.dimensions != b.dimensions:
+            raise ValueError(f"Dimension mismatch: {a.dimensions} != {b.dimensions}")
+        return sum((x - y) ** 2 for x, y in zip(a.get_position(), b.get_position()))
 
-    def _delta_utility(self, bill_space: UtilitySpace) -> float:
+    def _delta_utility(self, bill_space: PolicySpace) -> float:
         return (
             self._sq_distance(self.space, self.status_quo)
             - self._sq_distance(self.space, bill_space)
@@ -76,19 +52,25 @@ class IdealPointLayer(Layer):
     def call(self, bill_space: UtilitySpace, **kwargs) -> float:
         delta_u = self._delta_utility(bill_space)
         return self._sigmoid(delta_u)
-    
-class IdealPointEncoderDF(nn.Module):
-    def __init__(self, output_dim: int, dataset: pd.DataFrame) -> None:
-        super().__init__()
-        input_dim = dataset.shape[1]
-        self.input_dim = input_dim
-        self.output_dim = output_dim
-        self.linear = nn.Linear(input_dim, output_dim)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+class IdealPointEncoderDF:
+    def __init__(self, output_dim: int, dataset: pd.DataFrame) -> None:
+        if not HAS_TORCH:
+            raise ImportError("torch is required for IdealPointEncoderDF")
+        input_dim: int = dataset.shape[1]
+        self.input_dim: int = input_dim
+        self.output_dim: int = output_dim
+        if HAS_TORCH and nn:
+            self.linear: Any = nn.Linear(input_dim, output_dim)
+        else:
+            self.linear = None
+
+    def forward(self, x: Any) -> Any:
+        if not HAS_TORCH:
+            raise ImportError("torch is required for forward pass")
         return torch.sigmoid(self.linear(x))
     
-    def encode(self, df: pd.DataFrame) -> torch.Tensor:
+    def encode(self, df: pd.DataFrame) -> Any:
         """Encode any DataFrame to output_dim dimensional space.
         
         Args:
@@ -100,6 +82,8 @@ class IdealPointEncoderDF(nn.Module):
         Raises:
             ValueError: If DataFrame dimensions don't match input_dim
         """
+        if not HAS_TORCH:
+            raise ImportError("torch is required for encode method")
         if df.shape[1] != self.input_dim:
             raise ValueError(
                 f"DataFrame has {df.shape[1]} columns, but encoder expects {self.input_dim}"
@@ -114,7 +98,7 @@ class IdealPointEncoderDF(nn.Module):
         
         return encoded
 
-class IdealPointTextEncoder(nn.Module):
+class IdealPointTextEncoder:
     def __init__(self, output_dim: int, corpus: List[str], max_features: int = 1000) -> None:
         """Text encoder that maps text documents to output_dim dimensional space.
         
@@ -123,18 +107,22 @@ class IdealPointTextEncoder(nn.Module):
             corpus: List of text documents to fit the vectorizer
             max_features: Maximum number of TF-IDF features to extract
         """
-        super().__init__()
-        self.output_dim = output_dim
-        self.max_features = max_features
+        if not HAS_TORCH:
+            raise ImportError("torch is required for IdealPointTextEncoder")
+        self.output_dim: int = output_dim
+        self.max_features: int = max_features
         
         # Initialize and fit TF-IDF vectorizer
-        self.vectorizer = TfidfVectorizer(max_features=max_features)
+        self.vectorizer: TfidfVectorizer = TfidfVectorizer(max_features=max_features)
         self.vectorizer.fit(corpus)
         
         # Linear layer to map from TF-IDF space to output_dim
-        self.linear = nn.Linear(len(self.vectorizer.get_feature_names_out()), output_dim)
+        if HAS_TORCH and nn:
+            self.linear: Any = nn.Linear(len(self.vectorizer.get_feature_names_out()), output_dim)
+        else:
+            self.linear = None
         
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: Any) -> Any:
         """Forward pass through the linear layer.
         
         Args:
@@ -143,9 +131,11 @@ class IdealPointTextEncoder(nn.Module):
         Returns:
             Tensor of shape (batch_size, output_dim)
         """
+        if not HAS_TORCH:
+            raise ImportError("torch is required for forward pass")
         return torch.sigmoid(self.linear(x))
     
-    def encode(self, texts: Union[List[str], str]) -> torch.Tensor:
+    def encode(self, texts: Union[List[str], str]) -> Any:
         """Encode text(s) to output_dim dimensional space.
         
         Args:
@@ -154,6 +144,8 @@ class IdealPointTextEncoder(nn.Module):
         Returns:
             Tensor of shape (n_texts, output_dim) representing the encoded space
         """
+        if not HAS_TORCH:
+            raise ImportError("torch is required for encode method")
         # Handle single string input
         if isinstance(texts, str):
             texts = [texts]

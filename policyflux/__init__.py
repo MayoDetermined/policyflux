@@ -14,26 +14,24 @@ from .core import *  # noqa: F401,F403
 from .config import get_settings, Settings  # noqa: F401
 from .logging_config import logger  # noqa: F401
 from .pfrandom import set_seed, get_rng, random  # noqa: F401
+from typing import Any
+import importlib
 
 
-def import_models():
+def import_models() -> Any:
 	"""Import `policyflux.models` on demand and return the module.
 
 	Use this to avoid importing model implementations at package import time.
 	"""
-	import importlib
-
 	return importlib.import_module("policyflux.models")
 
 
-def import_integration():
+def import_integration() -> Any:
 	"""Import `policyflux.integration` on demand and return the module."""
-	import importlib
-
 	return importlib.import_module("policyflux.integration")
 
 
-def get_layer_registry():
+def get_layer_registry() -> Any:
 	"""Return the layer registry from policyflux.integration."""
 	integration = import_integration()
 	return integration.LAYER_REGISTRY

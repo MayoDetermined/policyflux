@@ -23,8 +23,8 @@ class PartyDisciplineLayer(Layer):
             id = get_id_generator().generate_layer_id()
         super().__init__(id, name, input_dim, output_dim)
         self.whips: List[SequentialWhip] = party_whips if party_whips is not None else []
-        self.discipline_base_strength = max(0.0, min(1.0, discipline_base_strength))
-        self.party_line_support = max(0.0, min(1.0, party_line_support))
+        self.discipline_base_strength: float = max(0.0, min(1.0, discipline_base_strength))
+        self.party_line_support: float = max(0.0, min(1.0, party_line_support))
 
     def add_whip(self, whip: SequentialWhip) -> None:
         self.whips.append(whip)
@@ -48,7 +48,7 @@ class PartyDisciplineLayer(Layer):
     def _aggregate_whip_strength(self) -> float:
         if not self.whips:
             return self.discipline_base_strength
-        total = 0.0
+        total: float = 0.0
         for whip in self.whips:
             total += max(0.0, min(1.0, getattr(whip, "discipline_strength", 0.0)))
         avg = total / len(self.whips)
@@ -57,7 +57,7 @@ class PartyDisciplineLayer(Layer):
     def _aggregate_party_line(self) -> float:
         if not self.whips:
             return self.party_line_support
-        total = 0.0
+        total: float = 0.0
         for whip in self.whips:
             total += max(0.0, min(1.0, getattr(whip, "party_line_support", 0.5)))
         avg = total / len(self.whips)

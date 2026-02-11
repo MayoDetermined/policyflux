@@ -28,7 +28,7 @@ class SequentialCongressModel(CongressModel):
         self.speaker: Optional[SequentialSpeaker] = None
         self.president: Optional[SequentialPresident] = None
     
-    def cast_votes(self, bill: Bill, bill_space=None, **context) -> int:
+    def cast_votes(self, bill: Bill, bill_space: Optional[List[float]] = None, **context) -> int:
         """
         Cast votes from all congressmen on a bill.
         
@@ -69,7 +69,7 @@ class SequentialCongressModel(CongressModel):
             context.setdefault("president", self.president)
             context.setdefault("president_approval", getattr(self.president, "approval_rating", 0.5))
 
-        votes_for = 0
+        votes_for: int = 0
         for congressman in self.congressmen:
             if congressman.vote(bill, bill_space, **context):
                 votes_for += 1
@@ -91,7 +91,7 @@ class SequentialCongressModel(CongressModel):
             congressman.remove_layer(layer_id)
         return True
     
-    def add_n_congressmen(self, n: int, layers: list[Layer] = None) -> None:
+    def add_n_congressmen(self, n: int, layers: Optional[List[Layer]] = None) -> None:
         """Add n congressmen with unique IDs."""
         for _ in range(n):
             new_id = get_id_generator().generate_actor_id()

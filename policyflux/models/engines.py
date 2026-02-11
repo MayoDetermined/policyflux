@@ -44,7 +44,7 @@ class SequentialMonteCarlo:
             ylabel = 'Number of Votes'
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         if not self.results:
             return "No simulations run yet"
         

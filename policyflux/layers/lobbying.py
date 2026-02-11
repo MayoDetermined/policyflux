@@ -2,8 +2,7 @@ from typing import List, Optional, TypeAlias
 
 from policyflux.models.advanced_actors.lobby import SequentialLobbyer
 from ..core.layer_template import Layer
-
-utilitySpace: TypeAlias = List[float]
+from ..core.types import UtilitySpace
 
 ## TO DO: Complete implementation
 
@@ -19,22 +18,16 @@ class LobbyingLayer(Layer):
         super().__init__(id, name, input_dim, output_dim)
         if not 0.0 <= intensity <= 1.0:
             raise ValueError(f"Intensity must be in [0, 1], got {intensity}")
-        self.intensity = intensity  # [0, 1] intensity of lobbying pressure
+        self.intensity: float = intensity  # [0, 1] intensity of lobbying pressure
         
-        self.lobbysts: list[SequentialLobbyer] = []
+        self.lobbysts: List[SequentialLobbyer] = []
     
     def set_intensity(self, intensity: float) -> None:
         """Update lobbying intensity for a bill."""
         self.intensity = max(0.0, min(1.0, intensity))
 
     def add_lobbyst(self, lobbyst: SequentialLobbyer) -> None:
-        """
-        Docstring for add_lobbyst
-        
-        :param self: Description
-        :param lobbyst: Description
-        :type lobbyst: SequentialLobbyer
-        """
+        """Add a lobbyist to influence the layer."""
         self.lobbysts.append(lobbyst)
 
     def delete_lobbyst(self, lobbyst_id: Optional[int] = None) -> bool:
@@ -50,14 +43,8 @@ class LobbyingLayer(Layer):
                 return True
         return False
 
-    def pop_lobbyst(self) -> SequentialLobbyer:
-        """
-        Docstring for pop_lobbyst
-        
-        :param self: Description
-        :return: Description
-        :rtype: SequentialLobbyer
-        """
+    def pop_lobbyst(self) -> Optional[SequentialLobbyer]:
+        """Remove and return the last lobbyist."""
         if self.lobbysts:
             return self.lobbysts.pop()
         return None
@@ -69,7 +56,7 @@ class LobbyingLayer(Layer):
         if not self.lobbysts:
             return 0.0
 
-        total = 0.0
+        total: float = 0.0
         for lobbyst in self.lobbysts:
             strength = max(0.0, min(1.0, getattr(lobbyst, "influence_strength", 0.0)))
             stance = max(-1.0, min(1.0, getattr(lobbyst, "stance", 1.0)))
@@ -83,7 +70,7 @@ class LobbyingLayer(Layer):
             return base_prob + (1.0 - base_prob) * pressure
         return base_prob * (1.0 + pressure)
 
-    def call(self, bill_space: utilitySpace, **kwargs) -> float:
+    def call(self, bill_space: UtilitySpace, **kwargs) -> float:
         """
         Apply lobbying modifier to voting decision.
         

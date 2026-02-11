@@ -1,13 +1,13 @@
 from threading import Lock
-from typing import Dict
+from typing import Dict, Optional
 
 class IdGenerator:
     """
     Thread-safe centralized ID generator for unique identifiers across entities.
     """
     
-    _instance = None
-    _lock = Lock()
+    _instance: Optional["IdGenerator"] = None
+    _lock: Lock = Lock()
     _counters: Dict[str, int] = {}
     
     def __new__(cls):

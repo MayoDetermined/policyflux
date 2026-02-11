@@ -1,13 +1,13 @@
-from typing import Optional
+from typing import Optional, List
 from ..core.bill_template import Bill
 from ..core.id_generator import get_id_generator
 
 class SequentialBill(Bill):
-    def __init__(self, id: Optional[int] = None, position: Optional[list] = None) -> None:
+    def __init__(self, id: Optional[int] = None, position: Optional[List[float]] = None) -> None:
         if id is None:
             id = get_id_generator().generate_bill_id()
         super().__init__(id)
-        self.position: list[float] = position if position is not None else []
+        self.position: List[float] = position if position is not None else []
 
         self.n_passed: int = 0
         self.n_failed: int = 0

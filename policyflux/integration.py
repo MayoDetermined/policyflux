@@ -6,7 +6,7 @@ advanced actors, and simulation engines in a configurable way.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Callable, Dict, Iterable, List, Optional
+from typing import Any, Callable, Dict, Iterable, List, Optional, TypeAlias
 
 from .core.aggregation_strategy import (
     AggregationStrategy,
@@ -29,7 +29,7 @@ from .models.advanced_actors import (
     SequentialWhip,
 )
 from .layers import (
-    IdealPointEncoder,
+    IdealPointLayer,
     LobbyingLayer,
     MediaPressureLayer,
     PartyDisciplineLayer,
@@ -49,7 +49,7 @@ class LayerConfig:
     include_neural: bool = False
 
     layer_names: Optional[List[str]] = None
-    layer_overrides: Dict[str, Dict] = field(default_factory=dict)
+    layer_overrides: Dict[str, Dict[str, Any]] = field(default_factory=dict)
 
     public_support: float = 0.5
     lobbying_intensity: float = 0.0
@@ -68,7 +68,7 @@ class LayerBuilderContext:
     whips: Iterable[SequentialWhip]
 
 
-LayerFactory = Callable[[LayerBuilderContext, Dict], object]
+LayerFactory: TypeAlias = Callable[[LayerBuilderContext, Dict[str, Any]], object]
 
 
 LAYER_REGISTRY: Dict[str, LayerFactory] = {}
@@ -82,36 +82,36 @@ def build_layer_by_name(name: str, context: LayerBuilderContext) -> object:
     factory = LAYER_REGISTRY.get(name)
     if factory is None:
         raise KeyError(f"Layer '{name}' is not registered")
-    overrides = context.layer_config.layer_overrides.get(name, {})
+    overrides: Dict[str, Any] = context.layer_config.layer_overrides.get(name, {})
     return factory(context, overrides)
 
 
 def _register_default_layers() -> None:
-    def ideal_point_factory(ctx: LayerBuilderContext, overrides: Dict) -> object:
-        space = overrides.get(
+    def ideal_point_factory(ctx: LayerBuilderContext, overrides: Dict[str, Any]) -> object:
+        space: List[float] = overrides.get(
             "space", [pf_random() for _ in range(ctx.policy_dim)]
         )
-        status_quo = overrides.get("status_quo", [0.5] * ctx.policy_dim)
-        return IdealPointEncoder(space=space, status_quo=status_quo)
+        status_quo: List[float] = overrides.get("status_quo", [0.5] * ctx.policy_dim)
+        return IdealPointLayer(space=space, status_quo=status_quo)
 
-    def public_opinion_factory(ctx: LayerBuilderContext, overrides: Dict) -> object:
-        support = overrides.get("support_level", ctx.layer_config.public_support)
+    def public_opinion_factory(ctx: LayerBuilderContext, overrides: Dict[str, Any]) -> object:
+        support: float = overrides.get("support_level", ctx.layer_config.public_support)
         return PublicOpinionLayer(support_level=support)
 
-    def lobbying_factory(ctx: LayerBuilderContext, overrides: Dict) -> object:
-        intensity = overrides.get("intensity", ctx.layer_config.lobbying_intensity)
+    def lobbying_factory(ctx: LayerBuilderContext, overrides: Dict[str, Any]) -> object:
+        intensity: float = overrides.get("intensity", ctx.layer_config.lobbying_intensity)
         lobbying = LobbyingLayer(intensity=intensity)
         for lobbyer in ctx.lobbyists:
             lobbying.add_lobbyst(lobbyer)
         return lobbying
 
-    def media_factory(ctx: LayerBuilderContext, overrides: Dict) -> object:
-        pressure = overrides.get("pressure", ctx.layer_config.media_pressure)
+    def media_factory(ctx: LayerBuilderContext, overrides: Dict[str, Any]) -> object:
+        pressure: float = overrides.get("pressure", ctx.layer_config.media_pressure)
         return MediaPressureLayer(pressure=pressure)
 
-    def party_factory(ctx: LayerBuilderContext, overrides: Dict) -> object:
-        party_line = overrides.get("party_line_support", ctx.layer_config.party_line_support)
-        discipline = overrides.get(
+    def party_factory(ctx: LayerBuilderContext, overrides: Dict[str, Any]) -> object:
+        party_line: float = overrides.get("party_line_support", ctx.layer_config.party_line_support)
+        discipline: float = overrides.get(
             "discipline_base_strength", ctx.layer_config.party_discipline_strength
         )
         return PartyDisciplineLayer(
@@ -221,7 +221,7 @@ def build_layers(
 
     if layer_cfg.include_ideal_point:
         layers.append(
-            IdealPointEncoder(
+            IdealPointLayer(
                 space=[pf_random() for _ in range(config.policy_dim)],
                 status_quo=[0.5] * config.policy_dim,
             )
