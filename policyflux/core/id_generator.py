@@ -1,7 +1,6 @@
 from threading import Lock
 from typing import Dict
 
-
 class IdGenerator:
     """
     Thread-safe centralized ID generator for unique identifiers across entities.

@@ -1,4 +1,4 @@
-﻿from .idealpoint import IdealPointEncoder
+﻿from .idealpoint import IdealPointLayer, IdealPointEncoderDF
 from .lobbying import LobbyingLayer
 from .public_pressure import PublicOpinionLayer
 from .media_pressure import MediaPressureLayer
