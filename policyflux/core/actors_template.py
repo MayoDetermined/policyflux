@@ -10,4 +10,14 @@ class CongressMan(ABC):
 
     @abstractmethod
     def vote(self, bill: Bill, **kwargs) -> bool:
+        """
+        Docstring for vote
+        
+        :param self: Description
+        :param bill: Description
+        :type bill: Bill
+        :param kwargs: Description
+        :return: Description
+        :rtype: bool
+        """
         pass
