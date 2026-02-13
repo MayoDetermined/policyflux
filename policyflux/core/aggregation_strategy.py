@@ -108,36 +108,17 @@ class WeightedAggregation(AggregationStrategy):
 class MultiplicativeAggregation(AggregationStrategy):
     """
     Multiplicative aggregation: multiply all layer outputs.
-    
+
     This creates a "veto" effect where low probability from any layer
     significantly reduces the final probability.
     """
-    
+
     def aggregate(self, layers: List[Layer], bill_space: UtilitySpace, **context) -> float:
         if not layers:
             return 0.5
-        
+
         result: float = 1.0
         for layer in layers:
             result *= layer.call(bill_space, **context)
-        
-        return max(0.0, min(1.0, result))
 
-
-class MultiplicativeAggregation(AggregationStrategy):
-    """
-    Multiplicative aggregation: multiply all layer outputs.
-    
-    This creates a "veto" effect where low probability from any layer
-    significantly reduces the final probability.
-    """
-    
-    def aggregate(self, layers: List[Layer], bill_space: UtilitySpace, **context) -> float:
-        if not layers:
-            return 0.5
-        
-        result = 1.0
-        for layer in layers:
-            result *= layer.call(bill_space, **context)
-        
         return max(0.0, min(1.0, result))

@@ -653,7 +653,7 @@ Projekt inspirowany badaniami z zakresu:
 
 - **Issues**: [GitHub Issues](https://github.com/yourusername/policyflux/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/yourusername/policyflux/discussions)
-- **Email**: your.email@example.com
+- **Email**: pawelecpiotr404@gmail.com
 
 ---
 
