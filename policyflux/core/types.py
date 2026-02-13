@@ -26,3 +26,6 @@ class PolicySpace:
     def get_position(self) -> PolicyPosition:
         """Get actor's current position in policy space."""
         return self._position.copy()  # Return copy for immutability
+    
+    def __str__(self):
+        return f"PolicySpace(dimensions={self.dimensions}, position={self._position})"

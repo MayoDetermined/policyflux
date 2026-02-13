@@ -45,7 +45,7 @@ def run_scenario(scenario: Scenario) -> dict:
     print(f"Pass rate: {pass_rate:.1%} | Średni margines: {avg_margin:.2f}")
 
     return {
-        "name": scenario.name,
+        "name": scenario.name,  
         "avg_votes_for": avg_votes_for,
         "avg_votes_against": total - avg_votes_for,
         "pass_rate": pass_rate,
