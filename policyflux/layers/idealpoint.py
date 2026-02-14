@@ -24,6 +24,8 @@ from ..core.layer_template import Layer
 from ..core.id_generator import get_id_generator
 from ..core.types import PolicyPosition, PolicySpace, UtilitySpace
 
+from data_layer_processor_template import LayerDataProcessor
+
 class IdealPointLayer(Layer, PolicySpace):
     def __init__(self, 
                 id: Optional[int] = None,
@@ -75,7 +77,7 @@ class IdealPointLayer(Layer, PolicySpace):
         delta_u = self._delta_utility(bill_space)
         return self._sigmoid(delta_u)
 
-class IdealPointEncoderDF:
+class IdealPointEncoderDF(LayerDataProcessor):
     def __init__(self, output_dim: int, dataset: pd.DataFrame) -> None:
         if not HAS_TORCH:
             raise ImportError("torch is required for IdealPointEncoderDF")
@@ -120,7 +122,7 @@ class IdealPointEncoderDF:
         
         return encoded
 
-class IdealPointTextEncoder:
+class IdealPointTextEncoder(LayerDataProcessor):
     def __init__(self,
                  output_dim: int,
                  corpus: List[str],

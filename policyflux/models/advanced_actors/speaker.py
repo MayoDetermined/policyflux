@@ -4,7 +4,9 @@ from policyflux.core.id_generator import get_id_generator
 from policyflux.layers.idealpoint import IdealPointLayer, IdealPointEncoderDF, IdealPointTextEncoder
 from policyflux.core.types import PolicySpace
 
-class SequentialSpeaker:
+from policyflux.core.complex_actors_template import ComplexActor
+
+class SequentialSpeaker(ComplexActor):
     """Represents a speaker with agenda-setting strength."""
 
     def __init__(

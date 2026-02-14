@@ -3,8 +3,9 @@ from typing import Optional
 from policyflux.core.id_generator import get_id_generator
 from policyflux.core.types import PolicySpace
 
+from policyflux.core.executive import ExeciveActor
 
-class SequentialPresident:
+class SequentialPresident(ExeciveActor):
     """Represents the president with an approval rating."""
 
     def __init__(

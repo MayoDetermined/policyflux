@@ -1,10 +1,10 @@
 from typing import Optional
 
+from policyflux.core.complex_actors_template import ComplexActor
 from policyflux.core.id_generator import get_id_generator
 from policyflux.core.types import PolicySpace
 
-
-class SequentialWhip:
+class SequentialWhip(ComplexActor):
     """Represents a party whip enforcing party discipline."""
 
     def __init__(

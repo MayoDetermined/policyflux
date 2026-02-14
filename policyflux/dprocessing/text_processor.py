@@ -3,8 +3,11 @@ from torch.nn.utils.rnn import pad_sequence
 import re
 from collections import Counter
 
-class SimpleTextVectorizer:
+from data_processor_template import DataProcessor
+
+class SimpleTextVectorizer(DataProcessor):
     def __init__(self, texts_to_process: list[str], tokenizer_name: str = 'basic_english'):
+        super().__init__(name="SimpleTextVectorizer")
         self.texts = texts_to_process
         self.tokenizer_name = tokenizer_name
         self.vocab = None
@@ -51,6 +54,11 @@ class SimpleTextVectorizer:
         tokenized_batch = [torch.tensor(self.text_pipeline(text), dtype=torch.long) for text in batch]
         padded_batch = pad_sequence(tokenized_batch, batch_first=True, padding_value=0)
         return padded_batch
+    
+    def fit(self, data):
+        # TO DO: Implement fit method if needed. For text processing, this might involve building the vocabulary.
+        """Easily fit the processor to the data (build vocab)"""
+        pass
     
     def process(self) -> torch.Tensor:
         """Process all texts and return as padded tensor"""

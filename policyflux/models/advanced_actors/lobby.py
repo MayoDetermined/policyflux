@@ -1,9 +1,10 @@
 from typing import Optional
 
+from policyflux.core.complex_actors_template import ComplexActor
 from policyflux.core.id_generator import get_id_generator
 
 
-class SequentialLobbyer:
+class SequentialLobbyer(ComplexActor):
     """Represents a lobbying actor with influence strength and stance."""
 
     def __init__(
