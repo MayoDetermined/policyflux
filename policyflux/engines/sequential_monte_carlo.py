@@ -9,19 +9,16 @@ from ..core.congress_model_template import CongressModel
 from policyflux import pfrandom
 from policyflux.logging_config import logger
 
-@dataclass(frozen=True)
-class Session:
-    n: int
-    seed: int
-    bill: Bill
-    description: str
-    congress_model: CongressModel
+from .sessions_mamagment import Session
 
-# TO DO
-class SequentialDeterministic:
-    pass
+from .engine_template import Engine
 
-class SequentialMonteCarlo:
+class SequentialMonteCarlo(Engine):
+    
+    """Sequential Monte Carlo engine that runs multiple simulations of the congress model.
+    This engine is useful for estimating the distribution of outcomes based on the initial conditions of the model.
+    Useful for stochastic models and when you want to get a sense of the variability in outcomes."""
+    
     def __init__(self, session_params: Session) -> None:
         self.n_simulations: int = session_params.n
         self.congress_model: CongressModel = session_params.congress_model
@@ -29,7 +26,7 @@ class SequentialMonteCarlo:
         self.results: List[int] = []
         self.seed: int = session_params.seed
 
-    def run_simulation(self) -> List[int]:
+    def run(self) -> List[int]:
         # Ensure deterministic randomness for voting across runs
         # Use package RNG manager so all modules draw from the same source.
         pfrandom.set_seed(self.seed)
@@ -37,16 +34,6 @@ class SequentialMonteCarlo:
             result = self.congress_model.cast_votes(self.bill)
             self.results.append(result)
         return self.results
-    
-    def get_pretty_votes(self) -> None:
-        avg_votes_for = sum(self.results) / len(self.results)
-        craft_a_bar(
-            data = [avg_votes_for, len(self.congress_model.congressmen) - avg_votes_for],
-            labels = ['Votes For', 'Votes Against'],
-            title = 'Average Voting Results',
-            xlabel = 'Vote Type',
-            ylabel = 'Number of Votes'
-        )
 
     def __str__(self) -> str:
         if not self.results:
