@@ -142,21 +142,21 @@ python -c "import policyflux; print(policyflux.__file__)"
 ### Najprostsza symulacja (30 sekund)
 
 ```python
-from policyflux.integration import IntegrationConfig, LayerConfig, build_engine
+from policyflux import build_engine, IntegrationConfig, LayerConfig
 
 # Konfiguracja symulacji
 config = IntegrationConfig(
-    num_actors=50,           # 50 posłów
-    policy_dim=2,            # 2D: Left-Right + Liberal-Conservative
-    iterations=100,          # 100 głosowań
-    seed=12345,              # Deterministyczny RNG
+    num_actors=50,            # 50 posłów
+    policy_dim=2,             # 2D: Left-Right + Liberal-Conservative
+    iterations=100,           # 100 głosowań
+    seed=12345,               # Deterministyczny RNG
     description="Moja pierwsza symulacja",
     layer_config=LayerConfig(
-        include_ideal_point=True,      # Preferencje ideologiczne
-        include_public_opinion=True,   # Opinia publiczna
-        include_party_discipline=True, # Dyscyplina partyjna
-        public_support=0.60,           # 60% poparcia publicznego
-        party_discipline_strength=0.5, # Średnia dyscyplina
+        include_ideal_point=True,       # Preferencje ideologiczne
+        include_public_opinion=True,    # Opinia publiczna
+        include_party_discipline=True,  # Dyscyplina partyjna
+        public_support=0.60,            # 60% poparcia publicznego
+        party_discipline_strength=0.5,  # Średnia dyscyplina
     ),
 )
 
@@ -166,38 +166,69 @@ engine.run_simulation()
 
 # Wyniki
 print(engine)
-engine.get_pretty_votes()
 ```
 
-### Uruchom gotowe przykłady
+### Przykład: Porównanie systemów politycznych
 
-```bash
-# Najprostsze głosowanie
-python examples/01_basic_voting.py
+```python
+from policyflux import build_engine
+from policyflux import create_presidential_config, create_parliamentary_config
 
-# Wszystkie warstwy decyzyjne
-python examples/02_all_layers_showcase.py
+# System prezydencki (USA)
+prez_config = create_presidential_config(
+    num_actors=100,
+    policy_dim=2,
+    iterations=200,
+    seed=42,
+    president_approval=0.52,
+)
+prez_engine = build_engine(prez_config)
+prez_engine.run_simulation()
 
-# Porównanie systemów politycznych
-python examples/03_executive_systems.py
+# System parlamentarny (UK)
+parl_config = create_parliamentary_config(
+    num_actors=100,
+    policy_dim=2,
+    iterations=200,
+    seed=42,
+)
+parl_engine = build_engine(parl_config)
+parl_engine.run_simulation()
 
-# Strategie agregacji
-python examples/04_aggregation_strategies.py
+# Porównanie
+print(f"Prezydencki: {prez_engine.pass_rate:.1%}")
+print(f"Parlamentarny: {parl_engine.pass_rate:.1%}")
+```
 
-# Integracja ML/PyTorch
-python examples/05_ml_integration.py
+### Przykład: Zaawansowani aktorzy
 
-# Zaawansowani aktorzy
-python examples/06_advanced_actors.py
+```python
+from policyflux import build_engine, IntegrationConfig, LayerConfig, AdvancedActorsConfig
 
-# Analiza scenariuszy "what-if"
-python examples/07_scenario_analysis.py
+config = IntegrationConfig(
+    num_actors=80,
+    policy_dim=2,
+    iterations=150,
+    seed=999,
+    layer_config=LayerConfig(
+        include_ideal_point=True,
+        include_lobbying=True,
+        include_party_discipline=True,
+        lobbying_intensity=0.4,
+        party_discipline_strength=0.6,
+    ),
+    actors_config=AdvancedActorsConfig(
+        n_lobbyists=5,                    # 5 lobbyistów
+        lobbyist_strength=0.5,            # Siła wpływu
+        n_whips=3,                        # 3 party whips
+        whip_discipline_strength=0.7,     # Dyscyplina
+        speaker_agenda_support=0.6,       # Speaker wspiera ustawę
+    ),
+)
 
-# Text encoders dla ideal points
-python examples/08_text_encoder_idealpoints.py
-
-# Prosty showcase
-python simple_simulation.py
+engine = build_engine(config)
+engine.run_simulation()
+print(engine)
 ```
 
 ---
@@ -252,83 +283,90 @@ PolicyFlux
 
 **Podstawowe abstrakcje i szablony:**
 
-- **`actors_template.py`**: Bazowe klasy dla posłów (Actor, Voter)
-- **`bill_template.py`**: Reprezentacja projektów ustaw (Bill)
-- **`congress_model_template.py`**: Model parlamentu (CongressModel)
-- **`layer_template.py`**: Abstrakcja warstw decyzyjnych (Layer, DecisionLayer)
-- **`executive.py`**: Abstrakcje dla egzekutywy (ExecutiveActor, Executive)
-- **`aggregation_strategy.py`**: Strategie łączenia output warstw
-- **`types.py`**: PolicySpace, UtilitySpace
-- **`id_generator.py`**: Generator unikalnych ID
+- **`simple_actors_template.py`**: `CongressMan` - bazowa klasa posła
+- **`complex_actors_template.py`**: `ComplexActor` - posłowie z zaawansowanym zachowaniem
+- **`bill_template.py`**: `Bill` - abstrakcja dla projektów ustaw
+- **`congress_model_template.py`**: `CongressModel` - abstrakcja dla parlamentu
+- **`layer_template.py`**: `Layer` - abstrakcja warstw decyzyjnych
+- **`executive.py`**: `ExecutiveActor`, `Executive` - abstrakcje dla egzekutywy
+- **`aggregation_strategy.py`**: Strategie łączenia output warstw (Sequential, Average, Weighted, Multiplicative)
+- **`types.py`**: Definicje typów (`PolicySpace`, `PolicyVector`, `UtilitySpace`, `PolicyPosition`)
+- **`contexts.py`** (NEW): `VotingContext`, `SimulationContext` - immutable konteksty decyzyjne
+- **`voting_strategy.py`** (NEW): `VotingStrategy`, `ProbabilisticVoting`, `DeterministicVoting` - strategie głosowania
+- **`container.py`** (NEW): `ServiceContainer` - lekkie dependency injection
 
 ### 2. Layers (policyflux/layers/)
 
 **Warstwy decyzyjne modyfikujące prawdopodobieństwo głosowania:**
 
-| Warstwa | Opis | Parametry kluczowe |
-|---------|------|-------------------|
-| **IdealPoint** | Bazowe preferencje ideologiczne, dystans w przestrzeni politycznej | `policy_dim` |
-| **PublicOpinion** | Wpływ opinii publicznej na głosowanie | `public_support` [0, 1] |
-| **Lobbying** | Naciski lobbyistów i grup interesów | `lobbying_intensity` [0, 1] |
-| **MediaPressure** | Wpływ mediów i pressure publicznego | `media_pressure` [0, 1] |
-| **PartyDiscipline** | Dyscyplina partyjna i linia partii | `discipline_strength`, `party_line_support` |
-| **GovernmentAgenda** | Kontrola agendy przez PM (systemy parlamentarne) | `pm_strength` |
-| **Neural** | PyTorch neural networks jako decision layer | `model`, `training_data` |
+| Warstwa | Plik | Opis |
+|---------|------|------|
+| **IdealPoint** | `idealpoint.py` | Preferencje ideologiczne, dystans w przestrzeni politycznej |
+| **PublicOpinion** | `public_pressure.py` | Wpływ opinii publicznej na głosowanie |
+| **Lobbying** | `lobbying.py` | Naciski lobbyistów i grup interesów |
+| **MediaPressure** | `media_pressure.py` | Wpływ mediów |
+| **PartyDiscipline** | `party.py` | Dyscyplina partyjna i linia partii |
+| **GovernmentAgenda** | `government_agenda.py` | Kontrola agendy przez PM (systemy parlamentarne) |
+| **Neural** | `neural.py` | PyTorch neural networks jako decision layer |
+| **Text Encoders** | `idealpoint.py` | `IdealPointTextEncoder`, `IdealPointEncoderDF` dla text→ideal points |
 
-### 3. Models (policyflux/models/)
+### 3. Toolbox (policyflux/toolbox/)
 
-**Implementacje modeli i silników:**
+**Konkretne implementacje abstrakcji:**
 
-- **`actors.py`**: SequentialVoter z multi-layer decision making
-- **`bill.py`**: SequentialBill z pozycją w policy space
-- **`congress_model.py`**: SequentialCongressModel z głosowaniem
-- **`engines.py`**: SequentialMonteCarlo, Session
-- **`executive_systems.py`**: 
-  - PresidentialExecutive (veto power, approval rating)
-  - ParliamentaryExecutive (agenda control, confidence votes)
-  - SemiPresidentialExecutive (kohabitacja)
+- **`actors.py`**: `SequentialVoter` - głosujący posły z wielowarstwowym podejmowaniem decyzji
+- **`bill.py`**: `SequentialBill` - projekty ustaw z pozycją w policy space
+- **`congress_model.py`**: `SequentialCongressModel` - model parlamentu z głosowaniem
+- **`executive_systems.py`**:
+  - `PresidentialExecutive` (model prezydencki z veto)
+  - `ParliamentaryExecutive` (model parlamentarny z kontrolą agendy)
+  - `SemiPresidentialExecutive` (model półprezydencki)
 
-**Advanced Actors** (policyflux/models/advanced_actors/):
-- **`speaker.py`**: SequentialSpeaker (agenda setting)
-- **`whips.py`**: SequentialWhip (party discipline)
-- **`lobby.py`**: SequentialLobbyer (influence campaigns)
-- **`white_house.py`**: SequentialPresident (executive influence)
+**Advanced Actors** (policyflux/toolbox/advanced_actors/):
+- **`speaker.py`**: `SequentialSpeaker` - kontrola agendy i scheduling power
+- **`whips.py`**: `SequentialWhip` - egzekwowanie dyscypliny partyjnej
+- **`lobby.py`**: `SequentialLobbyer` - kampanie lobbyingowe
+- **`white_house.py`**: `SequentialPresident` - wpływ egzekutywy
 
-### 4. Integration (policyflux/integration.py)
+### 4. Engines (policyflux/engines/)
 
-**High-level API do budowy symulacji:**
+**Silniki symulacji:**
 
-```python
-from policyflux.integration import (
-    IntegrationConfig,
-    LayerConfig,
-    AdvancedActorsConfig,
-    build_engine,
-    create_presidential_config,
-    create_parliamentary_config,
-    create_semi_presidential_config,
-)
-```
+- **`engine_template.py`**: `Engine`, `MPEngine` - klasy bazowe
+- **`parallel_monte_carlo.py`**: `ParallelMonteCarlo` - wielowątkowe/wieloprocesowe Monte Carlo
+- **`deterministic_engine.py`**: `DeterministicEngine` - głosowanie deterministyczne
+- **`engine_template.py`**: `Session` - pojedyncza sesja głosowania
 
-**Główne klasy konfiguracyjne:**
-- `IntegrationConfig`: Główna konfiguracja symulacji
-- `LayerConfig`: Konfiguracja warstw decyzyjnych
-- `AdvancedActorsConfig`: Konfiguracja zaawansowanych aktorów
+### 5. Integration (policyflux/integration/)
 
-### 5. Data Processing (policyflux/dprocessing/)
+**High-level API do budowy symulacji (NOW REFACTORED):**
+
+- **`config.py`**: `IntegrationConfig`, `LayerConfig`, `AdvancedActorsConfig` - klasy konfiguracyjne
+- **`builders/engine_builder.py`**: `build_engine()`, `build_session()`, `build_bill()` - fabryki
+- **`builders/congress_builder.py`**: `build_congress()` - budowanie parlamentu
+- **`builders/layer_builder.py`**: `build_layers()` - budowanie warstw decyzyjnych
+- **`builders/actor_builder.py`**: `build_executive()`, `build_advanced_actors()` - budowanie aktorów
+- **`presets/president_preset.py`**: `create_presidential_config()` - preset dla systemów prezydenckich
+- **`presets/parliament_preset.py`**: `create_parliamentary_config()` - preset dla systemów parlamentarnych
+- **`presets/semipresident_preset.py`**: `create_semi_presidential_config()` - preset dla systemów półprezydenckich
+- **`registry.py`**: `LAYER_REGISTRY`, `register_layer()` - dynamiczna rejestracja warstw
+
+### 6. Data Processing (policyflux/dprocessing/)
 
 **Przetwarzanie tekstów do przestrzeni politycznej:**
 
-- **`text_processor.py`**: SimpleTextVectorizer (tokenizacja, vocab)
-- **IdealPointTextEncoder**: TF-IDF + sentence embeddings → ideal points
-- **IdealPointEncoderDF**: DataFrame → policy space
+- Text vectorizers dla kodowania tekstów politycznych
+- TF-IDF + sentence embeddings dla ekstrakcji ideal points
+- Integracja z `sentence-transformers`
 
-### 6. Utils (policyflux/utils/)
+### 7. Utils (policyflux/utils/)
 
 **Narzędzia pomocnicze:**
 
-- **`reports/bar_charts.py`**: Wykresy słupkowe wyników głosowań
-- **`reports/pie_charts.py`**: Wykresy kołowe podziałów
+- **`reports/bar_charts.py`**: `craft_a_bar()` - wykresy słupkowe
+- **`reports/pie_charts.py`**: `bake_a_pie()` - wykresy kołowe
+- RNG management (`pfrandom.py`)
+- Logging configuration
 
 ---
 
@@ -337,19 +375,20 @@ from policyflux.integration import (
 ### Przykład 1: Podstawowe głosowanie ideologiczne
 
 ```python
-from policyflux.integration import IntegrationConfig, LayerConfig, build_engine
+from policyflux import build_engine, IntegrationConfig, LayerConfig
 
 config = IntegrationConfig(
     num_actors=50,
-    policy_dim=1,  # 1D: Left-Right tylko
+    policy_dim=1,  # 1D: Left-Right
     iterations=100,
     seed=12345,
     layer_config=LayerConfig(
-        include_ideal_point=True,  # Tylko preferencje ideologiczne
+        include_ideal_point=True,   # Tylko ideologia
         include_public_opinion=False,
         include_lobbying=False,
         include_media_pressure=False,
         include_party_discipline=False,
+        include_government_agenda=False,
     ),
 )
 
@@ -358,54 +397,53 @@ engine.run_simulation()
 print(engine)
 ```
 
-### Przykład 2: Porównanie systemów politycznych
+### Przykład 2: Wpływ opinii publicznej
 
 ```python
-from policyflux.integration import (
-    create_presidential_config,
-    create_parliamentary_config,
-    build_engine,
-)
+from policyflux import build_engine, IntegrationConfig, LayerConfig
 
-# System prezydencki (USA)
-prez_config = create_presidential_config(
+# Scenariusz 1: Bez poparcia publicznego
+config_no_support = IntegrationConfig(
     num_actors=100,
-    policy_dim=3,
+    policy_dim=2,
     iterations=200,
     seed=42,
-    president_approval=0.52,
-    veto_override_threshold=2/3,
+    layer_config=LayerConfig(
+        include_ideal_point=True,
+        include_public_opinion=True,
+        public_support=0.2,  # Tylko 20% poparcia
+    ),
 )
-prez_engine = build_engine(prez_config)
-prez_engine.run_simulation()
 
-# System parlamentarny (UK)
-parl_config = create_parliamentary_config(
+# Scenariusz 2: Z silnym poparciem publicznym
+config_high_support = IntegrationConfig(
     num_actors=100,
-    policy_dim=3,
+    policy_dim=2,
     iterations=200,
     seed=42,
-    pm_strength=0.7,
-    party_discipline=0.8,
+    layer_config=LayerConfig(
+        include_ideal_point=True,
+        include_public_opinion=True,
+        public_support=0.8,  # 80% poparcia
+    ),
 )
-parl_engine = build_engine(parl_config)
-parl_engine.run_simulation()
 
-# Porównanie wyników
-print(f"Presidential pass rate: {prez_engine.pass_rate:.2%}")
-print(f"Parliamentary pass rate: {parl_engine.pass_rate:.2%}")
+engine1 = build_engine(config_no_support)
+engine1.run_simulation()
+
+engine2 = build_engine(config_high_support)
+engine2.run_simulation()
+
+print(f"Bez poparcia: {engine1.pass_rate:.1%}")
+print(f"Z poparciem: {engine2.pass_rate:.1%}")
 ```
 
-### Przykład 3: Zaawansowani aktorzy (lobbyści, whips)
+### Przykład 3: Wielowarstwowy model decyzyjny
 
 ```python
-from policyflux.integration import (
-    IntegrationConfig,
-    LayerConfig,
-    AdvancedActorsConfig,
-    build_engine,
-)
+from policyflux import build_engine, IntegrationConfig, LayerConfig
 
+# Wszystkie warstwy decyzyjne
 config = IntegrationConfig(
     num_actors=80,
     policy_dim=2,
@@ -413,18 +451,15 @@ config = IntegrationConfig(
     seed=999,
     layer_config=LayerConfig(
         include_ideal_point=True,
+        include_public_opinion=True,
         include_lobbying=True,
+        include_media_pressure=True,
         include_party_discipline=True,
-        lobbying_intensity=0.4,
+        include_government_agenda=False,  # Nie parlamentarny
+        public_support=0.55,
+        lobbying_intensity=0.3,
+        media_pressure=0.4,
         party_discipline_strength=0.6,
-    ),
-    actors_config=AdvancedActorsConfig(
-        n_lobbyists=5,              # 5 lobbyistów
-        lobbyist_strength=0.5,      # Średnia siła wpływu
-        lobbyist_stance=0.8,        # Pro-bill stance
-        n_whips=3,                  # 3 whips
-        whip_discipline_strength=0.7,  # Silna dyscyplina
-        speaker_agenda_support=0.6,    # Speaker wspiera ustawę
     ),
 )
 
@@ -433,73 +468,100 @@ engine.run_simulation()
 print(engine)
 ```
 
-### Przykład 4: Analiza scenariuszy "what-if"
+### Przykład 4: Porównanie systemów politycznych
 
 ```python
-from policyflux.integration import IntegrationConfig, LayerConfig, build_engine
+from policyflux import build_engine
+from policyflux import create_presidential_config, create_parliamentary_config
 
-# SCENARIUSZ 1: Status quo
-base_config = IntegrationConfig(
+# System prezydencki (USA-style)
+prez_config = create_presidential_config(
     num_actors=100,
     policy_dim=2,
     iterations=200,
-    seed=2024,
-    layer_config=LayerConfig(
-        include_ideal_point=True,
-        include_public_opinion=True,
-        public_support=0.55,  # Neutralne poparcie
-    ),
+    seed=42,
+    president_approval=0.50,
+    veto_override_threshold=2/3,
 )
 
-# SCENARIUSZ 2: Mobilizacja oddolna (grassroots)
-grassroots_config = IntegrationConfig(
+# System parlamentarny (UK-style)
+parl_config = create_parliamentary_config(
     num_actors=100,
     policy_dim=2,
     iterations=200,
-    seed=2024,
-    layer_config=LayerConfig(
-        include_ideal_point=True,
-        include_public_opinion=True,
-        public_support=0.85,  # Wysokie poparcie!
-    ),
+    seed=42,
+    pm_strength=0.75,
+    party_discipline=0.7,
 )
 
-# Uruchom oba scenariusze
-base_engine = build_engine(base_config)
-base_engine.run_simulation()
+prez_engine = build_engine(prez_config)
+prez_engine.run_simulation()
 
-grassroots_engine = build_engine(grassroots_config)
-grassroots_engine.run_simulation()
+parl_engine = build_engine(parl_config)
+parl_engine.run_simulation()
 
-# Porównaj
-print(f"Status quo: {base_engine.pass_rate:.1%}")
-print(f"Grassroots: {grassroots_engine.pass_rate:.1%}")
+print(f"System prezydencki: {prez_engine.pass_rate:.1%}")
+print(f"System parlamentarny: {parl_engine.pass_rate:.1%}")
 ```
 
-### Przykład 5: Machine Learning integration
+### Przykład 5: Zaawansowani aktorzy (Whips, Lobbyiści, Speaker)
 
 ```python
-from policyflux.layers.idealpoint import IdealPointTextEncoder
+from policyflux import build_engine, IntegrationConfig, LayerConfig, AdvancedActorsConfig
 
-# Korpus tekstów politycznych
+# Model z lobbyistami i party whips
+config = IntegrationConfig(
+    num_actors=100,
+    policy_dim=2,
+    iterations=200,
+    seed=2024,
+    layer_config=LayerConfig(
+        include_ideal_point=True,
+        include_lobbying=True,
+        include_party_discipline=True,
+        lobbying_intensity=0.5,
+        party_discipline_strength=0.7,
+    ),
+    actors_config=AdvancedActorsConfig(
+        n_lobbyists=8,                     # 8 organizacji lobbyingowych
+        lobbyist_strength=0.6,             # Silny lobbing
+        lobbyist_stance=0.85,              # Większość wspiera ustawę
+        n_whips=4,                         # 4 party whips
+        whip_discipline_strength=0.8,      # Silna dyscyplina
+        speaker_agenda_support=0.7,        # Speaker wspiera ustawę
+    ),
+)
+
+engine = build_engine(config)
+engine.run_simulation()
+print(engine)
+```
+
+### Przykład 6: Integracja z Text Encoders (NLP)
+
+```python
+from policyflux.layers import IdealPointTextEncoder
+
+# Korpus wypowiedzi politycznych
 corpus = [
-    "We need to increase taxes on the wealthy to fund social programs",
-    "Lower taxes will stimulate economic growth and create jobs",
-    "Healthcare is a human right and should be universally provided",
-    "Free market competition improves healthcare quality",
+    "Musimy zwiększyć podatki dla bogatych, aby finansować programy społeczne",
+    "Niskie podatki stymulują wzrost gospodarczy i tworzą miejsca pracy",
+    "Opieka zdrowotna to prawo człowieka i powinna być uniwersalna",
+    "Wolny rynek poprawia jakość opieki zdrowotnej",
+    "Musimy walczyć ze zmianami klimatu za wszelką cenę",
+    "Ekologizm zagraża konkurencyjności gospodarki",
 ]
 
-# Encoder: text → 2D ideal point space
+# Encoder: tekst → 2D przestrzeń polityczna
 encoder = IdealPointTextEncoder(
     output_dim=2,  # 2D: Economic + Social
     corpus=corpus,
     use_embeddings=True,  # TF-IDF + sentence embeddings
     embedding_model="all-MiniLM-L6-v2",
-    hidden_dims=[128, 64],
 )
 
-# Enkoduj nowy tekst
-text = "Progressive taxation reduces inequality"
+# Koduj nowy tekst polityczny
+text = "Progresywne opodatkowanie zmniejsza nierówności"
 ideal_point = encoder.encode(text)
 print(f"Ideal point: {ideal_point.numpy()}")
 ```
@@ -512,46 +574,104 @@ print(f"Ideal point: {ideal_point.numpy()}")
 
 ```
 policyflux/
-├── policyflux/              # Główny pakiet
-│   ├── core/                # Podstawowe abstrakcje
-│   ├── layers/              # Warstwy decyzyjne
-│   ├── models/              # Implementacje modeli
-│   │   └── advanced_actors/ # Zaawansowani aktorzy
-│   ├── dprocessing/         # Przetwarzanie danych
-│   ├── utils/               # Narzędzia pomocnicze
-│   │   └── reports/         # Wykresy i raporty
-│   ├── __init__.py          # Public API
-│   ├── config.py            # Konfiguracja Settings
-│   ├── integration.py       # High-level builder API
-│   ├── logging_config.py    # Logger
-│   └── pfrandom.py          # RNG manager
+├── policyflux/                    # Główny pakiet
+│   ├── core/                      # Abstrakcje bazowe
+│   │   ├── simple_actors_template.py     # CongressMan
+│   │   ├── complex_actors_template.py    # ComplexActor
+│   │   ├── bill_template.py
+│   │   ├── congress_model_template.py
+│   │   ├── layer_template.py
+│   │   ├── executive.py
+│   │   ├── aggregation_strategy.py
+│   │   ├── types.py
+│   │   ├── contexts.py            # NEW
+│   │   ├── voting_strategy.py      # NEW
+│   │   ├── container.py            # NEW
+│   │   └── __init__.py
+│   │
+│   ├── layers/                    # Warstwy decyzyjne
+│   │   ├── idealpoint.py
+│   │   ├── public_pressure.py
+│   │   ├── lobbying.py
+│   │   ├── media_pressure.py
+│   │   ├── party.py
+│   │   ├── government_agenda.py
+│   │   ├── neural.py
+│   │   └── __init__.py
+│   │
+│   ├── toolbox/                   # Implementacje
+│   │   ├── actors.py
+│   │   ├── bill.py
+│   │   ├── congress_model.py
+│   │   ├── executive_systems.py
+│   │   ├── advanced_actors/
+│   │   │   ├── speaker.py
+│   │   │   ├── whips.py
+│   │   │   ├── lobby.py
+│   │   │   ├── white_house.py
+│   │   │   └── __init__.py
+│   │   └── __init__.py
+│   │
+│   ├── engines/                   # Silniki symulacji
+│   │   ├── engine_template.py
+│   │   ├── parallel_monte_carlo.py
+│   │   ├── deterministic_engine.py
+│   │   └── __init__.py
+│   │
+│   ├── integration/                # HIGH-LEVEL API (REFACTORED)
+│   │   ├── config.py              # Configuration classes
+│   │   ├── builders/              # Factory functions
+│   │   │   ├── engine_builder.py
+│   │   │   ├── congress_builder.py
+│   │   │   ├── layer_builder.py
+│   │   │   ├── actor_builder.py
+│   │   │   ├── mechanic_builders.py
+│   │   │   └── __init__.py
+│   │   ├── presets/               # Pre-configured systems
+│   │   │   ├── president_preset.py
+│   │   │   ├── parliament_preset.py
+│   │   │   ├── semipresident_preset.py
+│   │   │   └── __init__.py
+│   │   ├── registry.py
+│   │   └── __init__.py
+│   │
+│   ├── dprocessing/               # Text encoding & data processing
+│   │   └── __init__.py
+│   │
+│   ├── utils/                     # Utilities
+│   │   ├── reports/               # Visualizations
+│   │   │   ├── bar_charts.py
+│   │   │   └── pie_charts.py
+│   │   ├── pfrandom.py
+│   │   ├── logging_config.py
+│   │   └── __init__.py
+│   │
+│   ├── pipeline/                  # NEW (placeholder)
+│   │   └── __init__.py
+│   │
+│   ├── __init__.py                # Public API
+│   ├── logging_config.py
+│   ├── pfrandom.py
+│   └── __pycache__/
 │
-├── examples/                # Przykłady użycia
-│   ├── 01_basic_voting.py
-│   ├── 02_all_layers_showcase.py
-│   ├── 03_executive_systems.py
-│   ├── 04_aggregation_strategies.py
-│   ├── 05_ml_integration.py
-│   ├── 06_advanced_actors.py
-│   ├── 07_scenario_analysis.py
-│   └── 08_text_encoder_idealpoints.py
-│
-├── simple_simulation.py     # Prosty przykład
-├── pyproject.toml           # Metadata i zależności
-└── readme.md                # Ten plik
+├── pyproject.toml                 # Metadata i zależności
+├── readme.md                      # Ten plik
+└── .gitignore
 ```
 
 ### Kluczowe koncepcje
 
-**Policy Space**: Wielowymiarowa przestrzeń polityczna (np. [Left-Right, Liberal-Conservative, Isolationist-Interventionist])
+**Policy Space**: Wielowymiarowa przestrzeń polityczna reprezentująca różne wymiary ideologiczne (np. Left-Right, Liberal-Conservative, Isolationist-Interventionist). Każdy aktor i projekt ustawy ma pozycję w tej przestrzeni.
 
-**Ideal Point**: Pozycja aktora/ustawy w policy space, reprezentująca preferencje ideologiczne
+**Ideal Point**: Pozycja aktora lub ustawy w policy space, reprezentująca preferencje ideologiczne. Zwykle wyrażana jako wektor w n-wymiarowej przestrzeni.
 
-**Utility Function**: Funkcja użyteczności określająca korzyść aktora z danej pozycji ustawy (zwykle dystans euklidesowy)
+**Utility Function**: Funkcja określająca użyteczność dla aktora głosującego na projekt ustawy, zwykle oparta na dystansie euklidesowym między ideal point a pozycją ustawy (actor głosuje "tak" jeśli użyteczność > threshold).
 
-**Decision Layers**: Warstwy modyfikujące prawdopodobieństwo głosowania na podstawie różnych czynników (opinia publiczna, lobbying, etc.)
+**Decision Layer**: Warstwa wirtualna modyfikująca prawdopodobieństwo głosowania na podstawie różnych czynników (opinia publiczna, lobbying, dyscyplina partyjna, media, etc.). Każda warstwa przyjmuje wejściowe prawdopodobieństwo i zwraca zmodyfikowane.
 
-**Aggregation Strategy**: Sposób łączenia outputów warstw w finalną decyzję (sequential, average, weighted, multiplicative)
+**Aggregation Strategy**: Algorytm łączenia outputów wielu warstw w finalną decyzję. Dostępne strategie: Sequential (warstwy modyfikują się sekwencyjnie), Average (średnia arytmetyczna), Weighted (ważona suma), Multiplicative (mnożenie dla efektu weta).
+
+**Voting Strategy**: Abstrakcja określająca, jak przekonwertować prawdopodobieństwo na ostateczną decyzję (głos "tak"/"nie"). Można wybrać między ProbabilisticVoting (losowo z danym prawdopodobieństwem), DeterministicVoting (threshold) lub innymi strategiami.
 
 ---
 
@@ -582,7 +702,7 @@ pytest
 pytest -v
 
 # Konkretny plik
-pytest test_integration.py
+pytest tests/test_core.py
 
 # Z coverage
 pytest --cov=policyflux
@@ -612,25 +732,45 @@ Wkład w projekt jest mile widziany! Proces:
 5. **Pull Request**: Opisz zmiany, linkuj do issue
 
 **Co potrzebujemy:**
-- 🐛 Bug fixes
-- ✨ Nowe warstwy decyzyjne
+- 🐛 Bug fixes testy (coverage jest niskie)
+- ✨ Nowe warstwy decyzyjne (np. Media Sentiment Layer)
 - 📚 Więcej przykładów i case studies
-- 🧪 Więcej testów (coverage jest niskie)
-- 📖 Lepsza dokumentacja
-- 🌍 Wsparcie dla więcej systemów politycznych
+- 🧪 Lepsze testowanie (target >80% coverage)
+- 📖 Lepsza dokumentacja API (docstrings, Sphinx)
+- 🌍 Wsparcie dla więcej systemów politycznych (koalicje, kommitee)
 
-### Roadmap (planowane)
+### Ostatnie zmiany (Recent refactoring)
 
-- [ ] Lepsza dokumentacja API (docstrings, Sphinx)
-- [ ] Większa coverage testów (>80%)
-- [ ] Więcej przykładów real-world
-- [ ] Web UI/dashboard dla symulacji
-- [ ] Export/import symulacji (JSON/YAML)
-- [ ] Integracja z real-world datasets (voteview, parlgov)
-- [ ] Performance optimization (Cython, numba)
-- [ ] Więcej strategii agregacji
+Projekt przeszedł niedawno znaczną refaktoryzację:
+
+- **Reorganizacja Integration Module**: Była monolityczna `policyflux/integration.py`, teraz strukturyzowana hierarhicznie jako `policyflux/integration/` z podmodułami `builders/` i `presets/`
+- **Nowe abstrakcje**: Dodane `VotingContext`, `SimulationContext` (immutable konteksty decyzyjne) i `VotingStrategy` (abstrakcja strategii głosowania)
+- **Dependency Injection**: Dodany `ServiceContainer` dla zarządzania zależnościami
+- **Usunięte przykłady**: Wszystkie pliki przykładów (examples/*.py) były tymczasowe; użytkownicy powinni pisać swoje
+- **Lazy Loading**: Integration submodules używają `__getattr__` aby uniknąć circular imports
+
+Migracja z starego API:
+```python
+# Stare (niewalidne)
+from policyflux.integration import build_engine  # Może nie działać - stary singiel file
+
+# Nowe (poprawne)
+from policyflux import build_engine  # Importuj z głównego pakietu
+```
+
+### Roadmap
+
+- [ ] Lepsza dokumentacja API (Sphinx docs)
+- [ ] Test coverage >80%
+- [ ] Real-world case studies (parlamenty, legislatury)
+- [ ] Web dashboard/UI dla wizualizacji symulacji
+- [ ] Export/import symulacji (JSON, YAML, HDF5)
+- [ ] Integracja z real-world datasets (voteview.org, parlgov.org)
+- [ ] Performance optimization (Cython dla hot paths, numba JIT)
 - [ ] Coalition formation models
 - [ ] Committee assignment models
+- [ ] Veto point analysis
+- [ ] Comparative statics (parameter sensitivity analysis)
 
 ---
 
