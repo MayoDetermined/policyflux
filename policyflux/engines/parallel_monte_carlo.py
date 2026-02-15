@@ -1,7 +1,6 @@
-from policyflux.engines.engine_template import MPEngine
-from sequential_monte_carlo import SequentialMonteCarlo
-
-from sessions_mamagment import Session
+from .engine_template import MPEngine
+from .sequential_monte_carlo import SequentialMonteCarlo
+from .sessions_mamagment import Session
 
 class ParallelMonteCarlo(SequentialMonteCarlo, MPEngine):
     """Parallel Monte Carlo engine that runs multiple simulations of the congress model in parallel.
@@ -13,6 +12,5 @@ class ParallelMonteCarlo(SequentialMonteCarlo, MPEngine):
         MPEngine.__init__(self, session_params, processes)
 
     def _run_simulation(self) -> None:
-        # Run a single simulation and store the result
-        result = self._simulate_congress()
+        result = self.congress_model.cast_votes(self.bill)
         self.results.append(result)

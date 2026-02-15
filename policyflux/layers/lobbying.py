@@ -1,6 +1,6 @@
 from typing import List, Optional, TypeAlias
 
-from policyflux.models.advanced_actors.lobby import SequentialLobbyer
+from policyflux.toolbox.advanced_actors.lobby import SequentialLobbyer
 from ..core.layer_template import Layer
 from ..core.types import UtilitySpace
 

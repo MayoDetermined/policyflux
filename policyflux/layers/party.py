@@ -3,7 +3,7 @@ from typing import List, Optional
 from policyflux.core.layer_template import Layer
 from policyflux.core.id_generator import get_id_generator
 from policyflux.core.types import UtilitySpace
-from policyflux.models.advanced_actors.whips import SequentialWhip
+from policyflux.toolbox.advanced_actors.whips import SequentialWhip
 
 
 class PartyDisciplineLayer(Layer):

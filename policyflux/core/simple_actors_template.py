@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
-from ..core.bill_template import Bill
-from ..core.layer_template import Layer
+from .bill_template import Bill
+from .layer_template import Layer
 
 class CongressMan(ABC):
     def __init__(self, id: int, yes_chance: Optional[float] = None) -> None:

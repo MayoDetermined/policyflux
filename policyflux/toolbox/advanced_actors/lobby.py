@@ -16,10 +16,12 @@ class SequentialLobbyer(ComplexActor):
     ) -> None:
         if id is None:
             id = get_id_generator().generate_actor_id()
-        self.id: int = id
-        self.name: str = name or f"Lobbyer_{id}"
+        super().__init__(id, name or f"Lobbyer_{id}")
         self.influence_strength: float = max(0.0, min(1.0, influence_strength))
         self.stance: float = max(-1.0, min(1.0, stance))
+
+    def get_influence(self) -> float:
+        return self.influence_strength
 
     def set_influence_strength(self, strength: float) -> None:
         self.influence_strength = max(0.0, min(1.0, strength))

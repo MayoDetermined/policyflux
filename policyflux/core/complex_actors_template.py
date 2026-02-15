@@ -1,13 +1,22 @@
-from abc import ABC
-from typing import List
+from abc import ABC, abstractmethod
+from typing import Optional
 
-from policyflux.core.aggregation_strategy import AggregationStrategy
-from policyflux.core.layer_template import Layer
+from policyflux.core.types import PolicySpace
+
 
 class ComplexActor(ABC):
-    """Abstract base class for complex"""
+    """Abstract base class for advanced political actors that influence the legislative process.
 
-    def __init__(self, name: str, layers: List[Layer], aggregation_strategy: AggregationStrategy):
-        self.name = name
-        self.layers = layers
-        self.aggregation_strategy = aggregation_strategy
+    ComplexActors are contextual modifiers (speakers, lobbyists, whips) whose
+    attributes are consumed by Layer implementations during vote aggregation.
+    """
+
+    def __init__(self, id: int, name: str, ideology: Optional[PolicySpace] = None) -> None:
+        self.id: int = id
+        self.name: str = name
+        self.ideology: PolicySpace = ideology if ideology is not None else PolicySpace(2)
+
+    @abstractmethod
+    def get_influence(self) -> float:
+        """Return this actor's primary influence metric [0, 1]."""
+        pass

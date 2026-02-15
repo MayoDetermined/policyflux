@@ -1,19 +1,12 @@
-from sessions_mamagment import Session
-
-from dataclasses import dataclass
 from typing import List
 
-from policyflux.utils.reports import craft_a_bar
-from ..core.bill_template import Bill
-from ..core.congress_model_template import CongressModel
-#import importlib
-#pfrandom = importlib.import_module("policyflux.random")
 from policyflux import pfrandom
 from policyflux.logging_config import logger
 
 from .sessions_mamagment import Session
-
 from .engine_template import Engine
+from ..core.bill_template import Bill
+from ..core.congress_model_template import CongressModel
 
 class DeterministicEngine(Engine):
     

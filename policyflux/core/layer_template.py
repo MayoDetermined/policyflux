@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from ..core.id_generator import get_id_generator
 from .types import UtilitySpace
+from .contexts import VotingContext
 
 class Layer(ABC):
     def __init__(self, id: Optional[int] = None,

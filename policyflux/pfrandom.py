@@ -5,7 +5,7 @@ can share a single seeded RNG or re-seed per-session.
 """
 import random as _random
 from typing import Optional
-from .config import get_settings
+from .integration.config import get_settings
 
 
 # module-level RNG instance

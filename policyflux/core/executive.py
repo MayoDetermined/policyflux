@@ -1,11 +1,15 @@
 """Abstract base for executive branch actors across political systems."""
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, TYPE_CHECKING
 from enum import Enum
 
 from .types import PolicySpace
-from .bill_template import Bill
+
+if TYPE_CHECKING:
+    from .bill_template import Bill
 
 
 class ExecutiveType(Enum):

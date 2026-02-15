@@ -1,12 +1,22 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
-from .actors_template import CongressMan
+from typing import List, Optional, TYPE_CHECKING
+
+from policyflux.core.complex_actors_template import ComplexActor
+from policyflux.core.executive import Executive, ExecutiveType
+from .simple_actors_template import CongressMan
 from .bill_template import Bill
+
+if TYPE_CHECKING:
+    from policyflux.toolbox.advanced_actors.whips import SequentialWhip
 
 class CongressModel(ABC):
     def __init__(self, id: int) -> None:
         self.id: int = id
         self.congressmen: List[CongressMan] = []
+
+        self.executive: Optional[Executive] = None
+        self.executive_type: Optional[ExecutiveType] = None
+        self.whips: Optional[ComplexActor] = None
 
     def add_congressman(self, congressman: CongressMan) -> None:
         """Add a congressman to the Congress."""

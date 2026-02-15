@@ -24,7 +24,7 @@ from ..core.layer_template import Layer
 from ..core.id_generator import get_id_generator
 from ..core.types import PolicyPosition, PolicySpace, UtilitySpace
 
-from data_layer_processor_template import LayerDataProcessor
+from .data_layer_processor_template import LayerDataProcessor
 
 class IdealPointLayer(Layer, PolicySpace):
     def __init__(self, 

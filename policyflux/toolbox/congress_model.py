@@ -2,10 +2,10 @@ from typing import List, Optional
 
 from policyflux.core.executive import Executive
 from policyflux.core.types import PolicySpace
-from policyflux.models.advanced_actors.lobby import SequentialLobbyer
-from policyflux.models.advanced_actors.speaker import SequentialSpeaker
-from policyflux.models.advanced_actors.whips import SequentialWhip
-from policyflux.models.advanced_actors.white_house import SequentialPresident
+from .advanced_actors.lobby import SequentialLobbyer
+from .advanced_actors.speaker import SequentialSpeaker
+from .advanced_actors.whips import SequentialWhip
+from .advanced_actors.white_house import SequentialPresident
 
 from ..core.layer_template import Layer
 from ..core.congress_model_template import CongressModel

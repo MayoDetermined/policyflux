@@ -1,6 +1,6 @@
 """Configure a package-level logger for policyflux."""
 import logging
-from .config import get_settings
+from .integration.config import get_settings
 
 
 def configure_logging() -> None:
