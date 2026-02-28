@@ -175,7 +175,7 @@ class ParliamentaryExecutive(Executive):
 
 
 class SemiPresidentialExecutive(Executive):
-    """Semi-presidential system (France/Poland style)."""
+    """Semi-presidential system."""
 
     def __init__(
         self,

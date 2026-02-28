@@ -7,9 +7,11 @@ This module provides implementations of:
 """
 
 from ..models.ergmp import ExponentialRandomGraphModel
+from ..models.lobbying_ergmp import LobbyingERGMPModel
 from ..models.tullock_contest import TullockContest
 
 __all__ = [
     "ExponentialRandomGraphModel",
+    "LobbyingERGMPModel",
     "TullockContest",
 ]

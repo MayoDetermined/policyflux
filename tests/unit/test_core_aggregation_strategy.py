@@ -6,7 +6,7 @@ from policyflux.core.aggregation_strategy import (
     SequentialAggregation,
     WeightedAggregation,
 )
-from policyflux.core.layer import Layer
+from policyflux.core.abstract_layer import Layer
 
 
 class _ConstLayer(Layer):

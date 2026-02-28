@@ -1,6 +1,6 @@
 import pytest
 
-from policyflux.core.types import PolicySpace
+from policyflux.core.pf_typing import PolicySpace
 from policyflux.exceptions import DimensionMismatchError
 from policyflux.layers.ideal_point import IdealPointLayer
 

@@ -4,6 +4,7 @@ __all__ = [
     "IdealPointLayer",
     "IdealPointTextEncoder",
     "LobbyingLayer",
+    "LobbyingERGMPLayer",
     "MediaPressureLayer",
     "PartyDisciplineLayer",
     "PublicOpinionLayer",
@@ -13,11 +14,12 @@ __all__ = [
 from .government_agenda import GovernmentAgendaLayer
 from .ideal_point import IdealPointEncoderDF, IdealPointLayer, IdealPointTextEncoder
 from .lobbying import LobbyingLayer
+from .lobbying_ergmp import LobbyingERGMPLayer
 from .media_pressure import MediaPressureLayer
-from .party import PartyDisciplineLayer
+from .party_layers import PartyDisciplineLayer
 from .public_pressure import PublicOpinionLayer
 
 try:
-    from .neural import SequentialNeuralLayer
+    from .neural_layers import SequentialNeuralLayer
 except Exception:  # pragma: no cover - optional dependency
     SequentialNeuralLayer = None  # type: ignore[misc,assignment]

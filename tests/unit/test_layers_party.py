@@ -1,4 +1,4 @@
-from policyflux.layers.party import PartyDisciplineLayer
+from policyflux.layers.party_layers import PartyDisciplineLayer
 
 
 def test_party_discipline_construction() -> None:

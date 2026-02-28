@@ -2,7 +2,7 @@
 
 import pytest
 
-from policyflux.core.executive import ExecutiveType
+from policyflux.core.abstract_executive import ExecutiveType
 from policyflux.integration.config import IntegrationConfig, LayerConfig
 from policyflux.integration.presets import (
     create_parliamentary_config,

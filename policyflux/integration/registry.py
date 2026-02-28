@@ -8,7 +8,7 @@ from policyflux.layers import GovernmentAgendaLayer
 from policyflux.layers.ideal_point import IdealPointLayer
 from policyflux.layers.lobbying import LobbyingLayer
 from policyflux.layers.media_pressure import MediaPressureLayer
-from policyflux.layers.party import PartyDisciplineLayer
+from policyflux.layers.party_layers import PartyDisciplineLayer
 from policyflux.layers.public_pressure import PublicOpinionLayer
 from policyflux.pfrandom import random as pf_random
 

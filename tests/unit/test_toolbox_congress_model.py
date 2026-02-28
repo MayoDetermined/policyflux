@@ -3,14 +3,14 @@
 import pytest
 
 import policyflux.pfrandom as pfrandom
-from policyflux.core.layer import Layer
-from policyflux.core.types import PolicySpace, UtilitySpace
+from policyflux.core.abstract_layer import Layer
+from policyflux.core.pf_typing import PolicySpace, UtilitySpace
 from policyflux.exceptions import DimensionMismatchError
 from policyflux.layers.ideal_point import IdealPointLayer
-from policyflux.toolbox.actors import SequentialVoter
-from policyflux.toolbox.advanced_actors.speaker import SequentialSpeaker
-from policyflux.toolbox.advanced_actors.white_house import SequentialPresident
-from policyflux.toolbox.bill import SequentialBill
+from policyflux.toolbox.actor_models import SequentialVoter
+from policyflux.toolbox.special_actors.speaker import SequentialSpeaker
+from policyflux.toolbox.special_actors.white_house import SequentialPresident
+from policyflux.toolbox.bill_models import SequentialBill
 from policyflux.toolbox.congress_model import SequentialCongressModel
 
 

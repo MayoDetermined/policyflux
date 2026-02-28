@@ -2,9 +2,9 @@
 
 import pytest
 
-from policyflux.core.executive import ExecutiveType
-from policyflux.core.types import PolicySpace
-from policyflux.toolbox.bill import SequentialBill
+from policyflux.core.abstract_executive import ExecutiveType
+from policyflux.core.pf_typing import PolicySpace
+from policyflux.toolbox.bill_models import SequentialBill
 from policyflux.toolbox.executive_systems import (
     ParliamentaryExecutive,
     President,

@@ -31,11 +31,6 @@ class GovernmentAgendaLayer(Layer):
 
         # Check if this is a government bill
         is_government_bill = kwargs.get("is_government_bill", False)
-        is_confidence_vote = kwargs.get("is_confidence_vote", False)
-
-        if is_confidence_vote:
-            # Confidence votes have EXTREME discipline
-            return 0.98 if self.pm_party_strength > 0.5 else 0.02
 
         if is_government_bill:
             # Government bills have strong but not total discipline

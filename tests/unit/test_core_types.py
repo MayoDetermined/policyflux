@@ -3,7 +3,7 @@ import dataclasses
 import pytest
 
 import policyflux.pfrandom as pfrandom
-from policyflux.core.types import PolicyPosition, PolicySpace
+from policyflux.core.pf_typing import PolicyPosition, PolicySpace
 from policyflux.exceptions import DimensionMismatchError, ValidationError
 
 

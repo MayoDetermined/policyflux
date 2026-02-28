@@ -3,12 +3,12 @@
 import pytest
 
 import policyflux.pfrandom as pfrandom
-from policyflux.core.layer import Layer
-from policyflux.core.types import UtilitySpace
+from policyflux.core.abstract_layer import Layer
+from policyflux.core.pf_typing import UtilitySpace
 from policyflux.engines.deterministic_engine import DeterministicEngine
 from policyflux.engines.session_management import Session
-from policyflux.toolbox.actors import SequentialVoter
-from policyflux.toolbox.bill import SequentialBill
+from policyflux.toolbox.actor_models import SequentialVoter
+from policyflux.toolbox.bill_models import SequentialBill
 from policyflux.toolbox.congress_model import SequentialCongressModel
 
 

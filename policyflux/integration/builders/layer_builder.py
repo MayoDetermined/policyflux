@@ -9,7 +9,7 @@ from ...layers.government_agenda import GovernmentAgendaLayer
 from ...layers.ideal_point import IdealPointLayer
 from ...layers.lobbying import LobbyingLayer
 from ...layers.media_pressure import MediaPressureLayer
-from ...layers.party import PartyDisciplineLayer
+from ...layers.party_layers import PartyDisciplineLayer
 from ...layers.public_pressure import PublicOpinionLayer
 from ...pfrandom import random as pf_random
 from ...toolbox.special_actors.lobby import SequentialLobbyist
