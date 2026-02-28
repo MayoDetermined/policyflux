@@ -1,4 +1,4 @@
-from .engine import MPEngine
+from .abstract_engine import MPEngine
 from .sequential_monte_carlo import SequentialMonteCarlo
 from .session_management import Session
 

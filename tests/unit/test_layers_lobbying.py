@@ -2,7 +2,7 @@ import pytest
 
 from policyflux.exceptions import ValidationError
 from policyflux.layers.lobbying import LobbyingLayer
-from policyflux.toolbox.advanced_actors.lobby import SequentialLobbyist
+from policyflux.toolbox.special_actors.lobby import SequentialLobbyist
 
 
 def test_lobbying_construction_valid() -> None:

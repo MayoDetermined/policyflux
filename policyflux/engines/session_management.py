@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from ..core.bill import Bill
+from ..core.abstract_bill import Bill
 from ..core.congress_model import CongressModel
 
 

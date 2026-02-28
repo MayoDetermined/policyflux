@@ -5,10 +5,10 @@ from typing import Any
 
 from policyflux.logging_config import logger
 
-from ..core.bill import Bill
-from ..core.executive import Executive, ExecutiveActor, ExecutiveType
+from ..core.abstract_bill import Bill
+from ..core.abstract_executive import Executive, ExecutiveActor, ExecutiveType
 from ..core.id_generator import get_id_generator
-from ..core.types import PolicySpace
+from ..core.pf_typing import PolicySpace
 
 
 def _euclidean_distance(a: list[float], b: list[float]) -> float:

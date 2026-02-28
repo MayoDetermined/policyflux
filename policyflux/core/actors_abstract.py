@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
-from policyflux.core.types import PolicySpace
+from policyflux.core.abstract_bill import Bill
+from policyflux.core.pf_typing import PolicySpace
 
 
 class ComplexActor(ABC):

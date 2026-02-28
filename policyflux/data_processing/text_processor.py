@@ -5,7 +5,7 @@ from typing import Any
 import torch
 from torch.nn.utils.rnn import pad_sequence
 
-from .data_processor import DataProcessor
+from .abstract_data_processor import DataProcessor
 
 
 class SimpleTextVectorizer(DataProcessor):

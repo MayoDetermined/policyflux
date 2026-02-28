@@ -1,11 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from policyflux.core.complex_actor import ComplexActor
-from policyflux.core.executive import Executive, ExecutiveType
+from policyflux.core.actors_abstract import ComplexActor
+from policyflux.core.abstract_executive import Executive, ExecutiveType
 
-from .bill import Bill
-from .congressman import CongressMember
+from .abstract_bill import Bill
+from .actors_abstract import CongressMember
 
 if TYPE_CHECKING:
     pass

@@ -5,12 +5,12 @@ from policyflux.core import voting_strategy as vs_module
 from policyflux.exceptions import ValidationError
 
 from ..core.aggregation_strategy import AggregationStrategy, SequentialAggregation
-from ..core.bill import Bill
-from ..core.congressman import CongressMember
+from ..core.abstract_bill import Bill
+from ..core.actors_abstract import CongressMember
 from ..core.contexts import VotingContext
 from ..core.id_generator import get_id_generator
-from ..core.layer import Layer
-from ..core.types import PolicyPosition, UtilitySpace
+from ..core.abstract_layer import Layer
+from ..core.pf_typing import PolicyPosition, UtilitySpace
 
 
 class SequentialVoter(CongressMember):

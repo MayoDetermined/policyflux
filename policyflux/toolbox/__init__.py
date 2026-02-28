@@ -13,12 +13,12 @@ __all__ = [
 
 from ..engines.sequential_monte_carlo import SequentialMonteCarlo  # noqa: F401
 from ..engines.session_management import Session  # noqa: F401
-from .actors import SequentialVoter
-from .advanced_actors import (
+from .actor_models import SequentialVoter
+from .special_actors import (
     SequentialLobbyist,
     SequentialPresident,
     SequentialSpeaker,
     SequentialWhip,
 )
-from .bill import SequentialBill
-from .congress_model import SequentialCongressModel
+from .bill_models import SequentialBill
+from .usa_congress_model import SequentialCongressModel

@@ -1,7 +1,7 @@
 # policyflux/core/contexts.py
 from dataclasses import dataclass
 
-from .types import PolicyPosition
+from .pf_typing import PolicyPosition
 
 
 @dataclass(frozen=True)

@@ -1,6 +1,6 @@
 from typing import Any
 
-from ...core.executive import ExecutiveType
+from ...core.abstract_executive import ExecutiveType
 from ..config import AdvancedActorsConfig, IntegrationConfig, LayerConfig
 
 

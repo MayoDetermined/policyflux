@@ -4,7 +4,7 @@ from typing import Any
 
 from policyflux.exceptions import ConfigurationError
 
-from ...core.types import PolicySpace
+from ...core.pf_typing import PolicySpace
 from ...layers.government_agenda import GovernmentAgendaLayer
 from ...layers.ideal_point import IdealPointLayer
 from ...layers.lobbying import LobbyingLayer
@@ -12,8 +12,8 @@ from ...layers.media_pressure import MediaPressureLayer
 from ...layers.party import PartyDisciplineLayer
 from ...layers.public_pressure import PublicOpinionLayer
 from ...pfrandom import random as pf_random
-from ...toolbox.advanced_actors.lobby import SequentialLobbyist
-from ...toolbox.advanced_actors.whips import SequentialWhip
+from ...toolbox.special_actors.lobby import SequentialLobbyist
+from ...toolbox.special_actors.whips import SequentialWhip
 from ..config import IntegrationConfig, LayerConfig
 
 

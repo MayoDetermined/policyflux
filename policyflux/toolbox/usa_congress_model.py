@@ -1,19 +1,19 @@
 from typing import Any
 
-from policyflux.core.executive import Executive
-from policyflux.core.types import PolicySpace
+from policyflux.core.abstract_executive import Executive
+from policyflux.core.pf_typing import PolicySpace
 from policyflux.exceptions import DimensionMismatchError
 from policyflux.logging_config import logger
 
-from ..core.bill import Bill
+from ..core.abstract_bill import Bill
 from ..core.congress_model import CongressModel
 from ..core.id_generator import get_id_generator
-from ..core.layer import Layer
-from .actors import SequentialVoter
-from .advanced_actors.lobby import SequentialLobbyist
-from .advanced_actors.speaker import SequentialSpeaker
-from .advanced_actors.whips import SequentialWhip
-from .advanced_actors.white_house import SequentialPresident
+from ..core.abstract_layer import Layer
+from .actor_models import SequentialVoter
+from .special_actors.lobby import SequentialLobbyist
+from .special_actors.speaker import SequentialSpeaker
+from .special_actors.whips import SequentialWhip
+from .special_actors.white_house import SequentialPresident
 
 
 class SequentialCongressModel(CongressModel):
@@ -30,15 +30,6 @@ class SequentialCongressModel(CongressModel):
         self.whips: list[SequentialWhip] = []  # type: ignore[assignment]
         self.speaker: SequentialSpeaker | None = None
         self.president: SequentialPresident | None = None
-
-    @property
-    def lobbysts(self) -> list[SequentialLobbyist]:
-        """Backward-compatible alias for lobbyists."""
-        return self.lobbyists
-
-    @lobbysts.setter
-    def lobbysts(self, value: list[SequentialLobbyist]) -> None:
-        self.lobbyists = value
 
     def set_executive(self, executive: Executive) -> None:
         """Set the executive branch (Presidential/Parliamentary/Semi-Presidential)."""

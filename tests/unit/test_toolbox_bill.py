@@ -3,7 +3,7 @@
 import pytest
 
 import policyflux.pfrandom as pfrandom
-from policyflux.toolbox.bill import SequentialBill
+from policyflux.toolbox.bill_models import SequentialBill
 
 
 class TestSequentialBillConstruction:

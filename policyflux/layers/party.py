@@ -1,9 +1,9 @@
 from typing import Any
 
 from policyflux.core.id_generator import get_id_generator
-from policyflux.core.layer import Layer
-from policyflux.core.types import UtilitySpace
-from policyflux.toolbox.advanced_actors.whips import SequentialWhip
+from policyflux.core.abstract_layer import Layer
+from policyflux.core.pf_typing import UtilitySpace
+from policyflux.toolbox.special_actors.whips import SequentialWhip
 
 
 class PartyDisciplineLayer(Layer):

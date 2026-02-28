@@ -1,11 +1,11 @@
 from typing import TYPE_CHECKING, Any
 
-from policyflux.core.executive import ExecutiveActor
+from policyflux.core.abstract_executive import ExecutiveActor
 from policyflux.core.id_generator import get_id_generator
-from policyflux.core.types import PolicySpace
+from policyflux.core.pf_typing import PolicySpace
 
 if TYPE_CHECKING:
-    from policyflux.core.bill import Bill
+    from policyflux.core.abstract_bill import Bill
 
 
 class SequentialPresident(ExecutiveActor):

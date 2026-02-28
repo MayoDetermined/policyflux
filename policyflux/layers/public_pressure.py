@@ -1,7 +1,7 @@
 from typing import Any
 
-from ..core.layer import Layer
-from ..core.types import UtilitySpace
+from ..core.abstract_layer import Layer
+from ..core.pf_typing import UtilitySpace
 
 ## TO DO: Complete implementation
 

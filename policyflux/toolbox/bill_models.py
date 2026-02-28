@@ -1,4 +1,4 @@
-from ..core.bill import Bill
+from ..core.abstract_bill import Bill
 from ..core.id_generator import get_id_generator
 
 

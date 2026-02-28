@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from ..core.id_generator import get_id_generator
-from .types import UtilitySpace
+from .id_generator import get_id_generator
+from .pf_typing import UtilitySpace
 
 
 class Layer(ABC):

@@ -10,8 +10,8 @@ from typing import Any
 
 from policyflux.exceptions import ValidationError
 
-from .layer import Layer
-from .types import UtilitySpace
+from .abstract_layer import Layer
+from .pf_typing import UtilitySpace
 
 
 class AggregationStrategy(ABC):

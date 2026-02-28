@@ -8,7 +8,7 @@ __all__ = [
 ]
 
 from .deterministic_engine import DeterministicEngine
-from .engine import Engine, MPEngine
+from .abstract_engine import Engine, MPEngine
 from .parallel_monte_carlo import ParallelMonteCarlo
 from .sequential_monte_carlo import SequentialMonteCarlo
 from .session_management import Session

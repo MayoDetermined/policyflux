@@ -2,9 +2,9 @@
 # pfrandom = importlib.import_module("policyflux.random")
 from policyflux import pfrandom
 
-from ..core.bill import Bill
+from ..core.abstract_bill import Bill
 from ..core.congress_model import CongressModel
-from .engine import Engine
+from .abstract_engine import Engine
 from .session_management import Session
 
 

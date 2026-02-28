@@ -25,8 +25,8 @@ except ImportError:
     HAS_SENTENCE_TRANSFORMERS = False
 
 from ..core.id_generator import get_id_generator
-from ..core.layer import Layer
-from ..core.types import PolicySpace, UtilitySpace
+from ..core.abstract_layer import Layer
+from ..core.pf_typing import PolicySpace, UtilitySpace
 from .data_layer_processor import LayerDataProcessor
 
 

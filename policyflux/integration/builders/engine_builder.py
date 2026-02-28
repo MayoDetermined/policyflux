@@ -3,7 +3,7 @@ from ...core.id_generator import IdGenerator, get_id_generator
 from ...engines.sequential_monte_carlo import SequentialMonteCarlo
 from ...engines.session_management import Session
 from ...pfrandom import set_seed
-from ...toolbox.bill import SequentialBill
+from ...toolbox.bill_models import SequentialBill
 from ..config import IntegrationConfig
 from .congress_builder import build_congress
 

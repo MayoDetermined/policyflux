@@ -17,7 +17,7 @@ except ImportError:
 
 from functools import lru_cache
 
-from ..core.executive import ExecutiveType
+from ..core.abstract_executive import ExecutiveType
 
 
 class Settings(BaseSettings):  # type: ignore[valid-type,misc]

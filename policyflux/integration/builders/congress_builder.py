@@ -1,5 +1,5 @@
-from ...toolbox.actors import SequentialVoter
-from ...toolbox.congress_model import SequentialCongressModel
+from ...toolbox.actor_models import SequentialVoter
+from ...toolbox.usa_congress_model import SequentialCongressModel
 from ..config import IntegrationConfig
 from .actor_builder import build_advanced_actors, build_executive
 from .layer_builder import build_layers

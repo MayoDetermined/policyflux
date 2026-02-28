@@ -1,6 +1,6 @@
-from policyflux.core.complex_actor import ComplexActor
+from policyflux.core.actors_abstract import ComplexActor
 from policyflux.core.id_generator import get_id_generator
-from policyflux.core.types import PolicySpace
+from policyflux.core.pf_typing import PolicySpace
 
 
 class SequentialWhip(ComplexActor):

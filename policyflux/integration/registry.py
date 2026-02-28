@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from typing import Any, TypeAlias
 
-from policyflux.core.types import PolicySpace
+from policyflux.core.pf_typing import PolicySpace
 from policyflux.exceptions import RegistryError
 from policyflux.integration.builders.layer_builder import LayerBuilderContext
 from policyflux.layers import GovernmentAgendaLayer
