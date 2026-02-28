@@ -4,7 +4,7 @@ from typing import Any
 
 from ..core.id_generator import get_id_generator
 from ..core.abstract_layer import Layer
-from ..core.pf_typing import UtilitySpace
+from ..core.pf_typing import PolicyPosition
 
 
 class GovernmentAgendaLayer(Layer):
@@ -26,7 +26,7 @@ class GovernmentAgendaLayer(Layer):
     def compile(self) -> None:
         return None
 
-    def call(self, bill_space: UtilitySpace, **kwargs: Any) -> float:
+    def call(self, bill_position: PolicyPosition, **kwargs: Any) -> float:
         base_prob: float = float(kwargs.get("base_prob", 0.5))
 
         # Check if this is a government bill

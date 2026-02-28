@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any
 
 import policyflux.pfrandom as pfrandom
@@ -10,7 +12,7 @@ from ..core.actors_abstract import CongressMember
 from ..core.contexts import VotingContext
 from ..core.id_generator import get_id_generator
 from ..core.abstract_layer import Layer
-from ..core.pf_typing import PolicyPosition, UtilitySpace
+from ..core.pf_typing import PolicyPosition
 
 
 class SequentialVoter(CongressMember):
@@ -54,7 +56,7 @@ class SequentialVoter(CongressMember):
         self.layers = [layer for layer in self.layers if layer.id != layer_id]
         return True
 
-    def compute_layers(self, bill_space: UtilitySpace, **context: Any) -> float:
+    def compute_layers(self, bill_position: PolicyPosition, **context: Any) -> float:
         """
         Aggregate layer outputs using the configured aggregation strategy.
 
@@ -63,27 +65,25 @@ class SequentialVoter(CongressMember):
         """
         if not self.layers:
             return self.yes_chance
-        return self.aggregation.aggregate(self.layers, bill_space, **context)
+        return self.aggregation.aggregate(self.layers, bill_position, **context)
 
-    def _get_ideal_point(self) -> list[float] | None:
+    def _get_ideal_point(self) -> PolicyPosition | None:
         """Extract ideal point from the first IdealPointLayer, if present."""
         for layer in self.layers:
             if hasattr(layer, "space") and layer.space is not None:
                 space = layer.space
                 if hasattr(space, "position"):
-                    return list(space.position)
+                    return space.position
         return None
 
     def _build_voting_context(
-        self, bill_space: UtilitySpace, decision_prob: float, **context: Any
+        self, bill_position: PolicyPosition, decision_prob: float, **context: Any
     ) -> VotingContext:
         """Build a VotingContext from available data."""
         ideal_point = self._get_ideal_point()
-        bill_pos = tuple(bill_space) if bill_space else (0.5,)
-        actor_pos = tuple(ideal_point) if ideal_point else (0.5,)
         return VotingContext(
-            bill_position=PolicyPosition(bill_pos),
-            actor_ideal_point=PolicyPosition(actor_pos),
+            bill_position=bill_position if bill_position else PolicyPosition((0.5,)),
+            actor_ideal_point=ideal_point if ideal_point else PolicyPosition((0.5,)),
             base_prob=decision_prob,
             public_support=context.get("public_support"),
             lobbying_intensity=context.get("lobbying_intensity"),
@@ -91,14 +91,16 @@ class SequentialVoter(CongressMember):
             party_line_support=context.get("party_line_support"),
         )
 
-    def vote(self, bill: Bill, bill_space: UtilitySpace | None = None, **context: Any) -> bool:
+    def vote(
+        self, bill: Bill, bill_position: PolicyPosition | None = None, **context: Any
+    ) -> bool:
         """Cast a vote on a bill using layers and voting strategy."""
-        if bill_space is None:
-            bill_space = getattr(bill, "position", [])
-        decision_prob = self.compute_layers(bill_space, **context)
+        if bill_position is None:
+            bill_position = getattr(bill, "position", None)
+        decision_prob = self.compute_layers(bill_position, **context)
 
         if self.voting_strategy is not None:
-            voting_ctx = self._build_voting_context(bill_space, decision_prob, **context)
+            voting_ctx = self._build_voting_context(bill_position, decision_prob, **context)
             result = self.voting_strategy.decide(decision_prob, voting_ctx)
             return bool(result)
 

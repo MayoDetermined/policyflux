@@ -21,6 +21,7 @@ from typing import Any
 from policyflux.logging_config import logger
 
 from ..core.abstract_bill import Bill
+from ..core.pf_typing import PolicyPosition
 from .congress_model import SequentialCongressModel
 
 
@@ -295,7 +296,7 @@ class MultiChamberParliamentModel:
     def cast_votes(
         self,
         bill: Bill,
-        bill_space: list[float] | None = None,
+        bill_position: PolicyPosition | None = None,
         **context: Any,
     ) -> ParliamentVoteResult:
         """Route *bill* through all chambers according to configuration.
@@ -304,8 +305,8 @@ class MultiChamberParliamentModel:
         ----------
         bill:
             Bill to vote on.
-        bill_space:
-            Policy-space coordinates of the bill. Falls back to ``bill.position``.
+        bill_position:
+            Bill's position in policy space. Falls back to ``bill.position``.
         **context:
             Additional voting context forwarded to each chamber's
             :meth:`~policyflux.toolbox.congress_model.SequentialCongressModel.cast_votes`.
@@ -318,7 +319,7 @@ class MultiChamberParliamentModel:
             raise ValueError("Parliament has no chambers configured.")
 
         if len(self._chambers) == 1:
-            return self._unicameral_vote(bill, bill_space, **context)
+            return self._unicameral_vote(bill, bill_position, **context)
 
         upper_cfg = next(
             (cfg for cfg in self._configs if cfg.role == ChamberRole.UPPER), None
@@ -326,12 +327,12 @@ class MultiChamberParliamentModel:
 
         if upper_cfg is not None and _is_money_bill(bill) and upper_cfg.budget_bill_exempt:
             # Money bill: upper chamber has no say – only lower chamber votes.
-            return self._lower_only_vote(bill, bill_space, **context)
+            return self._lower_only_vote(bill, bill_position, **context)
 
         if len(self._chambers) == 2:
-            return self._bicameral_vote(bill, bill_space, **context)
+            return self._bicameral_vote(bill, bill_position, **context)
 
-        return self._sequential_multicameral_vote(bill, bill_space, **context)
+        return self._sequential_multicameral_vote(bill, bill_position, **context)
 
     # ------------------------------------------------------------------
     # Unicameral path
@@ -340,11 +341,11 @@ class MultiChamberParliamentModel:
     def _unicameral_vote(
         self,
         bill: Bill,
-        bill_space: list[float] | None,
+        bill_position: PolicyPosition | None,
         **context: Any,
     ) -> ParliamentVoteResult:
         ch, cfg = self._chambers[0], self._configs[0]
-        votes_for = ch.cast_votes(bill, bill_space, **context)
+        votes_for = ch.cast_votes(bill, bill_position, **context)
         votes_total = len(ch.congressmen)
         passed = _passes_threshold(votes_for, votes_total, cfg.passage_threshold)
         result = ChamberVoteResult(
@@ -380,14 +381,14 @@ class MultiChamberParliamentModel:
     def _lower_only_vote(
         self,
         bill: Bill,
-        bill_space: list[float] | None,
+        bill_position: PolicyPosition | None,
         **context: Any,
     ) -> ParliamentVoteResult:
         lower_pair = self.lower_chamber()
         if lower_pair is None:
             raise ValueError("No lower chamber configured for money bill path.")
         ch, cfg = lower_pair
-        votes_for = ch.cast_votes(bill, bill_space, **context)
+        votes_for = ch.cast_votes(bill, bill_position, **context)
         votes_total = len(ch.congressmen)
         passed = _passes_threshold(votes_for, votes_total, cfg.passage_threshold)
         result = ChamberVoteResult(
@@ -423,7 +424,7 @@ class MultiChamberParliamentModel:
     def _bicameral_vote(
         self,
         bill: Bill,
-        bill_space: list[float] | None,
+        bill_position: PolicyPosition | None,
         **context: Any,
     ) -> ParliamentVoteResult:
         lower_pair = self.lower_chamber()
@@ -432,7 +433,7 @@ class MultiChamberParliamentModel:
         # If both chambers have the same role (e.g. two LOWER chambers in an unusual setup)
         # fall back to sequential mandatory passage.
         if lower_pair is None or upper_pair is None:
-            return self._sequential_mandatory_both(bill, bill_space, **context)
+            return self._sequential_mandatory_both(bill, bill_position, **context)
 
         lower_ch, lower_cfg = lower_pair
         upper_ch, upper_cfg = upper_pair
@@ -440,7 +441,7 @@ class MultiChamberParliamentModel:
         all_results: list[ChamberVoteResult] = []
 
         # ---- Step 1: lower chamber ----------------------------------------
-        lower_votes_for = lower_ch.cast_votes(bill, bill_space, **context)
+        lower_votes_for = lower_ch.cast_votes(bill, bill_position, **context)
         lower_votes_total = len(lower_ch.congressmen)
         lower_passed = _passes_threshold(
             lower_votes_for, lower_votes_total, lower_cfg.passage_threshold
@@ -478,7 +479,7 @@ class MultiChamberParliamentModel:
         # ---- Step 2: upper chamber ----------------------------------------
         if upper_cfg.powers == UpperChamberPowers.ADVISORY:
             # Advisory: upper votes but outcome is non-binding.
-            upper_votes_for = upper_ch.cast_votes(bill, bill_space, **context)
+            upper_votes_for = upper_ch.cast_votes(bill, bill_position, **context)
             upper_votes_total = len(upper_ch.congressmen)
             upper_passed = _passes_threshold(
                 upper_votes_for, upper_votes_total, upper_cfg.passage_threshold
@@ -513,32 +514,32 @@ class MultiChamberParliamentModel:
 
         if upper_cfg.powers == UpperChamberPowers.FULL_VETO:
             return self._full_veto_path(
-                bill, bill_space, upper_ch, upper_cfg,
+                bill, bill_position, upper_ch, upper_cfg,
                 lower_votes_for, lower_votes_total, all_results, **context
             )
 
         if upper_cfg.powers == UpperChamberPowers.SUSPENSIVE_VETO:
             return self._suspensive_veto_path(
-                bill, bill_space, lower_ch, lower_cfg, upper_ch, upper_cfg,
+                bill, bill_position, lower_ch, lower_cfg, upper_ch, upper_cfg,
                 all_results, **context
             )
 
         if upper_cfg.powers == UpperChamberPowers.OVERRIDE_BY_LOWER:
             return self._override_by_lower_path(
-                bill, bill_space, lower_ch, lower_cfg, upper_ch, upper_cfg,
+                bill, bill_position, lower_ch, lower_cfg, upper_ch, upper_cfg,
                 lower_votes_for, lower_votes_total, all_results, **context
             )
 
         # Safety fallback
         return self._full_veto_path(
-            bill, bill_space, upper_ch, upper_cfg,
+            bill, bill_position, upper_ch, upper_cfg,
             lower_votes_for, lower_votes_total, all_results, **context
         )
 
     def _full_veto_path(
         self,
         bill: Bill,
-        bill_space: list[float] | None,
+        bill_position: PolicyPosition | None,
         upper_ch: SequentialCongressModel,
         upper_cfg: ChamberConfig,
         lower_votes_for: int,
@@ -547,7 +548,7 @@ class MultiChamberParliamentModel:
         **context: Any,
     ) -> ParliamentVoteResult:
         """Both chambers must pass (US, Italy)."""
-        upper_votes_for = upper_ch.cast_votes(bill, bill_space, **context)
+        upper_votes_for = upper_ch.cast_votes(bill, bill_position, **context)
         upper_votes_total = len(upper_ch.congressmen)
         upper_passed = _passes_threshold(
             upper_votes_for, upper_votes_total, upper_cfg.passage_threshold
@@ -584,7 +585,7 @@ class MultiChamberParliamentModel:
     def _suspensive_veto_path(
         self,
         bill: Bill,
-        bill_space: list[float] | None,
+        bill_position: PolicyPosition | None,
         lower_ch: SequentialCongressModel,
         lower_cfg: ChamberConfig,
         upper_ch: SequentialCongressModel,
@@ -597,7 +598,7 @@ class MultiChamberParliamentModel:
 
         for round_num in range(1, max_rounds + 2):  # +1 so lower always gets the last word
             # Upper chamber votes
-            upper_votes_for = upper_ch.cast_votes(bill, bill_space, **context)
+            upper_votes_for = upper_ch.cast_votes(bill, bill_position, **context)
             upper_votes_total = len(upper_ch.congressmen)
             upper_passed = _passes_threshold(
                 upper_votes_for, upper_votes_total, upper_cfg.passage_threshold
@@ -633,7 +634,7 @@ class MultiChamberParliamentModel:
             # Upper rejected → lower can override if within allowed rounds
             if round_num > max_rounds:
                 # Lower chamber has exhausted ping-pong patience; re-passes with simple majority
-                lower_votes_for = lower_ch.cast_votes(bill, bill_space, **context)
+                lower_votes_for = lower_ch.cast_votes(bill, bill_position, **context)
                 lower_votes_total = len(lower_ch.congressmen)
                 lower_passed = _passes_threshold(
                     lower_votes_for, lower_votes_total, lower_cfg.passage_threshold
@@ -670,7 +671,7 @@ class MultiChamberParliamentModel:
                 )
 
             # More rounds allowed: lower chamber re-votes (ping-pong)
-            lower_votes_for = lower_ch.cast_votes(bill, bill_space, **context)
+            lower_votes_for = lower_ch.cast_votes(bill, bill_position, **context)
             lower_votes_total = len(lower_ch.congressmen)
             lower_passed = _passes_threshold(
                 lower_votes_for, lower_votes_total, lower_cfg.passage_threshold
@@ -715,7 +716,7 @@ class MultiChamberParliamentModel:
     def _override_by_lower_path(
         self,
         bill: Bill,
-        bill_space: list[float] | None,
+        bill_position: PolicyPosition | None,
         lower_ch: SequentialCongressModel,
         lower_cfg: ChamberConfig,
         upper_ch: SequentialCongressModel,
@@ -726,7 +727,7 @@ class MultiChamberParliamentModel:
         **context: Any,
     ) -> ParliamentVoteResult:
         """Upper chamber can be overridden by lower chamber supermajority (Poland Sejm/Senat)."""
-        upper_votes_for = upper_ch.cast_votes(bill, bill_space, **context)
+        upper_votes_for = upper_ch.cast_votes(bill, bill_position, **context)
         upper_votes_total = len(upper_ch.congressmen)
         upper_passed = _passes_threshold(
             upper_votes_for, upper_votes_total, upper_cfg.passage_threshold
@@ -790,13 +791,13 @@ class MultiChamberParliamentModel:
     def _sequential_multicameral_vote(
         self,
         bill: Bill,
-        bill_space: list[float] | None,
+        bill_position: PolicyPosition | None,
         **context: Any,
     ) -> ParliamentVoteResult:
         """Each chamber votes in order; all must pass for the bill to become law."""
         all_results: list[ChamberVoteResult] = []
         for idx, (ch, cfg) in enumerate(self.chambers, start=1):
-            votes_for = ch.cast_votes(bill, bill_space, **context)
+            votes_for = ch.cast_votes(bill, bill_position, **context)
             votes_total = len(ch.congressmen)
             passed = _passes_threshold(votes_for, votes_total, cfg.passage_threshold)
             all_results.append(
@@ -837,11 +838,11 @@ class MultiChamberParliamentModel:
     def _sequential_mandatory_both(
         self,
         bill: Bill,
-        bill_space: list[float] | None,
+        bill_position: PolicyPosition | None,
         **context: Any,
     ) -> ParliamentVoteResult:
         """Fallback: treat all chambers as equal and require sequential passage."""
-        return self._sequential_multicameral_vote(bill, bill_space, **context)
+        return self._sequential_multicameral_vote(bill, bill_position, **context)
 
     # ------------------------------------------------------------------
     # Reporting

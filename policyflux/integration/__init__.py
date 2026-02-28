@@ -12,6 +12,10 @@ __all__ = [
     "IntegrationConfig",
     "LayerBuilderContext",
     "LayerConfig",
+    "ActorBuilder",
+    "ExecutiveBuilder",
+    "LayerBuilder",
+    "PolicyFlux",
     "Settings",
     "build_advanced_actors",
     "build_aggregation_strategy",
@@ -76,5 +80,17 @@ def __getattr__(name: str) -> Any:
         from . import presets
 
         return getattr(presets, name)
+
+    _fluent_names = {
+        "PolicyFlux",
+        "LayerBuilder",
+        "ExecutiveBuilder",
+        "ActorBuilder",
+    }
+
+    if name in _fluent_names:
+        from . import fluent
+
+        return getattr(fluent, name)
 
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

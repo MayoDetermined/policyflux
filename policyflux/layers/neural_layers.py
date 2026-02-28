@@ -10,7 +10,7 @@ from policyflux.logging_config import logger
 
 from ..core.id_generator import get_id_generator
 from ..core.abstract_layer import Layer
-from ..core.pf_typing import UtilitySpace
+from ..core.pf_typing import PolicyPosition
 
 
 class SequentialNeuralLayer(Layer, nn.Sequential):
@@ -39,8 +39,8 @@ class SequentialNeuralLayer(Layer, nn.Sequential):
         # ensure model parameters live on the chosen device
         self.to(self.device)
 
-    def call(self, bill_space: UtilitySpace, **kwargs: Any) -> float:
-        tensor_input = torch.tensor(bill_space, dtype=torch.float32, device=self.device)
+    def call(self, bill_position: PolicyPosition, **kwargs: Any) -> float:
+        tensor_input = torch.tensor(list(bill_position), dtype=torch.float32, device=self.device)
         output = self.forward(tensor_input)
         return float(output.squeeze().item())
 

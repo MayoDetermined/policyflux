@@ -2,7 +2,7 @@ from typing import Any
 
 from policyflux.core.id_generator import get_id_generator
 from policyflux.core.abstract_layer import Layer
-from policyflux.core.pf_typing import UtilitySpace
+from policyflux.core.pf_typing import PolicyPosition
 from policyflux.toolbox.special_actors.whips import SequentialWhip
 
 
@@ -63,7 +63,7 @@ class PartyDisciplineLayer(Layer):
         avg = total / len(self.whips)
         return max(0.0, min(1.0, avg))
 
-    def call(self, bill_space: UtilitySpace, **kwargs: Any) -> float:
+    def call(self, bill_position: PolicyPosition, **kwargs: Any) -> float:
         base_prob: float = float(kwargs.get("base_prob", 0.5))
         discipline_strength = self._aggregate_whip_strength()
         party_line = self._aggregate_party_line()

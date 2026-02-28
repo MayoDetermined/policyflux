@@ -11,20 +11,20 @@ from typing import Any
 from policyflux.exceptions import ValidationError
 
 from .abstract_layer import Layer
-from .pf_typing import UtilitySpace
+from .pf_typing import PolicyPosition
 
 
 class AggregationStrategy(ABC):
     """Abstract base class for layer aggregation strategies."""
 
     @abstractmethod
-    def aggregate(self, layers: list[Layer], bill_space: UtilitySpace, **context: Any) -> float:
+    def aggregate(self, layers: list[Layer], bill_position: PolicyPosition, **context: Any) -> float:
         """
         Aggregate outputs from multiple layers.
 
         Args:
             layers: List of Layer objects to aggregate
-            bill_space: Bill's position in policy space
+            bill_position: Bill's position in policy space
             **context: Additional context for layers
 
         Returns:
@@ -41,17 +41,17 @@ class SequentialAggregation(AggregationStrategy):
     receiving the previous probability as 'base_prob' in context.
     """
 
-    def aggregate(self, layers: list[Layer], bill_space: UtilitySpace, **context: Any) -> float:
+    def aggregate(self, layers: list[Layer], bill_position: PolicyPosition, **context: Any) -> float:
         if not layers:
             return 0.5  # Neutral default
 
         # Start with first layer
-        decision_prob: float = layers[0].call(bill_space, **context)
+        decision_prob: float = layers[0].call(bill_position, **context)
 
         # Apply subsequent layers sequentially
         for layer in layers[1:]:
             context["base_prob"] = decision_prob
-            decision_prob = layer.call(bill_space, **context)
+            decision_prob = layer.call(bill_position, **context)
 
         # Ensure output is in valid range [0, 1]
         return max(0.0, min(1.0, decision_prob))
@@ -64,11 +64,11 @@ class AverageAggregation(AggregationStrategy):
     Each layer computes independently, and the final decision is the mean.
     """
 
-    def aggregate(self, layers: list[Layer], bill_space: UtilitySpace, **context: Any) -> float:
+    def aggregate(self, layers: list[Layer], bill_position: PolicyPosition, **context: Any) -> float:
         if not layers:
             return 0.5
 
-        total: float = sum(layer.call(bill_space, **context) for layer in layers)
+        total: float = sum(layer.call(bill_position, **context) for layer in layers)
         avg = total / len(layers)
 
         return max(0.0, min(1.0, avg))
@@ -93,7 +93,7 @@ class WeightedAggregation(AggregationStrategy):
             raise ValidationError(f"Weights must sum to 1.0, got {sum(weights)}")
         self.weights: list[float] = weights
 
-    def aggregate(self, layers: list[Layer], bill_space: UtilitySpace, **context: Any) -> float:
+    def aggregate(self, layers: list[Layer], bill_position: PolicyPosition, **context: Any) -> float:
         if not layers:
             return 0.5
 
@@ -103,7 +103,7 @@ class WeightedAggregation(AggregationStrategy):
             )
 
         total: float = sum(
-            weight * layer.call(bill_space, **context)
+            weight * layer.call(bill_position, **context)
             for weight, layer in zip(self.weights, layers, strict=False)
         )
 
@@ -118,12 +118,12 @@ class MultiplicativeAggregation(AggregationStrategy):
     significantly reduces the final probability.
     """
 
-    def aggregate(self, layers: list[Layer], bill_space: UtilitySpace, **context: Any) -> float:
+    def aggregate(self, layers: list[Layer], bill_position: PolicyPosition, **context: Any) -> float:
         if not layers:
             return 0.5
 
         result: float = 1.0
         for layer in layers:
-            result *= layer.call(bill_space, **context)
+            result *= layer.call(bill_position, **context)
 
         return max(0.0, min(1.0, result))

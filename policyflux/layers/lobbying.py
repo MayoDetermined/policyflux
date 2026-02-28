@@ -4,7 +4,7 @@ from policyflux.exceptions import ValidationError
 from policyflux.toolbox.special_actors.lobby import SequentialLobbyist
 
 from ..core.abstract_layer import Layer
-from ..core.pf_typing import UtilitySpace
+from ..core.pf_typing import PolicyPosition
 
 
 class LobbyingLayer(Layer):
@@ -94,7 +94,7 @@ class LobbyingLayer(Layer):
             return base_prob + (1.0 - base_prob) * pressure
         return base_prob * (1.0 + pressure)
 
-    def call(self, bill_space: UtilitySpace, **kwargs: Any) -> float:
+    def call(self, bill_position: PolicyPosition, **kwargs: Any) -> float:
         """
         Apply lobbying modifier to voting decision.
 

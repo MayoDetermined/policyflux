@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 from typing import Any
 
 from policyflux.core.abstract_executive import Executive
-from policyflux.core.pf_typing import PolicySpace
+from policyflux.core.pf_typing import PolicyPosition
 from policyflux.exceptions import DimensionMismatchError
 from policyflux.logging_config import logger
 
@@ -35,37 +37,34 @@ class SequentialCongressModel(CongressModel):
         """Set the executive branch (Presidential/Parliamentary/Semi-Presidential)."""
         self.executive = executive
 
-    def cast_votes(self, bill: Bill, bill_space: list[float] | None = None, **context: Any) -> int:
+    def cast_votes(
+        self, bill: Bill, bill_position: PolicyPosition | None = None, **context: Any
+    ) -> int:
         """
         Cast votes from all congressmen on a bill.
 
         Args:
             bill: Bill object to vote on
-            bill_space: Bill's position in policy space
+            bill_position: Bill's position in policy space
             **context: Additional voting context (lobbying, public opinion, etc.)
 
         Returns:
             Number of votes in favor
 
         Raises:
-            ValueError: If bill_space dimensions are inconsistent with voter ideal points
+            ValueError: If bill_position dimensions are inconsistent with voter ideal points
         """
-        # Use bill.position if bill_space not explicitly provided
-        if bill_space is None:
-            bill_space = bill.position
+        # Use bill.position if bill_position not explicitly provided
+        if bill_position is None:
+            bill_position = bill.position
 
         # Validate dimensions across all voters with ideal points
-        if bill_space and self.congressmen:
-            bill_dim = len(bill_space)
+        if bill_position is not None and self.congressmen:
+            bill_dim = bill_position.dimensions
             for congressman in self.congressmen:
-                # Check if congressman has IdealPointEncoder layer
                 for layer in congressman.layers:
                     if hasattr(layer, "space") and layer.space:
-                        # Handle both PolicySpace objects and lists
-                        if isinstance(layer.space, PolicySpace):
-                            voter_dim = layer.space.dimensions
-                        else:
-                            voter_dim = len(layer.space)
+                        voter_dim = layer.space.dimensions
                         if voter_dim != bill_dim:
                             raise DimensionMismatchError(
                                 f"Dimension mismatch: bill has {bill_dim} dimensions, "
@@ -90,7 +89,7 @@ class SequentialCongressModel(CongressModel):
 
         votes_for: int = 0
         for congressman in self.congressmen:
-            if congressman.vote(bill, bill_space, **context):
+            if congressman.vote(bill, bill_position, **context):
                 votes_for += 1
 
         # Process through executive (veto, confidence votes, etc.)

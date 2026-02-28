@@ -6,8 +6,8 @@ build-backend = "setuptools.build_meta"
 name = "policyflux"
 version = "0.1.0"
 description = "Advanced library for modeling and simulating legislative processes and parliamentary behavior"
-authors = [{ name = "PolicyFlux Authors" }]
-readme = "README.md"
+authors = [{ name = "Piotr Pawelec", email = "pawelecpiotr404@gmail.com" }]
+readme = "readme.md"
 license = {file = "LICENSE"}
 requires-python = ">=3.10"
 keywords = ["simulation", "legislative", "political-science", "monte-carlo", "agent-based"]
@@ -46,6 +46,17 @@ dev = [
   "pyyaml>=6.0",
   "pre-commit>=3.5",
 ]
+examples = [
+  "jupyter>=1.0",
+  "notebook>=7.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/piotrpawelec/policyflux"
+Repository = "https://github.com/piotrpawelec/policyflux"
+Documentation = "https://piotrpawelec.github.io/policyflux/"
+Issues = "https://github.com/piotrpawelec/policyflux/issues"
+Changelog = "https://github.com/piotrpawelec/policyflux/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["."]

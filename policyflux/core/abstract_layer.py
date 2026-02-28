@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from typing import Any
 
 from .id_generator import get_id_generator
-from .pf_typing import UtilitySpace
+from .pf_typing import PolicyPosition
 
 
 class Layer(ABC):
@@ -17,12 +19,12 @@ class Layer(ABC):
         self.name: str = name or self.__class__.__name__
 
     @abstractmethod
-    def call(self, bill_space: UtilitySpace, **kwargs: Any) -> float:
+    def call(self, bill_position: PolicyPosition, **kwargs: Any) -> float:
         """
         Compute layer's influence on voting decision.
 
         Args:
-            bill_space: Bill's position in policy space
+            bill_position: Bill's position in policy space
             **kwargs: Additional context (e.g., actor's ideal point, lobbying intensity)
 
         Returns:

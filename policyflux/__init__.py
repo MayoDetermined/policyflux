@@ -11,7 +11,10 @@ Recommended imports:
 This module exposes core abstractions, utilities, and provides access to all submodules.
 """
 
+__version__ = "0.1.0"
+
 __all__ = [
+    "__version__",
     "LAYER_REGISTRY",
     "AdvancedActorsConfig",
     "AggregationStrategy",
@@ -50,6 +53,11 @@ __all__ = [
     "OptionalDependencyError",
     "ParallelMonteCarlo",
     "PartyDisciplineLayer",
+    # Fluent API / Fluent Builder API
+    "ActorBuilder",
+    "ExecutiveBuilder",
+    "LayerBuilder",
+    "PolicyFlux",
     # Exceptions
     "PolicyFluxError",
     "PolicyPosition",
@@ -165,10 +173,14 @@ from .exceptions import (
 # --- Integration (builders, registry, presets) ---
 from .integration import (
     LAYER_REGISTRY,
+    ActorBuilder,
     AdvancedActorsConfig,
+    ExecutiveBuilder,
     IntegrationConfig,
+    LayerBuilder,
     LayerBuilderContext,
     LayerConfig,
+    PolicyFlux,
     build_advanced_actors,
     build_aggregation_strategy,
     build_bill,

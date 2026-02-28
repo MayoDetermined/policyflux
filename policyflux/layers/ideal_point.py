@@ -26,7 +26,7 @@ except ImportError:
 
 from ..core.id_generator import get_id_generator
 from ..core.abstract_layer import Layer
-from ..core.pf_typing import PolicySpace, UtilitySpace
+from ..core.pf_typing import PolicyPosition, PolicySpace
 from .data_layer_processor import LayerDataProcessor
 
 
@@ -52,36 +52,28 @@ class IdealPointLayer(Layer, PolicySpace):
     def compile(self) -> None:
         pass
 
-    def _sq_distance(self, a: PolicySpace | list[float], b: PolicySpace | list[float]) -> float:
-        # Handle both PolicySpace objects and lists
-        if isinstance(a, PolicySpace):
-            a_pos = a.get_position()
-            a_dim = a.dimensions
-        else:
-            a_pos = a
-            a_dim = len(a)
+    def _sq_distance(
+        self, a: PolicySpace | PolicyPosition, b: PolicySpace | PolicyPosition
+    ) -> float:
+        a_pos = a.position if isinstance(a, PolicySpace) else a
+        b_pos = b.position if isinstance(b, PolicySpace) else b
 
-        if isinstance(b, PolicySpace):
-            b_pos = b.get_position()
-            b_dim = b.dimensions
-        else:
-            b_pos = b
-            b_dim = len(b)
-
-        if a_dim != b_dim:
-            raise DimensionMismatchError(f"Dimension mismatch: {a_dim} != {b_dim}")
+        if a_pos.dimensions != b_pos.dimensions:
+            raise DimensionMismatchError(
+                f"Dimension mismatch: {a_pos.dimensions} != {b_pos.dimensions}"
+            )
         return sum((x - y) ** 2 for x, y in zip(a_pos, b_pos, strict=False))
 
-    def _delta_utility(self, bill_space: PolicySpace | list[float]) -> float:
+    def _delta_utility(self, bill_position: PolicySpace | PolicyPosition) -> float:
         return self._sq_distance(self.space, self.status_quo) - self._sq_distance(
-            self.space, bill_space
+            self.space, bill_position
         )
 
     def _sigmoid(self, t: float) -> float:
         return 1 / (1 + exp(-t))
 
-    def call(self, bill_space: UtilitySpace, **kwargs: Any) -> float:
-        delta_u = self._delta_utility(bill_space)
+    def call(self, bill_position: PolicyPosition, **kwargs: Any) -> float:
+        delta_u = self._delta_utility(bill_position)
         return self._sigmoid(delta_u)
 
 

@@ -1,20 +1,29 @@
+from __future__ import annotations
+
 from ..core.abstract_bill import Bill
 from ..core.id_generator import get_id_generator
+from ..core.pf_typing import PolicyPosition
 
 
 class SequentialBill(Bill):
-    def __init__(self, id: int | None = None, position: list[float] | None = None) -> None:
+    def __init__(
+        self,
+        id: int | None = None,
+        position: PolicyPosition | list[float] | None = None,
+    ) -> None:
         if id is None:
             id = get_id_generator().generate_bill_id()
         super().__init__(id)
-        self.position: list[float] = position if position is not None else []
+        if isinstance(position, list):
+            self.position: PolicyPosition | None = PolicyPosition.from_list(position)
+        else:
+            self.position = position
 
         self.n_passed: int = 0
         self.n_failed: int = 0
 
         self.is_government_bill: bool = False
         self.is_confidence_vote: bool = False
-        # self.sponsor: Optional[str] = None
 
     def record_pass(self) -> None:
         self.n_passed += 1

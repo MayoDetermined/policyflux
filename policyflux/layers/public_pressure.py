@@ -1,9 +1,9 @@
+from __future__ import annotations
+
 from typing import Any
 
 from ..core.abstract_layer import Layer
-from ..core.pf_typing import UtilitySpace
-
-## TO DO: Complete implementation
+from ..core.pf_typing import PolicyPosition
 
 
 class PublicOpinionLayer(Layer):
@@ -27,7 +27,7 @@ class PublicOpinionLayer(Layer):
     def compile(self) -> None:
         pass
 
-    def call(self, bill_space: UtilitySpace, **kwargs: Any) -> float:
+    def call(self, bill_position: PolicyPosition, **kwargs: Any) -> float:
         """
         Apply public opinion influence on the vote.
 

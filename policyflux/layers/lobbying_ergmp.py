@@ -12,7 +12,7 @@ from policyflux.models.lobbying_ergmp import LobbyingERGMPModel
 from policyflux.toolbox.special_actors.lobby import SequentialLobbyist
 
 from ..core.abstract_layer import Layer
-from ..core.pf_typing import UtilitySpace
+from ..core.pf_typing import PolicyPosition
 
 
 class LobbyingERGMPLayer(Layer):
@@ -137,12 +137,12 @@ class LobbyingERGMPLayer(Layer):
             return base_prob + (1.0 - base_prob) * pressure
         return base_prob * (1.0 + pressure)
 
-    def call(self, bill_space: UtilitySpace, **kwargs: Any) -> float:
+    def call(self, bill_position: PolicyPosition, **kwargs: Any) -> float:
         """
         Apply ERGM-based lobbying influence to voting decision.
 
         Args:
-            bill_space: Bill's position in policy space
+            bill_position: Bill's position in policy space
             **kwargs: Additional context including:
                 - base_prob: Base voting probability [0, 1] (default 0.5)
                 - actor_legislator_id: ID of legislator in ERGM model (default None)
