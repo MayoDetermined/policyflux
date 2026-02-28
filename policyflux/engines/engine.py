@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from multiprocessing.dummy import Process
-from typing import Union, List
 
 from policyflux.utils.reports.bar_charts import craft_a_bar
-from .sessions_mamagment import Session
+
+from .session_management import Session
 
 
 class Engine(ABC):
@@ -14,7 +14,7 @@ class Engine(ABC):
     """
 
     @abstractmethod
-    def run(self) -> Union[List[int], int]:
+    def run(self) -> list[int] | int:
         """Run the simulation engine and return results."""
         pass
 
@@ -31,10 +31,10 @@ class Engine(ABC):
 
         craft_a_bar(
             data=[avg_votes_for, total - avg_votes_for],
-            labels=['Votes For', 'Votes Against'],
-            title='Average Voting Results',
-            xlabel='Vote Type',
-            ylabel='Number of Votes',
+            labels=["Votes For", "Votes Against"],
+            title="Average Voting Results",
+            xlabel="Vote Type",
+            ylabel="Number of Votes",
         )
 
 

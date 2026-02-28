@@ -1,6 +1,8 @@
 from dataclasses import dataclass
-from ..core.bill_template import Bill
-from ..core.congress_model_template import CongressModel
+
+from ..core.bill import Bill
+from ..core.congress_model import CongressModel
+
 
 @dataclass(frozen=True)
 class Session:

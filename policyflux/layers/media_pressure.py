@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Any
 
-from policyflux.core.layer_template import Layer
 from policyflux.core.id_generator import get_id_generator
+from policyflux.core.layer import Layer
 from policyflux.core.types import UtilitySpace
 
 
@@ -14,7 +14,7 @@ class MediaPressureLayer(Layer):
 
     def __init__(
         self,
-        id: Optional[int] = None,
+        id: int | None = None,
         pressure: float = 0.0,
         name: str = "MediaPressure",
         input_dim: int = 2,
@@ -36,8 +36,8 @@ class MediaPressureLayer(Layer):
             return base_prob + (1.0 - base_prob) * pressure
         return base_prob * (1.0 + pressure)
 
-    def call(self, bill_space: UtilitySpace, **kwargs) -> float:
-        base_prob = kwargs.get("base_prob", 0.5)
+    def call(self, bill_space: UtilitySpace, **kwargs: Any) -> float:
+        base_prob: float = float(kwargs.get("base_prob", 0.5))
         speaker_agenda = kwargs.get("speaker_agenda_support")
         president_approval = kwargs.get("president_approval")
 

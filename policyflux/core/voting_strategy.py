@@ -1,6 +1,6 @@
 # policyflux/core/voting_strategy.py
 from abc import ABC, abstractmethod
-from typing import Union
+
 from .contexts import VotingContext
 
 
@@ -8,7 +8,7 @@ class VotingStrategy(ABC):
     """Strategy for converting decision probability to a vote outcome."""
 
     @abstractmethod
-    def decide(self, decision_prob: float, context: VotingContext) -> Union[bool, float]:
+    def decide(self, decision_prob: float, context: VotingContext) -> bool | float:
         """Convert probability to a vote outcome.
 
         Returns bool for hard voting strategies, float for soft voting.
@@ -21,6 +21,7 @@ class ProbabilisticVoting(VotingStrategy):
 
     def decide(self, decision_prob: float, context: VotingContext) -> bool:
         from policyflux.pfrandom import random
+
         return random() < decision_prob
 
 

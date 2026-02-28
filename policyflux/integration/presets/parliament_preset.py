@@ -1,5 +1,8 @@
-from ..config import IntegrationConfig, AdvancedActorsConfig, LayerConfig
+from typing import Any
+
 from ...core.executive import ExecutiveType
+from ..config import AdvancedActorsConfig, IntegrationConfig, LayerConfig
+
 
 def create_parliamentary_config(
     num_actors: int = 100,
@@ -9,7 +12,7 @@ def create_parliamentary_config(
     pm_party_strength: float = 0.55,
     confidence_threshold: float = 0.5,
     government_bill_rate: float = 0.7,
-    **kwargs
+    **kwargs: Any,
 ) -> IntegrationConfig:
     """Create configuration for a parliamentary system (UK/Canada-style).
 
@@ -31,13 +34,13 @@ def create_parliamentary_config(
         pm_party_strength=pm_party_strength,
         confidence_threshold=confidence_threshold,
         government_bill_rate=government_bill_rate,
-        **{k: v for k, v in kwargs.items() if k in AdvancedActorsConfig.__dataclass_fields__}
+        **{k: v for k, v in kwargs.items() if k in AdvancedActorsConfig.__dataclass_fields__},
     )
 
     layer_config = LayerConfig(
         include_government_agenda=True,
         government_agenda_pm_strength=pm_party_strength,
-        **{k: v for k, v in kwargs.items() if k in LayerConfig.__dataclass_fields__}
+        **{k: v for k, v in kwargs.items() if k in LayerConfig.__dataclass_fields__},
     )
 
     return IntegrationConfig(
@@ -47,6 +50,10 @@ def create_parliamentary_config(
         seed=seed,
         layer_config=layer_config,
         actors_config=actors_config,
-        **{k: v for k, v in kwargs.items() if k in IntegrationConfig.__dataclass_fields__
-           and k not in ['layer_config', 'actors_config']}
+        **{
+            k: v
+            for k, v in kwargs.items()
+            if k in IntegrationConfig.__dataclass_fields__
+            and k not in ["layer_config", "actors_config"]
+        },
     )

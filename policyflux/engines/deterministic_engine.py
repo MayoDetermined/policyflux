@@ -1,19 +1,16 @@
-from typing import List
-
 from policyflux import pfrandom
-from policyflux.logging_config import logger
 
-from .sessions_mamagment import Session
-from .engine_template import Engine
-from ..core.bill_template import Bill
-from ..core.congress_model_template import CongressModel
+from ..core.bill import Bill
+from ..core.congress_model import CongressModel
+from .engine import Engine
+from .session_management import Session
+
 
 class DeterministicEngine(Engine):
-    
     """Deterministic engine that runs multiple simulations of the congress model.
     This engine is useful for estimating the distribution of outcomes based on the initial conditions of the model.
     Useful for deterministic models."""
-    
+
     def __init__(self, session_params: Session) -> None:
         self.congress_model: CongressModel = session_params.congress_model
         self.bill: Bill = session_params.bill

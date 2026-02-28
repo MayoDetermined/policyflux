@@ -1,8 +1,9 @@
-from .engine_template import MPEngine
+from .engine import MPEngine
 from .sequential_monte_carlo import SequentialMonteCarlo
-from .sessions_mamagment import Session
+from .session_management import Session
 
-class ParallelMonteCarlo(SequentialMonteCarlo, MPEngine):
+
+class ParallelMonteCarlo(SequentialMonteCarlo, MPEngine):  # type: ignore[misc]
     """Parallel Monte Carlo engine that runs multiple simulations of the congress model in parallel.
     This engine is useful for estimating the distribution of outcomes based on the initial conditions of the model.
     Useful for stochastic models and when you want to get a sense of the variability in outcomes."""

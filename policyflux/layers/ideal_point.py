@@ -1,13 +1,16 @@
 from math import exp
-from typing import Optional, List, Union, Any
+from typing import Any
+
+from policyflux.exceptions import DimensionMismatchError, OptionalDependencyError
 
 try:
     import torch
     import torch.nn as nn
+
     HAS_TORCH = True
 except ImportError:
-    torch = None
-    nn = None
+    torch = None  # type: ignore[assignment]
+    nn = None  # type: ignore[assignment]
     HAS_TORCH = False
 
 import pandas as pd
@@ -15,36 +18,41 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 try:
     from sentence_transformers import SentenceTransformer
+
     HAS_SENTENCE_TRANSFORMERS = True
 except ImportError:
-    SentenceTransformer = None
+    SentenceTransformer = None  # type: ignore[misc,assignment]
     HAS_SENTENCE_TRANSFORMERS = False
 
-from ..core.layer_template import Layer
 from ..core.id_generator import get_id_generator
-from ..core.types import PolicyPosition, PolicySpace, UtilitySpace
+from ..core.layer import Layer
+from ..core.types import PolicySpace, UtilitySpace
+from .data_layer_processor import LayerDataProcessor
 
-from .data_layer_processor_template import LayerDataProcessor
 
 class IdealPointLayer(Layer, PolicySpace):
-    def __init__(self, 
-                id: Optional[int] = None,
-                input_dim: int = 2,
-                output_dim: int = 2,
-                space: Optional[PolicySpace] = None,
-                status_quo: Optional[PolicySpace] = None,
-                name: str = "IdealPoint") -> None:
+    def __init__(
+        self,
+        id: int | None = None,
+        input_dim: int = 2,
+        output_dim: int = 2,
+        space: PolicySpace | None = None,
+        status_quo: PolicySpace | None = None,
+        name: str = "IdealPoint",
+    ) -> None:
         if id is None:
             id = get_id_generator().generate_layer_id()
         super().__init__(id, name, input_dim, output_dim)
         PolicySpace.__init__(self, input_dim)
         self.space: PolicySpace = space if space is not None else PolicySpace(input_dim)
-        self.status_quo: PolicySpace = status_quo if status_quo is not None else PolicySpace(input_dim)
+        self.status_quo: PolicySpace = (
+            status_quo if status_quo is not None else PolicySpace(input_dim)
+        )
 
     def compile(self) -> None:
         pass
 
-    def _sq_distance(self, a: Union[PolicySpace, List[float]], b: Union[PolicySpace, List[float]]) -> float:
+    def _sq_distance(self, a: PolicySpace | list[float], b: PolicySpace | list[float]) -> float:
         # Handle both PolicySpace objects and lists
         if isinstance(a, PolicySpace):
             a_pos = a.get_position()
@@ -61,26 +69,26 @@ class IdealPointLayer(Layer, PolicySpace):
             b_dim = len(b)
 
         if a_dim != b_dim:
-            raise ValueError(f"Dimension mismatch: {a_dim} != {b_dim}")
-        return sum((x - y) ** 2 for x, y in zip(a_pos, b_pos))
+            raise DimensionMismatchError(f"Dimension mismatch: {a_dim} != {b_dim}")
+        return sum((x - y) ** 2 for x, y in zip(a_pos, b_pos, strict=False))
 
-    def _delta_utility(self, bill_space: Union[PolicySpace, List[float]]) -> float:
-        return (
-            self._sq_distance(self.space, self.status_quo)
-            - self._sq_distance(self.space, bill_space)
+    def _delta_utility(self, bill_space: PolicySpace | list[float]) -> float:
+        return self._sq_distance(self.space, self.status_quo) - self._sq_distance(
+            self.space, bill_space
         )
 
     def _sigmoid(self, t: float) -> float:
         return 1 / (1 + exp(-t))
 
-    def call(self, bill_space: UtilitySpace, **kwargs) -> float:
+    def call(self, bill_space: UtilitySpace, **kwargs: Any) -> float:
         delta_u = self._delta_utility(bill_space)
         return self._sigmoid(delta_u)
+
 
 class IdealPointEncoderDF(LayerDataProcessor):
     def __init__(self, output_dim: int, dataset: pd.DataFrame) -> None:
         if not HAS_TORCH:
-            raise ImportError("torch is required for IdealPointEncoderDF")
+            raise OptionalDependencyError("torch is required for IdealPointEncoderDF")
         input_dim: int = dataset.shape[1]
         self.input_dim: int = input_dim
         self.output_dim: int = output_dim
@@ -91,46 +99,49 @@ class IdealPointEncoderDF(LayerDataProcessor):
 
     def forward(self, x: Any) -> Any:
         if not HAS_TORCH:
-            raise ImportError("torch is required for forward pass")
+            raise OptionalDependencyError("torch is required for forward pass")
         return torch.sigmoid(self.linear(x))
-    
+
     def encode(self, df: pd.DataFrame) -> Any:
         """Encode any DataFrame to output_dim dimensional space.
-        
+
         Args:
             df: DataFrame with the same number of columns as the training dataset
-            
+
         Returns:
             Tensor of shape (n_rows, output_dim) representing the encoded space
-            
+
         Raises:
             ValueError: If DataFrame dimensions don't match input_dim
         """
         if not HAS_TORCH:
-            raise ImportError("torch is required for encode method")
+            raise OptionalDependencyError("torch is required for encode method")
         if df.shape[1] != self.input_dim:
             raise ValueError(
                 f"DataFrame has {df.shape[1]} columns, but encoder expects {self.input_dim}"
             )
-        
+
         # Convert DataFrame to tensor
         x = torch.tensor(df.values, dtype=torch.float32)
-        
+
         # Encode using forward pass
         with torch.no_grad():
             encoded = self.forward(x)
-        
+
         return encoded
 
+
 class IdealPointTextEncoder(LayerDataProcessor):
-    def __init__(self,
-                 output_dim: int,
-                 corpus: List[str],
-                 max_features: int = 1000,
-                 use_embeddings: bool = True,
-                 embedding_model: str = "all-MiniLM-L6-v2",
-                 ngram_range: tuple = (1, 2),
-                 hidden_dims: Optional[List[int]] = None) -> None:
+    def __init__(
+        self,
+        output_dim: int,
+        corpus: list[str],
+        max_features: int = 1000,
+        use_embeddings: bool = True,
+        embedding_model: str = "all-MiniLM-L6-v2",
+        ngram_range: tuple = (1, 2),
+        hidden_dims: list[int] | None = None,
+    ) -> None:
         """Hybrid text encoder that maps text documents to output_dim dimensional space.
 
         Combines TF-IDF (for syntactic features) with sentence embeddings (for semantic features)
@@ -147,7 +158,7 @@ class IdealPointTextEncoder(LayerDataProcessor):
                         If None, uses [256, 128] as default
         """
         if not HAS_TORCH:
-            raise ImportError("torch is required for IdealPointTextEncoder")
+            raise OptionalDependencyError("torch is required for IdealPointTextEncoder")
 
         self.output_dim: int = output_dim
         self.max_features: int = max_features
@@ -156,8 +167,7 @@ class IdealPointTextEncoder(LayerDataProcessor):
 
         # Initialize TF-IDF vectorizer with n-grams for syntactic features
         self.vectorizer: TfidfVectorizer = TfidfVectorizer(
-            max_features=max_features,
-            ngram_range=ngram_range
+            max_features=max_features, ngram_range=ngram_range
         )
         self.vectorizer.fit(corpus)
         tfidf_dim = len(self.vectorizer.get_feature_names_out())
@@ -165,11 +175,11 @@ class IdealPointTextEncoder(LayerDataProcessor):
         # Initialize sentence transformer for semantic features
         if use_embeddings:
             if not HAS_SENTENCE_TRANSFORMERS:
-                raise ImportError(
+                raise OptionalDependencyError(
                     "sentence-transformers is required when use_embeddings=True. "
                     "Install with: pip install sentence-transformers"
                 )
-            self.embedding_model: Optional[Any] = SentenceTransformer(embedding_model)
+            self.embedding_model: Any | None = SentenceTransformer(embedding_model)
             # Get embedding dimension
             test_embedding = self.embedding_model.encode(["test"], convert_to_tensor=False)
             embedding_dim = len(test_embedding[0])
@@ -183,7 +193,7 @@ class IdealPointTextEncoder(LayerDataProcessor):
             hidden_dims = [256, 128]
 
         if HAS_TORCH and nn:
-            layers: List[Any] = []
+            layers: list[Any] = []
             prev_dim = input_dim
 
             # Hidden layers with ReLU activation
@@ -200,7 +210,7 @@ class IdealPointTextEncoder(LayerDataProcessor):
             self.network: Any = nn.Sequential(*layers)
         else:
             self.network = None
-        
+
     def forward(self, x: Any) -> Any:
         """Forward pass through the neural network.
 
@@ -211,10 +221,10 @@ class IdealPointTextEncoder(LayerDataProcessor):
             Tensor of shape (batch_size, output_dim)
         """
         if not HAS_TORCH:
-            raise ImportError("torch is required for forward pass")
+            raise OptionalDependencyError("torch is required for forward pass")
         return self.network(x)
 
-    def _extract_features(self, texts: List[str]) -> Any:
+    def _extract_features(self, texts: list[str]) -> Any:
         """Extract hybrid features from texts (TF-IDF + embeddings).
 
         Args:
@@ -224,7 +234,7 @@ class IdealPointTextEncoder(LayerDataProcessor):
             Tensor with concatenated TF-IDF and embedding features
         """
         if not HAS_TORCH:
-            raise ImportError("torch is required for feature extraction")
+            raise OptionalDependencyError("torch is required for feature extraction")
 
         # Extract TF-IDF features (syntactic)
         tfidf_matrix = self.vectorizer.transform(texts)
@@ -233,12 +243,10 @@ class IdealPointTextEncoder(LayerDataProcessor):
         # Extract semantic embeddings if enabled
         if self.use_embeddings and self.embedding_model is not None:
             embeddings = self.embedding_model.encode(
-                texts,
-                convert_to_tensor=True,
-                show_progress_bar=False
+                texts, convert_to_tensor=True, show_progress_bar=False
             )
             # Move to CPU if needed and ensure correct dtype
-            if embeddings.device.type != 'cpu':
+            if embeddings.device.type != "cpu":
                 embeddings = embeddings.cpu()
             embeddings = embeddings.to(dtype=torch.float32)
 
@@ -249,7 +257,7 @@ class IdealPointTextEncoder(LayerDataProcessor):
 
         return features
 
-    def encode(self, texts: Union[List[str], str]) -> Any:
+    def encode(self, texts: list[str] | str) -> Any:
         """Encode text(s) to output_dim dimensional ideal point space.
 
         Args:
@@ -259,7 +267,7 @@ class IdealPointTextEncoder(LayerDataProcessor):
             Tensor of shape (n_texts, output_dim) representing the encoded ideal points
         """
         if not HAS_TORCH:
-            raise ImportError("torch is required for encode method")
+            raise OptionalDependencyError("torch is required for encode method")
 
         # Handle single string input
         if isinstance(texts, str):
@@ -293,7 +301,7 @@ class IdealPointTextEncoder(LayerDataProcessor):
         texts = df[text_column].tolist()
         return self.encode(texts)
 
-    def train_step(self, texts: List[str], targets: Any, optimizer: Any, criterion: Any) -> float:
+    def train_step(self, texts: list[str], targets: Any, optimizer: Any, criterion: Any) -> float:
         """Perform a single training step.
 
         Args:
@@ -306,7 +314,7 @@ class IdealPointTextEncoder(LayerDataProcessor):
             Loss value for this step
         """
         if not HAS_TORCH:
-            raise ImportError("torch is required for training")
+            raise OptionalDependencyError("torch is required for training")
 
         optimizer.zero_grad()
 

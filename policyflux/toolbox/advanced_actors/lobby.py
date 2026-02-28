@@ -1,22 +1,20 @@
-from typing import Optional
-
-from policyflux.core.complex_actors_template import ComplexActor
+from policyflux.core.complex_actor import ComplexActor
 from policyflux.core.id_generator import get_id_generator
 
 
-class SequentialLobbyer(ComplexActor):
+class SequentialLobbyist(ComplexActor):
     """Represents a lobbying actor with influence strength and stance."""
 
     def __init__(
         self,
-        id: Optional[int] = None,
+        id: int | None = None,
         name: str = "",
         influence_strength: float = 0.5,
         stance: float = 1.0,
     ) -> None:
         if id is None:
             id = get_id_generator().generate_actor_id()
-        super().__init__(id, name or f"Lobbyer_{id}")
+        super().__init__(id, name or f"Lobbyist_{id}")
         self.influence_strength: float = max(0.0, min(1.0, influence_strength))
         self.stance: float = max(-1.0, min(1.0, stance))
 

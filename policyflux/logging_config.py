@@ -1,5 +1,7 @@
 """Configure a package-level logger for policyflux."""
+
 import logging
+
 from .integration.config import get_settings
 
 

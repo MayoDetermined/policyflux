@@ -268,7 +268,7 @@ PolicyFlux
 │   ├── Layer Registry           # Rejestr warstw
 │   └── Preset Configs           # Presidential, Parliamentary configs
 │
-├── Data Processing (policyflux/dprocessing/)
+├── Data Processing (policyflux/data_processing/)
 │   └── Text Encoders            # TF-IDF + embeddings → ideal points
 │
 └── Utilities (policyflux/utils/)
@@ -281,13 +281,13 @@ PolicyFlux
 
 ### 1. Core (policyflux/core/)
 
-**Podstawowe abstrakcje i szablony:**
+**Podstawowe abstrakcje:**
 
-- **`simple_actors_template.py`**: `CongressMan` - bazowa klasa posła
-- **`complex_actors_template.py`**: `ComplexActor` - posłowie z zaawansowanym zachowaniem
-- **`bill_template.py`**: `Bill` - abstrakcja dla projektów ustaw
-- **`congress_model_template.py`**: `CongressModel` - abstrakcja dla parlamentu
-- **`layer_template.py`**: `Layer` - abstrakcja warstw decyzyjnych
+- **`congressman.py`**: `CongressMember` - bazowa klasa posła
+- **`complex_actor.py`**: `ComplexActor` - posłowie z zaawansowanym zachowaniem
+- **`bill.py`**: `Bill` - abstrakcja dla projektów ustaw
+- **`congress_model.py`**: `CongressModel` - abstrakcja dla parlamentu
+- **`layer.py`**: `Layer` - abstrakcja warstw decyzyjnych
 - **`executive.py`**: `ExecutiveActor`, `Executive` - abstrakcje dla egzekutywy
 - **`aggregation_strategy.py`**: Strategie łączenia output warstw (Sequential, Average, Weighted, Multiplicative)
 - **`types.py`**: Definicje typów (`PolicySpace`, `PolicyVector`, `UtilitySpace`, `PolicyPosition`)
@@ -301,14 +301,14 @@ PolicyFlux
 
 | Warstwa | Plik | Opis |
 |---------|------|------|
-| **IdealPoint** | `idealpoint.py` | Preferencje ideologiczne, dystans w przestrzeni politycznej |
+| **IdealPoint** | `ideal_point.py` | Preferencje ideologiczne, dystans w przestrzeni politycznej |
 | **PublicOpinion** | `public_pressure.py` | Wpływ opinii publicznej na głosowanie |
 | **Lobbying** | `lobbying.py` | Naciski lobbyistów i grup interesów |
 | **MediaPressure** | `media_pressure.py` | Wpływ mediów |
 | **PartyDiscipline** | `party.py` | Dyscyplina partyjna i linia partii |
 | **GovernmentAgenda** | `government_agenda.py` | Kontrola agendy przez PM (systemy parlamentarne) |
 | **Neural** | `neural.py` | PyTorch neural networks jako decision layer |
-| **Text Encoders** | `idealpoint.py` | `IdealPointTextEncoder`, `IdealPointEncoderDF` dla text→ideal points |
+| **Text Encoders** | `ideal_point.py` | `IdealPointTextEncoder`, `IdealPointEncoderDF` dla text→ideal points |
 
 ### 3. Toolbox (policyflux/toolbox/)
 
@@ -325,17 +325,17 @@ PolicyFlux
 **Advanced Actors** (policyflux/toolbox/advanced_actors/):
 - **`speaker.py`**: `SequentialSpeaker` - kontrola agendy i scheduling power
 - **`whips.py`**: `SequentialWhip` - egzekwowanie dyscypliny partyjnej
-- **`lobby.py`**: `SequentialLobbyer` - kampanie lobbyingowe
+- **`lobby.py`**: `SequentialLobbyist` - kampanie lobbyingowe
 - **`white_house.py`**: `SequentialPresident` - wpływ egzekutywy
 
 ### 4. Engines (policyflux/engines/)
 
 **Silniki symulacji:**
 
-- **`engine_template.py`**: `Engine`, `MPEngine` - klasy bazowe
+- **`engine.py`**: `Engine`, `MPEngine` - klasy bazowe
 - **`parallel_monte_carlo.py`**: `ParallelMonteCarlo` - wielowątkowe/wieloprocesowe Monte Carlo
 - **`deterministic_engine.py`**: `DeterministicEngine` - głosowanie deterministyczne
-- **`engine_template.py`**: `Session` - pojedyncza sesja głosowania
+- **`session_management.py`**: `Session` - pojedyncza sesja głosowania
 
 ### 5. Integration (policyflux/integration/)
 
@@ -348,10 +348,10 @@ PolicyFlux
 - **`builders/actor_builder.py`**: `build_executive()`, `build_advanced_actors()` - budowanie aktorów
 - **`presets/president_preset.py`**: `create_presidential_config()` - preset dla systemów prezydenckich
 - **`presets/parliament_preset.py`**: `create_parliamentary_config()` - preset dla systemów parlamentarnych
-- **`presets/semipresident_preset.py`**: `create_semi_presidential_config()` - preset dla systemów półprezydenckich
+- **`presets/semi_presidential_preset.py`**: `create_semi_presidential_config()` - preset dla systemów półprezydenckich
 - **`registry.py`**: `LAYER_REGISTRY`, `register_layer()` - dynamiczna rejestracja warstw
 
-### 6. Data Processing (policyflux/dprocessing/)
+### 6. Data Processing (policyflux/data_processing/)
 
 **Przetwarzanie tekstów do przestrzeni politycznej:**
 
@@ -576,11 +576,11 @@ print(f"Ideal point: {ideal_point.numpy()}")
 policyflux/
 ├── policyflux/                    # Główny pakiet
 │   ├── core/                      # Abstrakcje bazowe
-│   │   ├── simple_actors_template.py     # CongressMan
-│   │   ├── complex_actors_template.py    # ComplexActor
-│   │   ├── bill_template.py
-│   │   ├── congress_model_template.py
-│   │   ├── layer_template.py
+│   │   ├── congressman.py               # CongressMember
+│   │   ├── complex_actor.py             # ComplexActor
+│   │   ├── bill.py
+│   │   ├── congress_model.py
+│   │   ├── layer.py
 │   │   ├── executive.py
 │   │   ├── aggregation_strategy.py
 │   │   ├── types.py
@@ -590,7 +590,7 @@ policyflux/
 │   │   └── __init__.py
 │   │
 │   ├── layers/                    # Warstwy decyzyjne
-│   │   ├── idealpoint.py
+│   │   ├── ideal_point.py
 │   │   ├── public_pressure.py
 │   │   ├── lobbying.py
 │   │   ├── media_pressure.py
@@ -613,7 +613,7 @@ policyflux/
 │   │   └── __init__.py
 │   │
 │   ├── engines/                   # Silniki symulacji
-│   │   ├── engine_template.py
+│   │   ├── engine.py
 │   │   ├── parallel_monte_carlo.py
 │   │   ├── deterministic_engine.py
 │   │   └── __init__.py
@@ -625,17 +625,17 @@ policyflux/
 │   │   │   ├── congress_builder.py
 │   │   │   ├── layer_builder.py
 │   │   │   ├── actor_builder.py
-│   │   │   ├── mechanic_builders.py
+│   │   │   ├── mechanics_builders.py
 │   │   │   └── __init__.py
 │   │   ├── presets/               # Pre-configured systems
 │   │   │   ├── president_preset.py
 │   │   │   ├── parliament_preset.py
-│   │   │   ├── semipresident_preset.py
+│   │   │   ├── semi_presidential_preset.py
 │   │   │   └── __init__.py
 │   │   ├── registry.py
 │   │   └── __init__.py
 │   │
-│   ├── dprocessing/               # Text encoding & data processing
+│   ├── data_processing/           # Text encoding & data processing
 │   │   └── __init__.py
 │   │
 │   ├── utils/                     # Utilities

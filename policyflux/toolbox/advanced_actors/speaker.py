@@ -1,6 +1,4 @@
-from typing import Optional
-
-from policyflux.core.complex_actors_template import ComplexActor
+from policyflux.core.complex_actor import ComplexActor
 from policyflux.core.id_generator import get_id_generator
 from policyflux.core.types import PolicySpace
 
@@ -10,10 +8,10 @@ class SequentialSpeaker(ComplexActor):
 
     def __init__(
         self,
-        id: Optional[int] = None,
+        id: int | None = None,
         name: str = "",
         agenda_support: float = 0.5,
-        ideology: Optional[PolicySpace] = None
+        ideology: PolicySpace | None = None,
     ) -> None:
         if id is None:
             id = get_id_generator().generate_actor_id()

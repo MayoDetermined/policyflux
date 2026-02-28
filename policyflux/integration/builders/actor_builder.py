@@ -1,19 +1,19 @@
-from typing import Optional, List
-from ..config import IntegrationConfig
-from ...core.executive import ExecutiveType, Executive
-from ...toolbox.executive_systems import (
-    PresidentialExecutive,
-    ParliamentaryExecutive,
-    SemiPresidentialExecutive,
-    President,
-    PrimeMinister,
-)
-from ...toolbox.advanced_actors.lobby import SequentialLobbyer
-from ...toolbox.advanced_actors.whips import SequentialWhip
+from ...core.executive import Executive, ExecutiveType
+from ...toolbox.advanced_actors.lobby import SequentialLobbyist
 from ...toolbox.advanced_actors.speaker import SequentialSpeaker
+from ...toolbox.advanced_actors.whips import SequentialWhip
 from ...toolbox.advanced_actors.white_house import SequentialPresident
+from ...toolbox.executive_systems import (
+    ParliamentaryExecutive,
+    President,
+    PresidentialExecutive,
+    PrimeMinister,
+    SemiPresidentialExecutive,
+)
+from ..config import IntegrationConfig
 
-def build_executive(config: IntegrationConfig) -> Optional[Executive]:
+
+def build_executive(config: IntegrationConfig) -> Executive | None:
     """Build executive branch based on configuration.
 
     Args:
@@ -26,52 +26,50 @@ def build_executive(config: IntegrationConfig) -> Optional[Executive]:
 
     if exec_type == ExecutiveType.PRESIDENTIAL:
         president = President(
-            approval_rating=config.actors_config.president_approval_rating,
-            name="President"
+            approval_rating=config.actors_config.president_approval_rating, name="President"
         )
         return PresidentialExecutive(
             president=president,
-            veto_override_threshold=config.actors_config.veto_override_threshold
+            veto_override_threshold=config.actors_config.veto_override_threshold,
         )
 
     elif exec_type == ExecutiveType.PARLIAMENTARY:
         prime_minister = PrimeMinister(
-            party_strength=config.actors_config.pm_party_strength,
-            name="PrimeMinister"
+            party_strength=config.actors_config.pm_party_strength, name="PrimeMinister"
         )
         # Auto-enable government agenda layer for parliamentary systems
         if not config.layer_config.include_government_agenda:
             config.layer_config.include_government_agenda = True
-            config.layer_config.government_agenda_pm_strength = config.actors_config.pm_party_strength
+            config.layer_config.government_agenda_pm_strength = (
+                config.actors_config.pm_party_strength
+            )
 
         return ParliamentaryExecutive(
             prime_minister=prime_minister,
-            confidence_threshold=config.actors_config.confidence_threshold
+            confidence_threshold=config.actors_config.confidence_threshold,
         )
 
     elif exec_type == ExecutiveType.SEMI_PRESIDENTIAL:
         president = President(
-            approval_rating=config.actors_config.semi_president_approval,
-            name="President"
+            approval_rating=config.actors_config.semi_presidential_approval_rating, name="President"
         )
         prime_minister = PrimeMinister(
-            party_strength=config.actors_config.semi_pm_party_strength,
-            name="PrimeMinister"
+            party_strength=config.actors_config.semi_presidential_pm_party_strength,
+            name="PrimeMinister",
         )
-        return SemiPresidentialExecutive(
-            president=president,
-            prime_minister=prime_minister
-        )
+        return SemiPresidentialExecutive(president=president, prime_minister=prime_minister)
 
     return None
 
 
-def build_advanced_actors(config: IntegrationConfig) -> tuple[List[SequentialLobbyer], List[SequentialWhip], SequentialSpeaker, SequentialPresident]:
+def build_advanced_actors(
+    config: IntegrationConfig,
+) -> tuple[list[SequentialLobbyist], list[SequentialWhip], SequentialSpeaker, SequentialPresident]:
     lobbyists = [
-        SequentialLobbyer(
+        SequentialLobbyist(
             influence_strength=config.actors_config.lobbyist_strength,
             stance=config.actors_config.lobbyist_stance,
-            name=f"Lobbyer_{i + 1}",
+            name=f"Lobbyist_{i + 1}",
         )
         for i in range(config.actors_config.n_lobbyists)
     ]

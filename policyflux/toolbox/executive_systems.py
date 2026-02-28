@@ -1,31 +1,33 @@
 """Concrete implementations of executive systems."""
 
 from math import sqrt
-from typing import Optional, Dict, Any, List
+from typing import Any
 
-from ..core.executive import Executive, ExecutiveActor, ExecutiveType
-from ..core.bill_template import Bill
-from ..core.types import PolicySpace
-from ..core.id_generator import get_id_generator
 from policyflux.logging_config import logger
 
+from ..core.bill import Bill
+from ..core.executive import Executive, ExecutiveActor, ExecutiveType
+from ..core.id_generator import get_id_generator
+from ..core.types import PolicySpace
 
-def _euclidean_distance(a: List[float], b: List[float]) -> float:
+
+def _euclidean_distance(a: list[float], b: list[float]) -> float:
     """Euclidean distance between two policy positions."""
-    return sqrt(sum((ai - bi) ** 2 for ai, bi in zip(a, b)))
+    return sqrt(sum((ai - bi) ** 2 for ai, bi in zip(a, b, strict=False)))
 
 
 # ============ PRESIDENTIAL SYSTEM ============
+
 
 class President(ExecutiveActor):
     """President in a presidential system (US-style)."""
 
     def __init__(
         self,
-        id: Optional[int] = None,
+        id: int | None = None,
         name: str = "",
         approval_rating: float = 0.5,
-        ideology: Optional[PolicySpace] = None,
+        ideology: PolicySpace | None = None,
     ):
         if id is None:
             id = get_id_generator().generate_actor_id()
@@ -33,7 +35,7 @@ class President(ExecutiveActor):
         self.approval_rating = max(0.0, min(1.0, approval_rating))
         self.ideology = ideology or PolicySpace(2)
 
-    def get_influence_on_bill(self, bill: Bill, **context) -> float:
+    def get_influence_on_bill(self, bill: Bill, **context: Any) -> float:
         return self.approval_rating * 0.3
 
     def can_veto_bill(self, bill: Bill) -> bool:
@@ -46,7 +48,7 @@ class President(ExecutiveActor):
 class PresidentialExecutive(Executive):
     """Presidential system executive branch."""
 
-    def __init__(self, president: President, veto_override_threshold: float = 2/3):
+    def __init__(self, president: President, veto_override_threshold: float = 2 / 3):
         super().__init__(ExecutiveType.PRESIDENTIAL)
         self.president = president
         self.veto_override_threshold = veto_override_threshold
@@ -54,10 +56,10 @@ class PresidentialExecutive(Executive):
     def get_primary_actor(self) -> President:
         return self.president
 
-    def inject_context(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    def inject_context(self, context: dict[str, Any]) -> dict[str, Any]:
         context["president"] = self.president
         context["president_approval"] = self.president.approval_rating
-        context["executive_influence"] = self.president.get_influence_on_bill(None)
+        context["executive_influence"] = self.president.get_influence_on_bill(None, **context)  # type: ignore[arg-type]
         return context
 
     def process_bill_result(self, bill: Bill, votes_for: int, total_votes: int) -> int:
@@ -68,12 +70,14 @@ class PresidentialExecutive(Executive):
             if votes_for < total_votes * self.veto_override_threshold:
                 logger.info(
                     "President vetoes bill %s (votes %d/%d, override needs %.0f%%)",
-                    getattr(bill, 'id', '?'), votes_for, total_votes,
+                    getattr(bill, "id", "?"),
+                    votes_for,
+                    total_votes,
                     self.veto_override_threshold * 100,
                 )
                 return 0  # Veto sustained
             else:
-                logger.info("Presidential veto overridden on bill %s", getattr(bill, 'id', '?'))
+                logger.info("Presidential veto overridden on bill %s", getattr(bill, "id", "?"))
 
         return votes_for
 
@@ -84,7 +88,7 @@ class PresidentialExecutive(Executive):
         the president opposes the bill. High-approval presidents tolerate more
         distance; low-approval presidents veto more aggressively.
         """
-        bill_pos = getattr(bill, 'position', None)
+        bill_pos = getattr(bill, "position", None)
         if bill_pos is None or not bill_pos:
             return False
 
@@ -104,15 +108,16 @@ class PresidentialExecutive(Executive):
 
 # ============ PARLIAMENTARY SYSTEM ============
 
+
 class PrimeMinister(ExecutiveActor):
     """Prime Minister in a parliamentary system."""
 
     def __init__(
         self,
-        id: Optional[int] = None,
+        id: int | None = None,
         name: str = "",
         party_strength: float = 0.55,
-        ideology: Optional[PolicySpace] = None,
+        ideology: PolicySpace | None = None,
     ):
         if id is None:
             id = get_id_generator().generate_actor_id()
@@ -121,7 +126,7 @@ class PrimeMinister(ExecutiveActor):
         self.ideology = ideology or PolicySpace(2)
         self.in_office = True
 
-    def get_influence_on_bill(self, bill: Bill, **context) -> float:
+    def get_influence_on_bill(self, bill: Bill, **context: Any) -> float:
         if context.get("is_government_bill", False):
             return self.party_strength * 0.85
         return self.party_strength * 0.3
@@ -145,10 +150,10 @@ class ParliamentaryExecutive(Executive):
     def get_primary_actor(self) -> PrimeMinister:
         return self.prime_minister
 
-    def inject_context(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    def inject_context(self, context: dict[str, Any]) -> dict[str, Any]:
         context["prime_minister"] = self.prime_minister
         context["pm_party_strength"] = self.prime_minister.party_strength
-        context["executive_influence"] = self.prime_minister.get_influence_on_bill(None, **context)
+        context["executive_influence"] = self.prime_minister.get_influence_on_bill(None, **context)  # type: ignore[arg-type]
 
         if context.get("is_government_bill", False):
             context["party_discipline_strength"] = 0.9
@@ -156,15 +161,18 @@ class ParliamentaryExecutive(Executive):
         return context
 
     def process_bill_result(self, bill: Bill, votes_for: int, total_votes: int) -> int:
-        if getattr(bill, "is_confidence_vote", False):
-            if votes_for <= total_votes * self.confidence_threshold:
-                self.prime_minister.in_office = False
-                logger.info("Government falls! %s loses confidence vote.", self.prime_minister.name)
+        if (
+            getattr(bill, "is_confidence_vote", False)
+            and votes_for <= total_votes * self.confidence_threshold
+        ):
+            self.prime_minister.in_office = False
+            logger.info("Government falls! %s loses confidence vote.", self.prime_minister.name)
 
         return votes_for
 
 
 # ============ SEMI-PRESIDENTIAL SYSTEM ============
+
 
 class SemiPresidentialExecutive(Executive):
     """Semi-presidential system (France/Poland style)."""
@@ -173,7 +181,7 @@ class SemiPresidentialExecutive(Executive):
         self,
         president: President,
         prime_minister: PrimeMinister,
-        veto_override_threshold: float = 3/5,
+        veto_override_threshold: float = 3 / 5,
     ):
         super().__init__(ExecutiveType.SEMI_PRESIDENTIAL)
         self.president = president
@@ -183,46 +191,51 @@ class SemiPresidentialExecutive(Executive):
 
     def _check_cohabitation(self) -> bool:
         """Cohabitation: president and PM from opposing camps."""
-        return (self.president.approval_rating < 0.5
-                and self.prime_minister.party_strength > 0.5)
+        return self.president.approval_rating < 0.5 and self.prime_minister.party_strength > 0.5
 
     def get_primary_actor(self) -> ExecutiveActor:
         if self.cohabitation:
             return self.prime_minister
         return self.president
 
-    def inject_context(self, context: Dict[str, Any]) -> Dict[str, Any]:
+    def inject_context(self, context: dict[str, Any]) -> dict[str, Any]:
         context["president"] = self.president
         context["prime_minister"] = self.prime_minister
         context["president_approval"] = self.president.approval_rating
         context["cohabitation"] = self.cohabitation
 
         if self.cohabitation:
-            context["executive_influence"] = max(
-                self.president.get_influence_on_bill(None),
-                self.prime_minister.get_influence_on_bill(None, **context)
-            ) * 0.4
+            context["executive_influence"] = (
+                max(
+                    self.president.get_influence_on_bill(None),  # type: ignore[arg-type]
+                    self.prime_minister.get_influence_on_bill(None, **context),  # type: ignore[arg-type]
+                )
+                * 0.4
+            )
         else:
             context["executive_influence"] = (
-                self.president.get_influence_on_bill(None)
-                + self.prime_minister.get_influence_on_bill(None, **context)
-            ) / 2 * 0.7
+                (
+                    self.president.get_influence_on_bill(None)  # type: ignore[arg-type]
+                    + self.prime_minister.get_influence_on_bill(None, **context)  # type: ignore[arg-type]
+                )
+                / 2
+                * 0.7
+            )
 
         return context
 
     def process_bill_result(self, bill: Bill, votes_for: int, total_votes: int) -> int:
         # Confidence vote handling (parliamentary side)
-        if getattr(bill, "is_confidence_vote", False):
-            if votes_for <= total_votes * 0.5:
-                self.prime_minister.in_office = False
-                logger.info("Government falls! %s loses confidence vote.", self.prime_minister.name)
+        if getattr(bill, "is_confidence_vote", False) and votes_for <= total_votes * 0.5:
+            self.prime_minister.in_office = False
+            logger.info("Government falls! %s loses confidence vote.", self.prime_minister.name)
 
         if votes_for <= total_votes / 2:
             return votes_for  # Bill already failed
 
         # Presidential veto (weaker than pure presidential system)
         if self.president.can_veto_bill(bill) and not self.cohabitation:
-            bill_pos = getattr(bill, 'position', None)
+            bill_pos = getattr(bill, "position", None)
             pres_pos = self.president.ideology.position if self.president.ideology else None
             if bill_pos and pres_pos:
                 dim = min(len(bill_pos), len(pres_pos))
@@ -231,9 +244,11 @@ class SemiPresidentialExecutive(Executive):
                 normalised = distance / max_dist if max_dist > 0 else 0.0
 
                 threshold = 0.4 + 0.4 * self.president.approval_rating
-                if normalised > threshold:
-                    if votes_for < total_votes * self.veto_override_threshold:
-                        logger.info("Semi-presidential veto on bill %s", getattr(bill, 'id', '?'))
-                        return 0
+                if (
+                    normalised > threshold
+                    and votes_for < total_votes * self.veto_override_threshold
+                ):
+                    logger.info("Semi-presidential veto on bill %s", getattr(bill, "id", "?"))
+                    return 0
 
         return votes_for

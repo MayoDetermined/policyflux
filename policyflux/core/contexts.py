@@ -1,21 +1,23 @@
 # policyflux/core/contexts.py
 from dataclasses import dataclass
-from typing import Optional
-from .types import PolicyPosition, UtilitySpace
+
+from .types import PolicyPosition
+
 
 @dataclass(frozen=True)
 class VotingContext:
     """Immutable context for voting decisions."""
+
     bill_position: PolicyPosition
     actor_ideal_point: PolicyPosition
     base_prob: float = 0.5
-    
+
     # Optional influence factors
-    public_support: Optional[float] = None
-    lobbying_intensity: Optional[float] = None
-    media_pressure: Optional[float] = None
-    party_line_support: Optional[float] = None
-    
+    public_support: float | None = None
+    lobbying_intensity: float | None = None
+    media_pressure: float | None = None
+    party_line_support: float | None = None
+
     def with_base_prob(self, prob: float) -> "VotingContext":
         """Return new context with updated base_prob."""
         return VotingContext(
@@ -28,9 +30,11 @@ class VotingContext:
             party_line_support=self.party_line_support,
         )
 
+
 @dataclass(frozen=True)
 class SimulationContext:
     """Context for entire simulation run."""
+
     policy_dimensions: int
     num_actors: int
     num_bills: int

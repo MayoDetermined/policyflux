@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import Any
+
 
 class LayerDataProcessor(ABC):
     """Abstract base class for layer data processors."""
@@ -8,11 +9,11 @@ class LayerDataProcessor(ABC):
         self.name = name
 
     @abstractmethod
-    def forward(self, data: List) -> None:
+    def forward(self, data: list[Any]) -> None:
         """Forward the data through the processor. Default implementation does nothing."""
         pass
 
     @abstractmethod
-    def encode(self, data: List) -> List:
+    def encode(self, data: list[Any]) -> list[Any]:
         """Encode the input data and return the encoded data."""
         pass

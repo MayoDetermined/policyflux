@@ -1,22 +1,26 @@
-from typing import List, Optional, Tuple, Type
+from typing import Any
 
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
 from typing_extensions import Self
 
+from policyflux.exceptions import EngineNotConfiguredError
+from policyflux.logging_config import logger
+
 from ..core.id_generator import get_id_generator
-from ..core.layer_template import Layer
+from ..core.layer import Layer
 from ..core.types import UtilitySpace
+
 
 class SequentialNeuralLayer(Layer, nn.Sequential):
     def __init__(
         self,
         input_size: int,
         output_size: int = 2,
-        id: Optional[int] = None,
+        id: int | None = None,
         name: str = "SequentialNeuralLayer",
-        architecture: Optional[List[nn.Module]] = None,
+        architecture: list[nn.Module] | None = None,
     ) -> None:
         if id is None:
             id = get_id_generator().generate_layer_id()
@@ -25,17 +29,17 @@ class SequentialNeuralLayer(Layer, nn.Sequential):
         nn.Sequential.__init__(self, *(architecture or []))
 
         self.device: torch.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.optimizer: Optional[torch.optim.Optimizer] = None
-        self.loss_fn: Optional[nn.Module] = None
-        self.train_loader: Optional[DataLoader] = None
-        self.val_loader: Optional[DataLoader] = None
+        self.optimizer: torch.optim.Optimizer | None = None
+        self.loss_fn: nn.Module | None = None
+        self.train_loader: DataLoader | None = None
+        self.val_loader: DataLoader | None = None
         self.epochs: int = 1
         self.batch_size: int = 32
 
         # ensure model parameters live on the chosen device
         self.to(self.device)
 
-    def call(self, bill_space: UtilitySpace, **kwargs) -> float:
+    def call(self, bill_space: UtilitySpace, **kwargs: Any) -> float:
         tensor_input = torch.tensor(bill_space, dtype=torch.float32, device=self.device)
         output = self.forward(tensor_input)
         return float(output.squeeze().item())
@@ -56,15 +60,17 @@ class SequentialNeuralLayer(Layer, nn.Sequential):
             x = x.to(self.device)
         return super().forward(x)
 
-    def set_nn_architecture(self, architecture: List[nn.Module]) -> None:
+    def set_nn_architecture(self, architecture: list[nn.Module]) -> None:
         self._modules.clear()
         for layer in architecture:
             self.append_neural_layer(layer)
         self.to(self.device)
 
-    def _run_train_step(self, batch: Tuple[torch.Tensor, torch.Tensor]) -> float:
+    def _run_train_step(self, batch: tuple[torch.Tensor, torch.Tensor]) -> float:
         if self.optimizer is None or self.loss_fn is None:
-            raise RuntimeError("Optimizer and loss_fn must be set. Call compile(...) first.")
+            raise EngineNotConfiguredError(
+                "Optimizer and loss_fn must be set. Call compile(...) first."
+            )
 
         inputs, targets = batch
         inputs = inputs.to(self.device)
@@ -94,10 +100,15 @@ class SequentialNeuralLayer(Layer, nn.Sequential):
             avg_loss = epoch_loss / batch_count if batch_count else 0.0
             if self.val_loader is not None:
                 val_loss = self.run_validation()
-                # simple progress print; users can replace with logging
-                print(f"Epoch {epoch}/{self.epochs} - train_loss={avg_loss:.6f} val_loss={val_loss:.6f}")
+                logger.info(
+                    "Epoch %d/%d - train_loss=%.6f val_loss=%.6f",
+                    epoch,
+                    self.epochs,
+                    avg_loss,
+                    val_loss,
+                )
             else:
-                print(f"Epoch {epoch}/{self.epochs} - train_loss={avg_loss:.6f}")
+                logger.info("Epoch %d/%d - train_loss=%.6f", epoch, self.epochs, avg_loss)
 
     def run_validation(self) -> float:
         if self.val_loader is None or self.loss_fn is None:
@@ -120,19 +131,19 @@ class SequentialNeuralLayer(Layer, nn.Sequential):
 
     def compile(
         self,
-        optimizer_cls: Type[torch.optim.Optimizer] = torch.optim.SGD,
+        optimizer_cls: type[torch.optim.Optimizer] = torch.optim.SGD,
         lr: float = 1e-3,
-        loss_fn: Optional[nn.Module] = None,
+        loss_fn: nn.Module | None = None,
         epochs: int = 10,
         batch_size: int = 32,
-        train_dataset: Optional[torch.utils.data.Dataset] = None,
-        val_dataset: Optional[torch.utils.data.Dataset] = None,
+        train_dataset: torch.utils.data.Dataset | None = None,
+        val_dataset: torch.utils.data.Dataset | None = None,
     ) -> None:
         # Setup training configuration
         self.epochs = epochs
         self.batch_size = batch_size
         self.loss_fn = loss_fn or nn.MSELoss()
-        self.optimizer = optimizer_cls(self.parameters(), lr=lr)
+        self.optimizer = optimizer_cls(self.parameters(), lr=lr)  # type: ignore[call-arg]
 
         if train_dataset is not None:
             self.train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)

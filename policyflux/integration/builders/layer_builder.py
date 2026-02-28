@@ -1,29 +1,35 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import List, Iterable
-from ..config import IntegrationConfig, LayerConfig
+from typing import Any
+
+from policyflux.exceptions import ConfigurationError
+
 from ...core.types import PolicySpace
-from ...pfrandom import random as pf_random
-from ...toolbox.advanced_actors.lobby import SequentialLobbyer
-from ...toolbox.advanced_actors.whips import SequentialWhip
-from ...layers.idealpoint import IdealPointLayer
-from ...layers.public_pressure import PublicOpinionLayer
+from ...layers.government_agenda import GovernmentAgendaLayer
+from ...layers.ideal_point import IdealPointLayer
 from ...layers.lobbying import LobbyingLayer
 from ...layers.media_pressure import MediaPressureLayer
 from ...layers.party import PartyDisciplineLayer
-from ...layers.government_agenta import GovernmentAgendaLayer
+from ...layers.public_pressure import PublicOpinionLayer
+from ...pfrandom import random as pf_random
+from ...toolbox.advanced_actors.lobby import SequentialLobbyist
+from ...toolbox.advanced_actors.whips import SequentialWhip
+from ..config import IntegrationConfig, LayerConfig
+
 
 @dataclass
 class LayerBuilderContext:
     policy_dim: int
     layer_config: LayerConfig
-    lobbyists: Iterable[SequentialLobbyer]
+    lobbyists: Iterable[SequentialLobbyist]
     whips: Iterable[SequentialWhip]
+
 
 def build_layers(
     config: IntegrationConfig,
-    lobbyists: Iterable[SequentialLobbyer],
+    lobbyists: Iterable[SequentialLobbyist],
     whips: Iterable[SequentialWhip],
-) -> List:
+) -> list[Any]:
     layers = []
     layer_cfg = config.layer_config
 
@@ -36,10 +42,13 @@ def build_layers(
         )
         for name in layer_cfg.layer_names:
             from ..registry import build_layer_by_name
+
             layers.append(build_layer_by_name(name, context))
         if layer_cfg.include_neural:
             if layer_cfg.neural_layer_factory is None:
-                raise ValueError("neural_layer_factory must be provided when include_neural=True")
+                raise ConfigurationError(
+                    "neural_layer_factory must be provided when include_neural=True"
+                )
             layers.append(layer_cfg.neural_layer_factory())
         return layers
 
@@ -63,8 +72,8 @@ def build_layers(
 
     if layer_cfg.include_lobbying:
         lobbying = LobbyingLayer(id=None, intensity=layer_cfg.lobbying_intensity)
-        for lobbyer in lobbyists:
-            lobbying.add_lobbyst(lobbyer)
+        for lobbyist in lobbyists:
+            lobbying.add_lobbyist(lobbyist)
         layers.append(lobbying)
 
     if layer_cfg.include_media_pressure:
@@ -88,7 +97,9 @@ def build_layers(
 
     if layer_cfg.include_neural:
         if layer_cfg.neural_layer_factory is None:
-            raise ValueError("neural_layer_factory must be provided when include_neural=True")
+            raise ConfigurationError(
+                "neural_layer_factory must be provided when include_neural=True"
+            )
         layers.append(layer_cfg.neural_layer_factory())
 
     return layers

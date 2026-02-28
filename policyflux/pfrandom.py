@@ -3,16 +3,16 @@
 Provides a minimal wrapper around `random.Random` so the whole package
 can share a single seeded RNG or re-seed per-session.
 """
-import random as _random
-from typing import Optional
-from .integration.config import get_settings
 
+import random as _random
+
+from .integration.config import get_settings
 
 # module-level RNG instance
 _RNG: _random.Random = _random.Random(get_settings().seed)
 
 
-def set_seed(seed: Optional[int]) -> None:
+def set_seed(seed: int | None) -> None:
     """Re-seed the package RNG (use None to reinitialise non-deterministically)."""
     global _RNG
     if seed is None:

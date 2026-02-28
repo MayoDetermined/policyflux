@@ -1,5 +1,8 @@
-from ..config import IntegrationConfig, AdvancedActorsConfig, LayerConfig
+from typing import Any
+
 from ...core.executive import ExecutiveType
+from ..config import AdvancedActorsConfig, IntegrationConfig, LayerConfig
+
 
 def create_presidential_config(
     num_actors: int = 100,
@@ -7,8 +10,8 @@ def create_presidential_config(
     iterations: int = 300,
     seed: int = 42,
     president_approval: float = 0.5,
-    veto_override_threshold: float = 2/3,
-    **kwargs
+    veto_override_threshold: float = 2 / 3,
+    **kwargs: Any,
 ) -> IntegrationConfig:
     """Create configuration for a presidential system (US-style).
 
@@ -28,7 +31,7 @@ def create_presidential_config(
         executive_type=ExecutiveType.PRESIDENTIAL,
         president_approval_rating=president_approval,
         veto_override_threshold=veto_override_threshold,
-        **{k: v for k, v in kwargs.items() if k in AdvancedActorsConfig.__dataclass_fields__}
+        **{k: v for k, v in kwargs.items() if k in AdvancedActorsConfig.__dataclass_fields__},
     )
 
     layer_config = LayerConfig(
@@ -42,6 +45,10 @@ def create_presidential_config(
         seed=seed,
         layer_config=layer_config,
         actors_config=actors_config,
-        **{k: v for k, v in kwargs.items() if k in IntegrationConfig.__dataclass_fields__
-           and k not in ['layer_config', 'actors_config']}
+        **{
+            k: v
+            for k, v in kwargs.items()
+            if k in IntegrationConfig.__dataclass_fields__
+            and k not in ["layer_config", "actors_config"]
+        },
     )

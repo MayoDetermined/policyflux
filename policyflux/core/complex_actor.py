@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from policyflux.core.types import PolicySpace
 
@@ -11,7 +10,7 @@ class ComplexActor(ABC):
     attributes are consumed by Layer implementations during vote aggregation.
     """
 
-    def __init__(self, id: int, name: str, ideology: Optional[PolicySpace] = None) -> None:
+    def __init__(self, id: int, name: str, ideology: PolicySpace | None = None) -> None:
         self.id: int = id
         self.name: str = name
         self.ideology: PolicySpace = ideology if ideology is not None else PolicySpace(2)

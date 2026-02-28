@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import Any
+
 
 class DataProcessor(ABC):
     """Abstract base class for data processors."""
@@ -8,11 +9,11 @@ class DataProcessor(ABC):
         self.name = name
 
     @abstractmethod
-    def fit(self, data: List) -> None:
+    def fit(self, data: list[Any]) -> None:
         """Fit the processor to the data. Default implementation does nothing."""
         pass
 
     @abstractmethod
-    def process(self, data: List) -> List:
+    def process(self, data: list[Any]) -> list[Any]:
         """Process the input data and return the processed data."""
         pass

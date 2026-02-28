@@ -1,7 +1,7 @@
-from typing import List, Optional
+from typing import Any
 
-from policyflux.core.layer_template import Layer
 from policyflux.core.id_generator import get_id_generator
+from policyflux.core.layer import Layer
 from policyflux.core.types import UtilitySpace
 from policyflux.toolbox.advanced_actors.whips import SequentialWhip
 
@@ -11,8 +11,8 @@ class PartyDisciplineLayer(Layer):
 
     def __init__(
         self,
-        id: Optional[int] = None,
-        party_whips: Optional[List[SequentialWhip]] = None,
+        id: int | None = None,
+        party_whips: list[SequentialWhip] | None = None,
         discipline_base_strength: float = 0.5,
         party_line_support: float = 0.5,
         name: str = "PartyDiscipline",
@@ -22,7 +22,7 @@ class PartyDisciplineLayer(Layer):
         if id is None:
             id = get_id_generator().generate_layer_id()
         super().__init__(id, name, input_dim, output_dim)
-        self.whips: List[SequentialWhip] = party_whips if party_whips is not None else []
+        self.whips: list[SequentialWhip] = party_whips if party_whips is not None else []
         self.discipline_base_strength: float = max(0.0, min(1.0, discipline_base_strength))
         self.party_line_support: float = max(0.0, min(1.0, party_line_support))
 
@@ -63,8 +63,8 @@ class PartyDisciplineLayer(Layer):
         avg = total / len(self.whips)
         return max(0.0, min(1.0, avg))
 
-    def call(self, bill_space: UtilitySpace, **kwargs) -> float:
-        base_prob = kwargs.get("base_prob", 0.5)
+    def call(self, bill_space: UtilitySpace, **kwargs: Any) -> float:
+        base_prob: float = float(kwargs.get("base_prob", 0.5))
         discipline_strength = self._aggregate_whip_strength()
         party_line = self._aggregate_party_line()
         speaker_agenda = kwargs.get("speaker_agenda_support")

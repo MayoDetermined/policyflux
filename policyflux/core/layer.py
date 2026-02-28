@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Any
+
 from ..core.id_generator import get_id_generator
 from .types import UtilitySpace
-from .contexts import VotingContext
+
 
 class Layer(ABC):
-    def __init__(self, id: Optional[int] = None,
-                name: str = "",
-                input_dim: int = 2,
-                output_dim: int = 2) -> None:
+    def __init__(
+        self, id: int | None = None, name: str = "", input_dim: int = 2, output_dim: int = 2
+    ) -> None:
         if id is None:
             id = get_id_generator().generate_layer_id()
         self.id: int = id
@@ -17,14 +17,14 @@ class Layer(ABC):
         self.name: str = name or self.__class__.__name__
 
     @abstractmethod
-    def call(self, bill_space: UtilitySpace, **kwargs) -> float:
+    def call(self, bill_space: UtilitySpace, **kwargs: Any) -> float:
         """
         Compute layer's influence on voting decision.
-        
+
         Args:
             bill_space: Bill's position in policy space
             **kwargs: Additional context (e.g., actor's ideal point, lobbying intensity)
-            
+
         Returns:
             Float between 0 and 1 representing likelihood of support
         """

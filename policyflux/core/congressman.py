@@ -1,18 +1,19 @@
 from abc import ABC, abstractmethod
-from typing import Optional
-from .bill_template import Bill
-from .layer_template import Layer
+from typing import Any
 
-class CongressMan(ABC):
-    def __init__(self, id: int, yes_chance: Optional[float] = None) -> None:
+from .bill import Bill
+
+
+class CongressMember(ABC):
+    def __init__(self, id: int, yes_chance: float | None = None) -> None:
         self.id: int = id
         self.yes_chance: float = yes_chance if yes_chance is not None else 0.5
 
     @abstractmethod
-    def vote(self, bill: Bill, **kwargs) -> bool:
+    def vote(self, bill: Bill, **kwargs: Any) -> bool:
         """
         Docstring for vote
-        
+
         :param self: Description
         :param bill: Description
         :type bill: Bill

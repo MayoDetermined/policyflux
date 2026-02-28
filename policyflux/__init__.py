@@ -11,84 +11,209 @@ Recommended imports:
 This module exposes core abstractions, utilities, and provides access to all submodules.
 """
 
-from typing import Any
+__all__ = [
+    "LAYER_REGISTRY",
+    "AdvancedActorsConfig",
+    "AggregationStrategy",
+    "AverageAggregation",
+    # Core abstractions
+    "Bill",
+    "BuildError",
+    "ComplexActor",
+    "ConfigurationError",
+    "CongressMember",
+    "CongressModel",
+    "DeterministicEngine",
+    "DeterministicVoting",
+    "DimensionMismatchError",
+    # Engines
+    "Engine",
+    "EngineNotConfiguredError",
+    "Executive",
+    "ExecutiveActor",
+    "ExecutiveType",
+    "GovernmentAgendaLayer",
+    "IdGenerator",
+    "IdealPointEncoderDF",
+    # Layers
+    "IdealPointLayer",
+    "IdealPointTextEncoder",
+    # Integration
+    "IntegrationConfig",
+    "Layer",
+    "LayerBuilderContext",
+    "LayerConfig",
+    "LobbyingLayer",
+    "MPEngine",
+    "MediaPressureLayer",
+    "MultiplicativeAggregation",
+    "OptionalDependencyError",
+    "ParallelMonteCarlo",
+    "PartyDisciplineLayer",
+    # Exceptions
+    "PolicyFluxError",
+    "PolicyPosition",
+    "PolicySpace",
+    "PolicyVector",
+    "ProbabilisticVoting",
+    "PublicOpinionLayer",
+    "RegistryError",
+    "SequentialAggregation",
+    "SequentialBill",
+    "SequentialCongressModel",
+    "SequentialLobbyist",
+    "SequentialMonteCarlo",
+    "SequentialPresident",
+    "SequentialSpeaker",
+    # Toolbox
+    "SequentialVoter",
+    "SequentialWhip",
+    "ServiceContainer",
+    "Session",
+    "Settings",
+    "SimulationContext",
+    "SimulationError",
+    "SoftVoting",
+    "UtilitySpace",
+    "ValidationError",
+    "VotingContext",
+    "VotingStrategy",
+    "WeightedAggregation",
+    "bake_a_pie",
+    "build_advanced_actors",
+    "build_aggregation_strategy",
+    "build_bill",
+    "build_congress",
+    "build_engine",
+    "build_executive",
+    "build_layer_by_name",
+    "build_layers",
+    "build_session",
+    # Reports
+    "craft_a_bar",
+    "create_parliamentary_config",
+    "create_presidential_config",
+    "create_semi_presidential_config",
+    "get_id_generator",
+    "get_rng",
+    # Configuration & utilities
+    "get_settings",
+    # Lazy import
+    "import_models",
+    "logger",
+    "random",
+    "register_layer",
+    "set_seed",
+]
+
 import importlib
+from typing import Any
 
 # --- Core abstractions ---
-from .core import (  # noqa: F401
-    Bill, CongressModel, CongressMan, Layer, ComplexActor,
-    ExecutiveType, ExecutiveActor, Executive,
-    PolicyVector, UtilitySpace, PolicySpace, PolicyPosition,
-    VotingContext, SimulationContext,
-    VotingStrategy, ProbabilisticVoting, DeterministicVoting, SoftVoting,
-    AggregationStrategy, SequentialAggregation, AverageAggregation,
-    WeightedAggregation, MultiplicativeAggregation,
+from .core import (
+    AggregationStrategy,
+    AverageAggregation,
+    Bill,
+    ComplexActor,
+    CongressMember,
+    CongressModel,
+    DeterministicVoting,
+    Executive,
+    ExecutiveActor,
+    ExecutiveType,
+    IdGenerator,
+    Layer,
+    MultiplicativeAggregation,
+    PolicyPosition,
+    PolicySpace,
+    PolicyVector,
+    ProbabilisticVoting,
+    SequentialAggregation,
     ServiceContainer,
-    IdGenerator, get_id_generator,
-)
-
-# --- Configuration & utilities ---
-from .integration.config import get_settings, Settings  # noqa: F401
-from .logging_config import logger  # noqa: F401
-from .pfrandom import set_seed, get_rng, random  # noqa: F401
-
-# --- Toolbox (concrete implementations) ---
-from .toolbox import (  # noqa: F401
-    SequentialVoter,
-    SequentialBill,
-    SequentialCongressModel,
-    SequentialLobbyer,
-    SequentialSpeaker,
-    SequentialWhip,
-    SequentialPresident,
-)
-
-# --- Layers ---
-from .layers import (  # noqa: F401
-    IdealPointLayer,
-    IdealPointEncoderDF,
-    IdealPointTextEncoder,
-    PublicOpinionLayer,
-    LobbyingLayer,
-    MediaPressureLayer,
-    PartyDisciplineLayer,
-    GovernmentAgendaLayer,
+    SimulationContext,
+    SoftVoting,
+    UtilitySpace,
+    VotingContext,
+    VotingStrategy,
+    WeightedAggregation,
+    get_id_generator,
 )
 
 # --- Engines ---
-from .engines import (  # noqa: F401
+from .engines import (
+    DeterministicEngine,
     Engine,
     MPEngine,
-    Session,
-    SequentialMonteCarlo,
     ParallelMonteCarlo,
-    DeterministicEngine,
+    SequentialMonteCarlo,
+    Session,
+)
+
+# --- Exceptions ---
+from .exceptions import (
+    BuildError,
+    ConfigurationError,
+    DimensionMismatchError,
+    EngineNotConfiguredError,
+    OptionalDependencyError,
+    PolicyFluxError,
+    RegistryError,
+    SimulationError,
+    ValidationError,
 )
 
 # --- Integration (builders, registry, presets) ---
-from .integration import (  # noqa: F401
-    IntegrationConfig,
-    AdvancedActorsConfig,
-    LayerConfig,
+from .integration import (
     LAYER_REGISTRY,
-    register_layer,
-    build_layer_by_name,
-    build_executive,
-    build_advanced_actors,
-    build_layers,
-    build_congress,
-    build_bill,
-    build_session,
-    build_engine,
-    build_aggregation_strategy,
+    AdvancedActorsConfig,
+    IntegrationConfig,
     LayerBuilderContext,
-    create_presidential_config,
+    LayerConfig,
+    build_advanced_actors,
+    build_aggregation_strategy,
+    build_bill,
+    build_congress,
+    build_engine,
+    build_executive,
+    build_layer_by_name,
+    build_layers,
+    build_session,
     create_parliamentary_config,
+    create_presidential_config,
     create_semi_presidential_config,
+    register_layer,
+)
+
+# --- Configuration & utilities ---
+from .integration.config import Settings, get_settings
+
+# --- Layers ---
+from .layers import (
+    GovernmentAgendaLayer,
+    IdealPointEncoderDF,
+    IdealPointLayer,
+    IdealPointTextEncoder,
+    LobbyingLayer,
+    MediaPressureLayer,
+    PartyDisciplineLayer,
+    PublicOpinionLayer,
+)
+from .logging_config import logger
+from .pfrandom import get_rng, random, set_seed
+
+# --- Toolbox (concrete implementations) ---
+from .toolbox import (
+    SequentialBill,
+    SequentialCongressModel,
+    SequentialLobbyist,
+    SequentialPresident,
+    SequentialSpeaker,
+    SequentialVoter,
+    SequentialWhip,
 )
 
 # --- Reports ---
-from .utils.reports import craft_a_bar, bake_a_pie  # noqa: F401
+from .utils.reports import bake_a_pie, craft_a_bar
 
 
 def import_models() -> Any:
