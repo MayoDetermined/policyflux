@@ -25,12 +25,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any
 
-from ..core.pf_typing import PolicySpace
-from ..layers.ideal_point import IdealPointLayer
-from ..pfrandom import random as pf_random
-from .actor_models import SequentialVoter
-from .congress_model import SequentialCongressModel
-from .parliament_models import (
+from ...core.pf_typing import PolicySpace
+from ...layers.ideal_point import IdealPointLayer
+from ...pfrandom import random as pf_random
+from ...toolbox.actor_models import SequentialVoter
+from ...toolbox.congress_model import SequentialCongressModel
+from ...toolbox.parliament_models import (
     ChamberConfig,
     ChamberRole,
     MultiChamberParliamentModel,

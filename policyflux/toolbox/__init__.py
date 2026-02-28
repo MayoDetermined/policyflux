@@ -55,7 +55,7 @@ from .parliament_models import (
     PassageThreshold,
     UpperChamberPowers,
 )
-from .parliament_presets import (
+from ..integration.presets.parliament_presets import (
     PARLIAMENT_PRESETS,
     ParliamentPresetConfig,
     create_australian_parliament,
