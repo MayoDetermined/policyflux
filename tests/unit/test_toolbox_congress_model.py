@@ -8,11 +8,10 @@ from policyflux.core.pf_typing import PolicySpace, UtilitySpace
 from policyflux.exceptions import DimensionMismatchError
 from policyflux.layers.ideal_point import IdealPointLayer
 from policyflux.toolbox.actor_models import SequentialVoter
-from policyflux.toolbox.special_actors.speaker import SequentialSpeaker
-from policyflux.toolbox.special_actors.white_house import SequentialPresident
 from policyflux.toolbox.bill_models import SequentialBill
 from policyflux.toolbox.congress_model import SequentialCongressModel
-
+from policyflux.toolbox.special_actors.speaker import SequentialSpeaker
+from policyflux.toolbox.special_actors.white_house import SequentialPresident
 
 # ---------------------------------------------------------------------------
 # Helpers

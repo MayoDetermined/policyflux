@@ -1,4 +1,3 @@
-import pytest
 
 from policyflux.layers.public_pressure import PublicOpinionLayer
 

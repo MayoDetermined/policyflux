@@ -4,7 +4,6 @@ import pytest
 
 from policyflux.core.id_generator import get_id_generator
 
-
 os.environ.setdefault("MPLBACKEND", "Agg")
 
 

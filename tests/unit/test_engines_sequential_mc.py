@@ -1,15 +1,12 @@
 """Tests for policyflux.engines.sequential_monte_carlo.SequentialMonteCarlo."""
 
-import pytest
 
-import policyflux.pfrandom as pfrandom
 from policyflux.integration import (
     AdvancedActorsConfig,
     IntegrationConfig,
     LayerConfig,
     build_engine,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

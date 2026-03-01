@@ -1,6 +1,5 @@
 """Tests for policyflux.engines.deterministic_engine.DeterministicEngine."""
 
-import pytest
 
 import policyflux.pfrandom as pfrandom
 from policyflux.core.abstract_layer import Layer
@@ -10,7 +9,6 @@ from policyflux.engines.session_management import Session
 from policyflux.toolbox.actor_models import SequentialVoter
 from policyflux.toolbox.bill_models import SequentialBill
 from policyflux.toolbox.congress_model import SequentialCongressModel
-
 
 # ---------------------------------------------------------------------------
 # Helpers

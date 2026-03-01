@@ -1,7 +1,7 @@
 import pytest
 
-from policyflux.exceptions import OptionalDependencyError
 from policyflux.data_processing import text_processor as tp
+from policyflux.exceptions import OptionalDependencyError
 
 
 def _install_fake_torch(monkeypatch: pytest.MonkeyPatch) -> None:

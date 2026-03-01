@@ -3,17 +3,15 @@
 import pytest
 
 import policyflux.pfrandom as pfrandom
+from policyflux.core.abstract_layer import Layer
 from policyflux.core.aggregation_strategy import (
     AggregationStrategy,
     AverageAggregation,
-    SequentialAggregation,
 )
-from policyflux.core.abstract_layer import Layer
 from policyflux.core.pf_typing import UtilitySpace
 from policyflux.exceptions import ValidationError
 from policyflux.toolbox.actor_models import SequentialVoter
 from policyflux.toolbox.bill_models import SequentialBill
-
 
 # ---------------------------------------------------------------------------
 # Helpers

@@ -1,6 +1,6 @@
+from policyflux.engines.abstract_engine import MPEngine
 from policyflux.engines.parallel_monte_carlo import ParallelMonteCarlo
 from policyflux.engines.session_management import Session
-from policyflux.engines.abstract_engine import MPEngine
 
 
 class _DummyCongress:
