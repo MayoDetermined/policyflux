@@ -4,7 +4,7 @@ import pytest
 
 from policyflux.exceptions import ValidationError
 from policyflux.layers.lobbying_ergmp import LobbyingERGMPLayer
-from policyflux.models.lobbying_ergmp import LobbyingERGMPModel
+from policyflux.math_models.lobbying_ergmp import LobbyingERGMPModel
 from policyflux.toolbox.special_actors.lobby import SequentialLobbyist
 
 

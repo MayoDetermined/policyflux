@@ -53,7 +53,7 @@ class LobbyingERGMPModel:
         self.theta_transitivity: float = theta_transitivity
         self.theta_homophily: float = theta_homophily
 
-        # Bipartite adjacency matrix: lobbyists × legislators
+        # Bipartite adjacency matrix: lobbyists x legislators
         self.adjacency: list[list[int]] = [
             [0] * n_legislators for _ in range(n_lobbyists)
         ]
@@ -161,7 +161,7 @@ class LobbyingERGMPModel:
             seed: Optional random seed for reproducibility
 
         Returns:
-            Bipartite adjacency matrix (lobbyists × legislators)
+            Bipartite adjacency matrix (lobbyists x legislators)
         """
         if seed is not None:
             pfrandom.set_seed(seed)

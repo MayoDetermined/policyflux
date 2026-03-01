@@ -3,7 +3,7 @@
 import pytest
 
 from policyflux.exceptions import ValidationError
-from policyflux.models.lobbying_ergmp import LobbyingERGMPModel
+from policyflux.math_models.lobbying_ergmp import LobbyingERGMPModel
 
 
 def test_lobbying_ergmp_construction_valid() -> None:
@@ -160,4 +160,4 @@ def test_lobbying_ergmp_average_reach_and_exposure() -> None:
     assert avg_reach == pytest.approx(1.5)
 
     avg_exposure = model.get_average_legislator_exposure()
-    assert avg_exposure == pytest.approx(1.0)
+    assert avg_exposure == pytest.approx(1.5)

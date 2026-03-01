@@ -10,6 +10,7 @@ from __future__ import annotations
 import math
 from collections.abc import Iterator
 from dataclasses import dataclass
+from typing import overload
 
 from policyflux.exceptions import DimensionMismatchError, ValidationError
 
@@ -41,7 +42,13 @@ class PolicyPosition:
     def __len__(self) -> int:
         return len(self.coordinates)
 
-    def __getitem__(self, index: int) -> float:
+    @overload
+    def __getitem__(self, index: int) -> float: ...
+
+    @overload
+    def __getitem__(self, index: slice) -> tuple[float, ...]: ...
+
+    def __getitem__(self, index: int | slice) -> float | tuple[float, ...]:
         return self.coordinates[index]
 
     # -- Properties ---------------------------------------------------------
@@ -81,6 +88,14 @@ class PolicyPosition:
         """Utility function (inverse distance)."""
         dist = self.distance_to(bill_position)
         return 1.0 / (1.0 + dist)
+
+
+#: Type alias - a raw coordinate vector (plain list or tuple of floats).
+PolicyVector = list[float] | tuple[float, ...]
+
+#: Type alias - alias for :class:`PolicyPosition`, used in legacy layer
+#: signatures that accept bill/utility positions.
+UtilitySpace = PolicyPosition
 
 
 class PolicySpace:

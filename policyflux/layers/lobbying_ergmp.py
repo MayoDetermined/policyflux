@@ -8,7 +8,7 @@ each legislator, then aggregates their influence on voting decisions.
 from typing import Any
 
 from policyflux.exceptions import ValidationError
-from policyflux.models.lobbying_ergmp import LobbyingERGMPModel
+from policyflux.math_models.lobbying_ergmp import LobbyingERGMPModel
 from policyflux.toolbox.special_actors.lobby import SequentialLobbyist
 
 from ..core.abstract_layer import Layer

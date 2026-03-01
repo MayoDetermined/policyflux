@@ -1,6 +1,6 @@
 import pytest
 
-from policyflux.core.pf_typing import PolicySpace
+from policyflux.core.pf_typing import PolicyPosition, PolicySpace
 from policyflux.exceptions import DimensionMismatchError
 from policyflux.layers.ideal_point import IdealPointLayer
 
@@ -21,21 +21,21 @@ def test_ideal_point_construction() -> None:
 
 def test_ideal_point_call_returns_float_in_range() -> None:
     layer = _make_layer([0.3, 0.7], [0.5, 0.5])
-    result = layer.call([0.4, 0.6])
+    result = layer.call(PolicyPosition((0.4, 0.6)))
     assert 0.0 <= result <= 1.0
 
 
 def test_ideal_point_dimension_mismatch_raises() -> None:
     layer = _make_layer([0.3, 0.7], [0.5, 0.5])
     with pytest.raises(DimensionMismatchError):
-        layer.call([0.5, 0.5, 0.5])
+        layer.call(PolicyPosition((0.5, 0.5, 0.5)))
 
 
 def test_ideal_point_closer_to_bill_higher_prob() -> None:
     sq = [0.5, 0.5]
     close_layer = _make_layer([0.4, 0.6], sq)
     far_layer = _make_layer([0.0, 0.0], sq)
-    bill = [0.4, 0.6]
+    bill = PolicyPosition((0.4, 0.6))
     assert close_layer.call(bill) > far_layer.call(bill)
 
 

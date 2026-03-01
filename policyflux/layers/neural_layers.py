@@ -8,12 +8,12 @@ from typing_extensions import Self
 from policyflux.exceptions import EngineNotConfiguredError
 from policyflux.logging_config import logger
 
-from ..core.id_generator import get_id_generator
 from ..core.abstract_layer import Layer
+from ..core.id_generator import get_id_generator
 from ..core.pf_typing import PolicyPosition
 
 
-class SequentialNeuralLayer(Layer, nn.Sequential):
+class SequentialNeuralLayer(Layer, nn.Sequential):  # type: ignore[misc]
     def __init__(
         self,
         input_size: int,
@@ -143,7 +143,7 @@ class SequentialNeuralLayer(Layer, nn.Sequential):
         self.epochs = epochs
         self.batch_size = batch_size
         self.loss_fn = loss_fn or nn.MSELoss()
-        self.optimizer = optimizer_cls(self.parameters(), lr=lr)  # type: ignore[call-arg]
+        self.optimizer = optimizer_cls(self.parameters(), lr=lr)
 
         if train_dataset is not None:
             self.train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)

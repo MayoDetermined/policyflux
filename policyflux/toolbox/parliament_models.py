@@ -3,13 +3,13 @@
 This module provides infrastructure for simulating bicameral and multi-chamber
 legislative systems. Key abstractions:
 
-- ``ChamberRole``         – role of a chamber in the legislature
-- ``UpperChamberPowers``  – how much power the upper house has over bills
-- ``PassageThreshold``    – quorum/threshold required to pass in a chamber
-- ``ChamberConfig``       – full configuration for one chamber
-- ``ChamberVoteResult``   – result of a single chamber's vote
-- ``ParliamentVoteResult``– aggregated result across all chambers
-- ``MultiChamberParliamentModel`` – orchestrator that routes bills through chambers
+- ``ChamberRole``         - role of a chamber in the legislature
+- ``UpperChamberPowers``  - how much power the upper house has over bills
+- ``PassageThreshold``    - quorum/threshold required to pass in a chamber
+- ``ChamberConfig``       - full configuration for one chamber
+- ``ChamberVoteResult``   - result of a single chamber's vote
+- ``ParliamentVoteResult``- aggregated result across all chambers
+- ``MultiChamberParliamentModel`` - orchestrator that routes bills through chambers
 """
 
 from __future__ import annotations
@@ -23,7 +23,6 @@ from policyflux.logging_config import logger
 from ..core.abstract_bill import Bill
 from ..core.pf_typing import PolicyPosition
 from .congress_model import SequentialCongressModel
-
 
 # ---------------------------------------------------------------------------
 # Enumerations
@@ -326,7 +325,7 @@ class MultiChamberParliamentModel:
         )
 
         if upper_cfg is not None and _is_money_bill(bill) and upper_cfg.budget_bill_exempt:
-            # Money bill: upper chamber has no say – only lower chamber votes.
+            # Money bill: upper chamber has no say - only lower chamber votes.
             return self._lower_only_vote(bill, bill_position, **context)
 
         if len(self._chambers) == 2:
@@ -400,7 +399,7 @@ class MultiChamberParliamentModel:
             round_number=1,
         )
         logger.info(
-            "[%s] Money bill – only %s votes: %d/%d (%s)",
+            "[%s] Money bill - only %s votes: %d/%d (%s)",
             self.name,
             cfg.name,
             votes_for,
@@ -414,7 +413,7 @@ class MultiChamberParliamentModel:
             chamber_results=[result],
             final_votes_for=votes_for,
             final_votes_total=votes_total,
-            notes="Money bill – upper chamber exempt",
+            notes="Money bill - upper chamber exempt",
         )
 
     # ------------------------------------------------------------------

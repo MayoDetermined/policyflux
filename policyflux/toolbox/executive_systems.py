@@ -1,5 +1,6 @@
 """Concrete implementations of executive systems."""
 
+from collections.abc import Sequence
 from math import sqrt
 from typing import Any
 
@@ -11,7 +12,7 @@ from ..core.id_generator import get_id_generator
 from ..core.pf_typing import PolicySpace
 
 
-def _euclidean_distance(a: list[float], b: list[float]) -> float:
+def _euclidean_distance(a: Sequence[float], b: Sequence[float]) -> float:
     """Euclidean distance between two policy positions."""
     return sqrt(sum((ai - bi) ** 2 for ai, bi in zip(a, b, strict=False)))
 

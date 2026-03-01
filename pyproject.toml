@@ -45,6 +45,8 @@ dev = [
   "ruff>=0.1.8",
   "pyyaml>=6.0",
   "pre-commit>=3.5",
+  "build>=1.2.0",
+  "twine>=5.1.0",
 ]
 examples = [
   "jupyter>=1.0",
@@ -65,7 +67,10 @@ include = ["policyflux*"]
 [tool.pytest.ini_options]
 addopts = "-q --tb=short"
 pythonpath = ["."]
+testpaths = ["tests"]
 markers = [
+  "unit: fast, isolated unit tests",
+  "smoke: end-to-end smoke tests",
   "slow: marks tests as slow (deselect with '-m \"not slow\"')",
 ]
 

@@ -8,22 +8,23 @@ members using basic :class:`~policyflux.layers.ideal_point.IdealPointLayer` voti
 
 Supported systems
 -----------------
-- :func:`create_uk_parliament`        – Westminster bicameral (Commons + Lords)
-- :func:`create_us_congress`          – US-style symmetric bicameral (House + Senate)
-- :func:`create_german_parliament`    – Bundestag + Bundesrat (consent/non-consent)
-- :func:`create_french_parliament`    – Assemblée Nationale + Sénat (navette)
-- :func:`create_italian_parliament`   – Camera dei Deputati + Senato (perfect bicameralism)
-- :func:`create_polish_parliament`    – Sejm + Senat (override by lower majority)
-- :func:`create_swedish_parliament`   – Riksdag (unicameral)
-- :func:`create_spanish_parliament`   – Congreso + Senado (weak upper)
-- :func:`create_australian_parliament`– House of Representatives + Senate (symmetric)
-- :func:`create_canadian_parliament`  – House of Commons + Senate (advisory upper)
+- :func:`create_uk_parliament`        - Westminster bicameral (Commons + Lords)
+- :func:`create_us_congress`          - US-style symmetric bicameral (House + Senate)
+- :func:`create_german_parliament`    - Bundestag + Bundesrat (consent/non-consent)
+- :func:`create_french_parliament`    - Assemblée Nationale + Sénat (navette)
+- :func:`create_italian_parliament`   - Camera dei Deputati + Senato (perfect bicameralism)
+- :func:`create_polish_parliament`    - Sejm + Senat (override by lower majority)
+- :func:`create_swedish_parliament`   - Riksdag (unicameral)
+- :func:`create_spanish_parliament`   - Congreso + Senado (weak upper)
+- :func:`create_australian_parliament`- House of Representatives + Senate (symmetric)
+- :func:`create_canadian_parliament`  - House of Commons + Senate (advisory upper)
 """
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 from ...core.pf_typing import PolicySpace
 from ...layers.ideal_point import IdealPointLayer
@@ -37,7 +38,6 @@ from ...toolbox.parliament_models import (
     PassageThreshold,
     UpperChamberPowers,
 )
-
 
 # ---------------------------------------------------------------------------
 # Internal helpers
@@ -105,8 +105,8 @@ def create_uk_parliament(
 ) -> MultiChamberParliamentModel:
     """Westminster bicameral parliament.
 
-    - **House of Commons** (650 seats) – simple majority, full legislative power.
-    - **House of Lords** (~800 members) – suspensive veto only; Commons can override
+    - **House of Commons** (650 seats) - simple majority, full legislative power.
+    - **House of Lords** (~800 members) - suspensive veto only; Commons can override
       after one round by re-passing the bill (Parliament Acts 1911/1949).
     - Money bills are exempt from Lords interference (``budget_bill_exempt=True``).
 
@@ -152,8 +152,8 @@ def create_us_congress(
 ) -> MultiChamberParliamentModel:
     """US-style symmetric bicameral congress.
 
-    - **House of Representatives** (435 seats) – simple majority.
-    - **Senate** (100 seats) – simple majority; full veto (both must pass identical text).
+    - **House of Representatives** (435 seats) - simple majority.
+    - **Senate** (100 seats) - simple majority; full veto (both must pass identical text).
     - Constitutional reference: Article I, United States Constitution.
 
     Note: this model does *not* simulate the Senate filibuster (which requires
@@ -199,18 +199,18 @@ def create_german_parliament(
 ) -> MultiChamberParliamentModel:
     """German federal parliament (Bundestag + Bundesrat).
 
-    - **Bundestag** (736 seats) – simple majority.
-    - **Bundesrat** (69 votes representing Länder) –
+    - **Bundestag** (736 seats) - simple majority.
+    - **Bundesrat** (69 votes representing Länder) -
 
       * *Consent laws* (``consent_law=True``): Bundesrat has a full veto.
-        These are laws that affect the Länder directly (about 40–50 % of all laws).
+        These are laws that affect the Länder directly (about 40-50 % of all laws).
       * *Non-consent laws* (``consent_law=False``): Bundesrat's veto can be
         overridden by the Bundestag with the same majority used to pass the law
         (simple majority → simple majority override; absolute majority needed
         for an absolute-majority bundesrat objection).
 
     Constitutional reference:
-        Articles 77–78, Grundgesetz (Basic Law) of Germany.
+        Articles 77-78, Grundgesetz (Basic Law) of Germany.
     """
     cfg = config or ParliamentPresetConfig()
     name = cfg.parliament_name or "Deutscher Bundestag/Bundesrat"
@@ -222,7 +222,7 @@ def create_german_parliament(
     bundesrat = _make_chamber(bundesrat_size, policy_dim, "BRat")
 
     powers = UpperChamberPowers.FULL_VETO if consent_law else UpperChamberPowers.OVERRIDE_BY_LOWER
-    override_threshold = 0.5 if not consent_law else 0.5  # absolute majority of Bundestag
+    override_threshold = 0.5  # absolute majority of Bundestag
 
     parliament = MultiChamberParliamentModel(name)
     parliament.add_chamber(
@@ -258,9 +258,9 @@ def create_french_parliament(
 ) -> MultiChamberParliamentModel:
     """French Parliament (Assemblée Nationale + Sénat), navette législative.
 
-    - **Assemblée Nationale** (577 seats) – simple majority, can invoke *dernier mot*
+    - **Assemblée Nationale** (577 seats) - simple majority, can invoke *dernier mot*
       (last word) after *max_navette_rounds* rounds of navette.
-    - **Sénat** (348 seats) – suspensive veto; AN always prevails in the end.
+    - **Sénat** (348 seats) - suspensive veto; AN always prevails in the end.
     - The ``max_navette_rounds`` parameter controls how many ping-pong exchanges
       occur before AN's position prevails.
 
@@ -303,17 +303,17 @@ def create_french_parliament(
 def create_italian_parliament(
     config: ParliamentPresetConfig | None = None,
 ) -> MultiChamberParliamentModel:
-    """Italian Parliament – *bicameralismo perfetto* (symmetric bicameralism).
+    """Italian Parliament - *bicameralismo perfetto* (symmetric bicameralism).
 
-    - **Camera dei Deputati** (400 seats) – simple majority.
-    - **Senato della Repubblica** (200 seats + 6 life senators) –
+    - **Camera dei Deputati** (400 seats) - simple majority.
+    - **Senato della Repubblica** (200 seats + 6 life senators) -
       full veto; both chambers must pass *identical text*.
 
     This is one of the rare examples of a truly symmetric bicameral system:
     neither chamber is dominant.
 
     Constitutional reference:
-        Articles 70–82, Costituzione della Repubblica Italiana (1948),
+        Articles 70-82, Costituzione della Repubblica Italiana (1948),
         as amended by constitutional law 2020 reducing seat numbers.
     """
     cfg = config or ParliamentPresetConfig()
@@ -353,14 +353,14 @@ def create_polish_parliament(
 ) -> MultiChamberParliamentModel:
     """Polish Parliament (Sejm + Senat).
 
-    - **Sejm** (460 seats) – simple majority passage; can override Senat
+    - **Sejm** (460 seats) - simple majority passage; can override Senat
       rejection with an *absolute majority* (231 votes out of 460).
-    - **Senat** (100 seats) – suspensive veto; Sejm can override.
+    - **Senat** (100 seats) - suspensive veto; Sejm can override.
     - The Senat has 30 days to amend or reject; if it does reject, the Sejm
       votes on whether to override (modelled as override_threshold = 0.5).
 
     Constitutional reference:
-        Articles 119–127, Konstytucja Rzeczypospolitej Polskiej (1997).
+        Articles 119-127, Konstytucja Rzeczypospolitej Polskiej (1997).
     """
     cfg = config or ParliamentPresetConfig()
     name = cfg.parliament_name or "Parlament RP"
@@ -399,9 +399,9 @@ def create_polish_parliament(
 def create_swedish_parliament(
     config: ParliamentPresetConfig | None = None,
 ) -> MultiChamberParliamentModel:
-    """Swedish Parliament – Riksdag (unicameral since 1971).
+    """Swedish Parliament - Riksdag (unicameral since 1971).
 
-    - **Riksdag** (349 seats) – simple majority; qualified majority (3/5) for
+    - **Riksdag** (349 seats) - simple majority; qualified majority (3/5) for
       constitutional amendments.
 
     Constitutional reference:
@@ -430,16 +430,16 @@ def create_swedish_parliament(
 def create_spanish_parliament(
     config: ParliamentPresetConfig | None = None,
 ) -> MultiChamberParliamentModel:
-    """Spanish Parliament (Cortes Generales) – Congreso + Senado.
+    """Spanish Parliament (Cortes Generales) - Congreso + Senado.
 
-    - **Congreso de los Diputados** (350 seats) – primary legislative chamber;
+    - **Congreso de los Diputados** (350 seats) - primary legislative chamber;
       can override Senate veto with absolute majority, and with simple majority
       after two months.
-    - **Senado** (265 seats) – suspensive veto; can amend or veto bills
+    - **Senado** (265 seats) - suspensive veto; can amend or veto bills
       but Congreso always has the final word.
 
     Constitutional reference:
-        Articles 74–91, Constitución Española (1978).
+        Articles 74-91, Constitución Española (1978).
     """
     cfg = config or ParliamentPresetConfig()
     name = cfg.parliament_name or "Cortes Generales"
@@ -477,14 +477,14 @@ def create_spanish_parliament(
 def create_australian_parliament(
     config: ParliamentPresetConfig | None = None,
 ) -> MultiChamberParliamentModel:
-    """Australian Parliament – House of Representatives + Senate.
+    """Australian Parliament - House of Representatives + Senate.
 
-    - **House of Representatives** (151 seats) – simple majority.
-    - **Senate** (76 seats) – symmetric chamber; full veto (both must agree).
+    - **House of Representatives** (151 seats) - simple majority.
+    - **Senate** (76 seats) - symmetric chamber; full veto (both must agree).
     - Deadlock resolution: double dissolution election (not modelled here).
 
     Constitutional reference:
-        Sections 53–60, Commonwealth of Australia Constitution Act (1900).
+        Sections 53-60, Commonwealth of Australia Constitution Act (1900).
     """
     cfg = config or ParliamentPresetConfig()
     name = cfg.parliament_name or "Parliament of Australia"
@@ -521,10 +521,10 @@ def create_australian_parliament(
 def create_canadian_parliament(
     config: ParliamentPresetConfig | None = None,
 ) -> MultiChamberParliamentModel:
-    """Canadian Parliament – House of Commons + Senate (appointed upper house).
+    """Canadian Parliament - House of Commons + Senate (appointed upper house).
 
-    - **House of Commons** (338 seats) – simple majority; primary chamber.
-    - **Senate of Canada** (105 seats, appointed) – formally full veto but in
+    - **House of Commons** (338 seats) - simple majority; primary chamber.
+    - **Senate of Canada** (105 seats, appointed) - formally full veto but in
       practice acts as a revising/advisory chamber. Modelled here as
       ``SUSPENSIVE_VETO`` with a single round (reflects political convention).
 
@@ -613,7 +613,10 @@ def create_parliament(
     if preset not in PARLIAMENT_PRESETS:
         available = ", ".join(sorted(PARLIAMENT_PRESETS.keys()))
         raise ValueError(f"Unknown parliament preset {preset!r}. Available: {available}")
-    factory = PARLIAMENT_PRESETS[preset]
+    factory = cast(
+        Callable[..., MultiChamberParliamentModel],
+        PARLIAMENT_PRESETS[preset],
+    )
     if kwargs:
         return factory(config, **kwargs)
     return factory(config)

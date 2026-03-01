@@ -151,7 +151,7 @@ config = IntegrationConfig(
 )
 
 engine = build_engine(config)
-engine.run_simulation()
+engine.run()
 print(engine)
 ```
 
@@ -190,7 +190,7 @@ config = create_presidential_config(
 from policyflux import build_engine
 
 engine = build_engine(config)
-engine.run_simulation()
+engine.run()
 print(engine)           # formatted summary with pass rate, mean votes, std
 ```
 
@@ -273,6 +273,7 @@ See [docs/architecture.md](docs/architecture.md) for a deeper breakdown.
 - [Getting started guide](docs/getting-started.md)
 - [Architecture guide](docs/architecture.md)
 - [API overview](docs/api-overview.md)
+- [Release guide](docs/release.md)
 
 ---
 
@@ -288,7 +289,8 @@ pip install -e ".[dev,torch,text-encoders]"
 
 ```bash
 pytest
-pytest -v
+pytest tests/unit -m unit
+pytest tests/smoke -m smoke
 ```
 
 ### Lint and type-check
@@ -296,6 +298,13 @@ pytest -v
 ```bash
 ruff check policyflux/
 mypy policyflux/
+```
+
+### Build package locally
+
+```bash
+python -m build
+twine check dist/*
 ```
 
 ---

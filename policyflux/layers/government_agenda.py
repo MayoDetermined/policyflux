@@ -2,8 +2,8 @@
 
 from typing import Any
 
-from ..core.id_generator import get_id_generator
 from ..core.abstract_layer import Layer
+from ..core.id_generator import get_id_generator
 from ..core.pf_typing import PolicyPosition
 
 

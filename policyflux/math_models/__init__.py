@@ -6,9 +6,9 @@ This module provides implementations of:
 - Tullock Contest Model: Rent-seeking and competitive expenditure modeling
 """
 
-from ..models.ergmp import ExponentialRandomGraphModel
-from ..models.lobbying_ergmp import LobbyingERGMPModel
-from ..models.tullock_contest import TullockContest
+from ..math_models.ergmp import ExponentialRandomGraphModel
+from ..math_models.lobbying_ergmp import LobbyingERGMPModel
+from ..math_models.tullock_contest import TullockContest
 
 __all__ = [
     "ExponentialRandomGraphModel",

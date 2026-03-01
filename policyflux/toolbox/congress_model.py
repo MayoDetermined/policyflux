@@ -8,9 +8,9 @@ from policyflux.exceptions import DimensionMismatchError
 from policyflux.logging_config import logger
 
 from ..core.abstract_bill import Bill
+from ..core.abstract_layer import Layer
 from ..core.congress_model import CongressModel
 from ..core.id_generator import get_id_generator
-from ..core.abstract_layer import Layer
 from .actor_models import SequentialVoter
 from .special_actors.lobby import SequentialLobbyist
 from .special_actors.speaker import SequentialSpeaker

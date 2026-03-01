@@ -29,6 +29,10 @@ __all__ = [
     "get_id_generator",
 ]
 
+from .abstract_bill import Bill
+from .abstract_executive import Executive, ExecutiveActor, ExecutiveType
+from .abstract_layer import Layer
+from .actors_abstract import ComplexActor, CongressMember
 from .aggregation_strategy import (
     AggregationStrategy,
     AverageAggregation,
@@ -36,15 +40,10 @@ from .aggregation_strategy import (
     SequentialAggregation,
     WeightedAggregation,
 )
-from .abstract_bill import Bill
-from .actors_abstract import ComplexActor
 from .congress_model import CongressModel
-from .actors_abstract import CongressMember
 from .container import ServiceContainer
 from .contexts import SimulationContext, VotingContext
-from .abstract_executive import Executive, ExecutiveActor, ExecutiveType
 from .id_generator import IdGenerator, get_id_generator
-from .abstract_layer import Layer
 from .pf_typing import PolicyPosition, PolicySpace, PolicyVector, UtilitySpace
 from .voting_strategy import (
     DeterministicVoting,

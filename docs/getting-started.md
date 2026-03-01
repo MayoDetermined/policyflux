@@ -51,7 +51,7 @@ config = IntegrationConfig(
 )
 
 engine = build_engine(config)
-engine.run_simulation()
+engine.run()
 print(engine)
 ```
 
@@ -78,8 +78,8 @@ parliamentary = create_parliamentary_config(
 eng1 = build_engine(presidential)
 eng2 = build_engine(parliamentary)
 
-eng1.run_simulation()
-eng2.run_simulation()
+eng1.run()
+eng2.run()
 
 print(f"Presidential pass rate: {eng1.pass_rate:.1%}")
 print(f"Parliamentary pass rate: {eng2.pass_rate:.1%}")
@@ -89,6 +89,8 @@ print(f"Parliamentary pass rate: {eng2.pass_rate:.1%}")
 
 ```bash
 pytest
+pytest tests/unit -m unit
+pytest tests/smoke -m smoke
 ruff check policyflux/
 mypy policyflux/
 ```

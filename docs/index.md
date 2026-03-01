@@ -9,6 +9,7 @@ PolicyFlux is a Python library for simulating legislative behavior under configu
 - [Getting Started](getting-started.md)
 - [Architecture](architecture.md)
 - [API Overview](api-overview.md)
+- [Release Guide](release.md)
 
 ## Who is this for?
 

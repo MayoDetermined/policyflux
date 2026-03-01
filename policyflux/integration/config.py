@@ -319,9 +319,7 @@ class IntegrationConfig:
         weights: list[float] | None = None,
     ) -> TIntegrationConfig:
         self.aggregation_strategy = strategy
-        if strategy == "weighted":
-            self.aggregation_weights = weights
-        elif weights is not None:
+        if strategy == "weighted" or weights is not None:
             self.aggregation_weights = weights
         return self
 

@@ -15,12 +15,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions CI/CD pipeline
 - Pre-commit configuration
 - Comprehensive test suite
+- Release workflow for trusted PyPI publishing (`.github/workflows/publish.yml`)
+- Release guide documentation (`docs/release.md`)
+- Explicit `unit` and `smoke` pytest markers with automatic assignment by test path
 
 ### Changed
 
 - Standardized all docstrings to Google style
 - Strict mypy and ruff linting configuration
 - Improved type annotations across all modules
+- CI split into dedicated quality, unit, smoke, coverage, and package-check jobs
+- Documentation examples updated to current engine API (`engine.run()`)
+- `SimpleTextVectorizer` now fails gracefully when optional `torch` dependency is missing
 
 ## [0.1.0] - 2026-02-26
 

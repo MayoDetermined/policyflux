@@ -53,7 +53,6 @@ from typing import Any
 from ..core.abstract_executive import ExecutiveType
 from .config import AdvancedActorsConfig, IntegrationConfig, LayerConfig
 
-
 # ======================================================================
 # Section sub-builders
 # ======================================================================
@@ -268,8 +267,8 @@ class PolicyFlux:
 
     Supports two usage styles:
 
-    * **Flat chaining** – all methods live on ``PolicyFlux`` directly.
-    * **Section builders** – call :meth:`layers`, :meth:`executive`, or
+    * **Flat chaining** - all methods live on ``PolicyFlux`` directly.
+    * **Section builders** - call :meth:`layers`, :meth:`executive`, or
       :meth:`special_actors` to enter a scoped sub-builder, then
       ``.done()`` to return here.
 

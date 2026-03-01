@@ -1,7 +1,7 @@
 from typing import Any
 
-from policyflux.core.id_generator import get_id_generator
 from policyflux.core.abstract_layer import Layer
+from policyflux.core.id_generator import get_id_generator
 from policyflux.core.pf_typing import PolicyPosition
 
 

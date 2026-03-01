@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from policyflux.core.actors_abstract import ComplexActor
 from policyflux.core.abstract_executive import Executive, ExecutiveType
+from policyflux.core.actors_abstract import ComplexActor
 
 from .abstract_bill import Bill
 from .actors_abstract import CongressMember

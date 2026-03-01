@@ -29,7 +29,7 @@ config = create_presidential_config(
 )
 
 engine = build_engine(config)
-engine.run_simulation()
+engine.run()
 
 print(f"Pass rate: {engine.pass_rate:.1%}")
 print(f"Accepted bills: {engine.accepted_bills}")
@@ -66,7 +66,7 @@ assert config.iterations == 300
 assert config.seed == 42
 
 engine = build_engine(config)
-engine.run_simulation()
+engine.run()
 ```
 
 You can also apply flat updates to an existing config:
@@ -124,7 +124,7 @@ These helpers produce ready-to-use `IntegrationConfig` setups for common institu
 ```python
 config = create_presidential_config(num_actors=100, policy_dim=2, iterations=200, seed=42)
 engine = build_engine(config)
-engine.run_simulation()
+engine.run()
 print(engine.pass_rate)
 ```
 

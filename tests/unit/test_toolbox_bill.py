@@ -1,8 +1,7 @@
 """Tests for policyflux.toolbox.bill.SequentialBill."""
 
-import pytest
-
 import policyflux.pfrandom as pfrandom
+from policyflux.core.pf_typing import PolicyPosition
 from policyflux.toolbox.bill_models import SequentialBill
 
 
@@ -18,11 +17,11 @@ class TestSequentialBillConstruction:
 
     def test_default_position_empty(self) -> None:
         bill = SequentialBill()
-        assert bill.position == []
+        assert bill.position is None
 
     def test_explicit_position(self) -> None:
         bill = SequentialBill(position=[0.1, 0.2, 0.3])
-        assert bill.position == [0.1, 0.2, 0.3]
+        assert bill.position == PolicyPosition((0.1, 0.2, 0.3))
 
     def test_initial_counters(self) -> None:
         bill = SequentialBill()

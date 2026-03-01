@@ -53,10 +53,10 @@ pytest tests/
 pytest tests/ --cov=policyflux --cov-report=term-missing
 
 # Run only unit tests
-pytest tests/unit/
+pytest tests/unit/ -m unit
 
 # Run only smoke tests
-pytest tests/smoke/
+pytest tests/smoke/ -m smoke
 ```
 
 ## Linting and Type Checking
@@ -73,6 +73,20 @@ mypy policyflux/
 ```
 
 All checks must pass before a pull request can be merged.
+
+## Release Readiness (maintainers)
+
+Before publishing a new version, run:
+
+```bash
+pytest tests/
+ruff check policyflux/
+mypy policyflux/
+python -m build
+twine check dist/*
+```
+
+Then follow [docs/release.md](docs/release.md) for the full GitHub/PyPI release flow.
 
 ## Code Style
 

@@ -1,15 +1,31 @@
+from __future__ import annotations
+
 import re
 from collections import Counter
 from typing import Any
 
-import torch
-from torch.nn.utils.rnn import pad_sequence
+from policyflux.exceptions import OptionalDependencyError
+
+try:
+    import torch
+    from torch.nn.utils.rnn import pad_sequence
+
+    HAS_TORCH = True
+except ImportError:
+    torch = None
+    pad_sequence = None
+    HAS_TORCH = False
 
 from .abstract_data_processor import DataProcessor
 
 
 class SimpleTextVectorizer(DataProcessor):
     def __init__(self, texts_to_process: list[str], tokenizer_name: str = "basic_english"):
+        if not HAS_TORCH:
+            raise OptionalDependencyError(
+                "SimpleTextVectorizer requires torch. Install optional dependency with: "
+                "pip install policyflux[torch]"
+            )
         super().__init__(name="SimpleTextVectorizer")
         self.texts = texts_to_process
         self.tokenizer_name = tokenizer_name
@@ -24,7 +40,7 @@ class SimpleTextVectorizer(DataProcessor):
         tokens = re.findall(r"\b\w+\b", text)
         return tokens
 
-    def build_vocab(self, min_freq: int = 1) -> "SimpleTextVectorizer":
+    def build_vocab(self, min_freq: int = 1) -> SimpleTextVectorizer:
         """Build vocabulary from all texts"""
         # Collect all tokens
         all_tokens = []
@@ -54,6 +70,8 @@ class SimpleTextVectorizer(DataProcessor):
 
     def collect_batch(self, batch: list[str]) -> torch.Tensor:
         """Convert batch of texts to padded tensor"""
+        if not HAS_TORCH or pad_sequence is None:
+            raise OptionalDependencyError("torch is required for collect_batch")
         tokenized_batch = [
             torch.tensor(self.text_pipeline(text), dtype=torch.long) for text in batch
         ]
@@ -72,6 +90,8 @@ class SimpleTextVectorizer(DataProcessor):
 
     def vectorize(self, text: str) -> torch.Tensor:
         """Vectorize a single text"""
+        if not HAS_TORCH:
+            raise OptionalDependencyError("torch is required for vectorize")
         if not self.word_to_idx:
             self.build_vocab()
         return torch.tensor(self.text_pipeline(text), dtype=torch.long)

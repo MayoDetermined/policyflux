@@ -6,12 +6,12 @@ import policyflux.pfrandom as pfrandom
 from policyflux.core import voting_strategy as vs_module
 from policyflux.exceptions import ValidationError
 
-from ..core.aggregation_strategy import AggregationStrategy, SequentialAggregation
 from ..core.abstract_bill import Bill
+from ..core.abstract_layer import Layer
 from ..core.actors_abstract import CongressMember
+from ..core.aggregation_strategy import AggregationStrategy, SequentialAggregation
 from ..core.contexts import VotingContext
 from ..core.id_generator import get_id_generator
-from ..core.abstract_layer import Layer
 from ..core.pf_typing import PolicyPosition
 
 
@@ -73,7 +73,9 @@ class SequentialVoter(CongressMember):
             if hasattr(layer, "space") and layer.space is not None:
                 space = layer.space
                 if hasattr(space, "position"):
-                    return space.position
+                    position = space.position
+                    if isinstance(position, PolicyPosition):
+                        return position
         return None
 
     def _build_voting_context(
@@ -97,6 +99,10 @@ class SequentialVoter(CongressMember):
         """Cast a vote on a bill using layers and voting strategy."""
         if bill_position is None:
             bill_position = getattr(bill, "position", None)
+
+        if bill_position is None:
+            bill_position = PolicyPosition((0.5,))
+
         decision_prob = self.compute_layers(bill_position, **context)
 
         if self.voting_strategy is not None:

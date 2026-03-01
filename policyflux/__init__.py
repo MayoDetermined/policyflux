@@ -11,11 +11,17 @@ Recommended imports:
 This module exposes core abstractions, utilities, and provides access to all submodules.
 """
 
+# ruff: noqa: RUF022
+
 __version__ = "0.1.0"
 
 __all__ = [
     "__version__",
     "LAYER_REGISTRY",
+    "model",
+    "PARLIAMENTARY_DEFAULT",
+    "PRESIDENTIAL_DEFAULT",
+    "SEMI_PRESIDENTIAL_DEFAULT",
     "AdvancedActorsConfig",
     "AggregationStrategy",
     "AverageAggregation",
@@ -109,8 +115,14 @@ __all__ = [
     # Lazy import
     "import_models",
     "logger",
+    "parliamentary_engine",
+    "presidential_engine",
     "random",
     "register_layer",
+    "run_parliamentary",
+    "run_presidential",
+    "run_semi_presidential",
+    "semi_presidential_engine",
     "set_seed",
 ]
 
@@ -173,6 +185,9 @@ from .exceptions import (
 # --- Integration (builders, registry, presets) ---
 from .integration import (
     LAYER_REGISTRY,
+    PARLIAMENTARY_DEFAULT,
+    PRESIDENTIAL_DEFAULT,
+    SEMI_PRESIDENTIAL_DEFAULT,
     ActorBuilder,
     AdvancedActorsConfig,
     ExecutiveBuilder,
@@ -193,7 +208,13 @@ from .integration import (
     create_parliamentary_config,
     create_presidential_config,
     create_semi_presidential_config,
+    parliamentary_engine,
+    presidential_engine,
     register_layer,
+    run_parliamentary,
+    run_presidential,
+    run_semi_presidential,
+    semi_presidential_engine,
 )
 
 # --- Configuration & utilities ---
@@ -229,8 +250,12 @@ from .utils.reports import bake_a_pie, craft_a_bar
 
 
 def import_models() -> Any:
-    """Import `policyflux.models` on demand and return the module.
+    """Import `policyflux.math_models` on demand and return the module.
 
     Use this to avoid importing model implementations at package import time.
     """
-    return importlib.import_module("policyflux.models")
+    return importlib.import_module("policyflux.math_models")
+
+
+# --- Model API (TF-style) ---
+from . import model  # noqa: E402  (must be after all other imports)

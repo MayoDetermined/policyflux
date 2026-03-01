@@ -1,8 +1,4 @@
 from ...core.abstract_executive import Executive, ExecutiveType
-from ...toolbox.special_actors.lobby import SequentialLobbyist
-from ...toolbox.special_actors.speaker import SequentialSpeaker
-from ...toolbox.special_actors.whips import SequentialWhip
-from ...toolbox.special_actors.white_house import SequentialPresident
 from ...toolbox.executive_systems import (
     ParliamentaryExecutive,
     President,
@@ -10,6 +6,10 @@ from ...toolbox.executive_systems import (
     PrimeMinister,
     SemiPresidentialExecutive,
 )
+from ...toolbox.special_actors.lobby import SequentialLobbyist
+from ...toolbox.special_actors.speaker import SequentialSpeaker
+from ...toolbox.special_actors.whips import SequentialWhip
+from ...toolbox.special_actors.white_house import SequentialPresident
 from ..config import IntegrationConfig
 
 

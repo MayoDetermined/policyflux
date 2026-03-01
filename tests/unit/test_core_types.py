@@ -10,7 +10,7 @@ from policyflux.exceptions import DimensionMismatchError, ValidationError
 def test_policy_space_valid_construction() -> None:
     space = PolicySpace(3)
     assert space.dimensions == 3
-    assert space.position == [0.0, 0.0, 0.0]
+    assert space.position == PolicyPosition((0.0, 0.0, 0.0))
 
 
 def test_policy_space_zero_dimensions_raises() -> None:
@@ -26,7 +26,7 @@ def test_policy_space_negative_dimensions_raises() -> None:
 def test_policy_space_set_get_position() -> None:
     space = PolicySpace(2)
     space.set_position([0.3, 0.7])
-    assert space.get_position() == pytest.approx([0.3, 0.7])
+    assert space.get_position().to_list() == pytest.approx([0.3, 0.7])
 
 
 def test_policy_space_set_position_copies_input() -> None:
@@ -34,15 +34,16 @@ def test_policy_space_set_position_copies_input() -> None:
     original = [0.3, 0.7]
     space.set_position(original)
     original[0] = 999.0
-    assert space.get_position() == pytest.approx([0.3, 0.7])
+    assert space.get_position().to_list() == pytest.approx([0.3, 0.7])
 
 
-def test_policy_space_get_position_returns_copy() -> None:
+def test_policy_space_get_position_returns_immutable_value() -> None:
     space = PolicySpace(2)
     space.set_position([0.3, 0.7])
     returned = space.get_position()
-    returned[0] = 999.0
-    assert space.get_position() == pytest.approx([0.3, 0.7])
+    with pytest.raises(TypeError):
+        returned[0] = 999.0
+    assert space.get_position().to_list() == pytest.approx([0.3, 0.7])
 
 
 def test_policy_space_wrong_dimension_raises() -> None:

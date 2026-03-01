@@ -184,7 +184,7 @@ class TullockContest:
 
         convergence_history = []
 
-        for iteration in range(max_iterations):
+        for _iteration in range(max_iterations):
             old_expenditures = self.expenditures.copy()
 
             # Best response for each contestant
@@ -226,7 +226,7 @@ class TullockContest:
 
     def analyze_contest_parameter_sensitivity(
         self, r_values: list[float] | None = None
-    ) -> dict[str, Any]:
+    ) -> dict[float, dict[str, Any]]:
         """
         Analyze how contest parameter r affects outcomes.
 

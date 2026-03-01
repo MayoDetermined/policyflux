@@ -9,8 +9,8 @@ try:
 
     HAS_TORCH = True
 except ImportError:
-    torch = None  # type: ignore[assignment]
-    nn = None  # type: ignore[assignment]
+    torch = None
+    nn = None
     HAS_TORCH = False
 
 import pandas as pd
@@ -21,11 +21,11 @@ try:
 
     HAS_SENTENCE_TRANSFORMERS = True
 except ImportError:
-    SentenceTransformer = None  # type: ignore[misc,assignment]
+    SentenceTransformer = None
     HAS_SENTENCE_TRANSFORMERS = False
 
-from ..core.id_generator import get_id_generator
 from ..core.abstract_layer import Layer
+from ..core.id_generator import get_id_generator
 from ..core.pf_typing import PolicyPosition, PolicySpace
 from .data_layer_processor import LayerDataProcessor
 
