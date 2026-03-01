@@ -54,11 +54,11 @@ examples = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/piotrpawelec/policyflux"
-Repository = "https://github.com/piotrpawelec/policyflux"
-Documentation = "https://piotrpawelec.github.io/policyflux/"
-Issues = "https://github.com/piotrpawelec/policyflux/issues"
-Changelog = "https://github.com/piotrpawelec/policyflux/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/MayoDetermined/policyflux"
+Repository = "https://github.com/MayoDetermined/policyflux"
+Documentation = "https://policyflux-docs.github.io"
+Issues = "https://github.com/MayoDetermined/policyflux/issues"
+Changelog = "https://github.com/MayoDetermined/policyflux/blob/main/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["."]

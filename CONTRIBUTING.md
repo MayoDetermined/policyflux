@@ -138,4 +138,4 @@ To add a new decision layer:
 
 ## Questions?
 
-Open a [GitHub Discussion](https://github.com/piotrpawelec/policyflux/discussions) for general questions about contributing or using the library.
+Open a [GitHub Discussion](https://github.com/MayoDetermined/policyflux/discussions) for general questions about contributing or using the library.
