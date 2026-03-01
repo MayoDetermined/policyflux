@@ -1,12 +1,12 @@
 import pytest
 
+from policyflux.core.abstract_layer import Layer
 from policyflux.core.aggregation_strategy import (
     AverageAggregation,
     MultiplicativeAggregation,
     SequentialAggregation,
     WeightedAggregation,
 )
-from policyflux.core.abstract_layer import Layer
 from policyflux.core.pf_typing import PolicyPosition
 from policyflux.exceptions import ValidationError
 

@@ -3,13 +3,12 @@
 import pytest
 
 from policyflux.core.abstract_executive import ExecutiveType
-from policyflux.integration.config import IntegrationConfig, LayerConfig
+from policyflux.integration.config import IntegrationConfig
 from policyflux.integration.presets import (
     create_parliamentary_config,
     create_presidential_config,
     create_semi_presidential_config,
 )
-
 
 # ===========================================================================
 # Presidential preset

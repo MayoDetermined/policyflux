@@ -3,14 +3,13 @@
 import pytest
 
 from policyflux.exceptions import RegistryError
-from policyflux.integration.config import LayerConfig
 from policyflux.integration.builders.layer_builder import LayerBuilderContext
+from policyflux.integration.config import LayerConfig
 from policyflux.integration.registry import (
     LAYER_REGISTRY,
     build_layer_by_name,
     register_layer,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

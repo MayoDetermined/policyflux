@@ -7,8 +7,8 @@ This module provides implementations of:
 """
 
 from .ergm import ExponentialRandomGraphModel
-from ..math_models.lobbying_ergmp import LobbyingERGMPModel
-from ..math_models.tullock_contest import TullockContest
+from .lobbying_ergmp import LobbyingERGMPModel
+from .tullock_contest import TullockContest
 
 __all__ = [
     "ExponentialRandomGraphModel",

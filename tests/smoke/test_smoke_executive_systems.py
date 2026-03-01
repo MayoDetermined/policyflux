@@ -4,21 +4,16 @@ Each test builds a small config, constructs an engine via ``build_engine``,
 runs the simulation, and verifies the basic shape of results.
 """
 
-import pytest
 
-import policyflux.pfrandom as pfrandom
 from policyflux.integration import build_engine
 from policyflux.integration.config import (
-    AdvancedActorsConfig,
     IntegrationConfig,
-    LayerConfig,
 )
 from policyflux.integration.presets import (
     create_parliamentary_config,
     create_presidential_config,
     create_semi_presidential_config,
 )
-
 
 # ---------------------------------------------------------------------------
 # Shared helpers

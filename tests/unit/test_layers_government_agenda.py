@@ -3,7 +3,6 @@ import pytest
 from policyflux.core.pf_typing import PolicyPosition
 from policyflux.layers.government_agenda import GovernmentAgendaLayer
 
-
 _BILL = PolicyPosition((0.2, 0.8))
 
 
