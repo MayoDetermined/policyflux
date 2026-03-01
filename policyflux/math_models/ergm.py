@@ -60,9 +60,7 @@ class ExponentialRandomGraphModel:
             raise ValidationError(f"Node ID {node_id} out of range [0, {self.n_nodes})")
         return self.node_attributes[node_id].get(attribute)
 
-    def _edge_probability(
-        self, i: int, j: int, current_adjacency: list[list[int]]
-    ) -> float:
+    def _edge_probability(self, i: int, j: int, current_adjacency: list[list[int]]) -> float:
         """
         Calculate the probability of edge (i, j) given current network state.
 

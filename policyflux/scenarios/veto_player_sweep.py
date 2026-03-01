@@ -170,8 +170,7 @@ def run(
     """
     steps = max(n_steps, 2)
     approval_levels = [
-        min_approval + (max_approval - min_approval) * i / (steps - 1)
-        for i in range(steps)
+        min_approval + (max_approval - min_approval) * i / (steps - 1) for i in range(steps)
     ]
 
     presidential = _sweep_system(
@@ -210,10 +209,7 @@ def run(
 
     print("Veto Player - Approval Rating Sweep")
     print("=" * 58)
-    print(
-        f"Actors: {num_actors}  |  Policy dim: {policy_dim}  |  "
-        f"Iterations: {iterations}"
-    )
+    print(f"Actors: {num_actors}  |  Policy dim: {policy_dim}  |  Iterations: {iterations}")
     print(
         f"Veto override threshold: {veto_override_threshold:.0%}  |  "
         f"Semi-presidential PM strength: {pm_party_strength}"

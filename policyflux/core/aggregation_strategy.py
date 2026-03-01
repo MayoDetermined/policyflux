@@ -18,7 +18,9 @@ class AggregationStrategy(ABC):
     """Abstract base class for layer aggregation strategies."""
 
     @abstractmethod
-    def aggregate(self, layers: list[Layer], bill_position: PolicyPosition, **context: Any) -> float:
+    def aggregate(
+        self, layers: list[Layer], bill_position: PolicyPosition, **context: Any
+    ) -> float:
         """
         Aggregate outputs from multiple layers.
 
@@ -41,7 +43,9 @@ class SequentialAggregation(AggregationStrategy):
     receiving the previous probability as 'base_prob' in context.
     """
 
-    def aggregate(self, layers: list[Layer], bill_position: PolicyPosition, **context: Any) -> float:
+    def aggregate(
+        self, layers: list[Layer], bill_position: PolicyPosition, **context: Any
+    ) -> float:
         if not layers:
             return 0.5  # Neutral default
 
@@ -64,7 +68,9 @@ class AverageAggregation(AggregationStrategy):
     Each layer computes independently, and the final decision is the mean.
     """
 
-    def aggregate(self, layers: list[Layer], bill_position: PolicyPosition, **context: Any) -> float:
+    def aggregate(
+        self, layers: list[Layer], bill_position: PolicyPosition, **context: Any
+    ) -> float:
         if not layers:
             return 0.5
 
@@ -93,7 +99,9 @@ class WeightedAggregation(AggregationStrategy):
             raise ValidationError(f"Weights must sum to 1.0, got {sum(weights)}")
         self.weights: list[float] = weights
 
-    def aggregate(self, layers: list[Layer], bill_position: PolicyPosition, **context: Any) -> float:
+    def aggregate(
+        self, layers: list[Layer], bill_position: PolicyPosition, **context: Any
+    ) -> float:
         if not layers:
             return 0.5
 
@@ -118,7 +126,9 @@ class MultiplicativeAggregation(AggregationStrategy):
     significantly reduces the final probability.
     """
 
-    def aggregate(self, layers: list[Layer], bill_position: PolicyPosition, **context: Any) -> float:
+    def aggregate(
+        self, layers: list[Layer], bill_position: PolicyPosition, **context: Any
+    ) -> float:
         if not layers:
             return 0.5
 

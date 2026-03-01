@@ -93,9 +93,7 @@ class SequentialVoter(CongressMember):
             party_line_support=context.get("party_line_support"),
         )
 
-    def vote(
-        self, bill: Bill, bill_position: PolicyPosition | None = None, **context: Any
-    ) -> bool:
+    def vote(self, bill: Bill, bill_position: PolicyPosition | None = None, **context: Any) -> bool:
         """Cast a vote on a bill using layers and voting strategy."""
         if bill_position is None:
             bill_position = getattr(bill, "position", None)
