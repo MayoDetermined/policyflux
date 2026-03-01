@@ -1,31 +1,25 @@
 # PolicyFlux Documentation
 
-Welcome to the PolicyFlux documentation.
+PolicyFlux is a Python package for simulating legislative decision-making under different institutional and political conditions.
 
-PolicyFlux is a Python library for simulating legislative behavior under configurable political and institutional conditions.
+## Start here
 
-## Documentation Map
+- New to the project: [Getting Started](getting-started.md)
+- Need public API summary: [API Overview](api-overview.md)
+- Want internals and module layout: [Architecture](architecture.md)
+- Publishing a release: [Release Guide](release.md)
 
-- [Getting Started](getting-started.md)
-- [Architecture](architecture.md)
-- [API Overview](api-overview.md)
-- [Release Guide](release.md)
+## Core concepts
 
-## Who is this for?
+- **Policy space**: an n-dimensional space used to represent policy positions.
+- **Actors and bills**: legislators and bills located in the same policy space.
+- **Decision layers**: composable influences that modify vote probabilities.
+- **Aggregation strategy**: method used to combine multiple layer outputs.
+- **Simulation engine**: deterministic or Monte Carlo runtime for voting sessions.
 
-- Political science researchers
-- Data scientists working with simulation workflows
-- Policy analysts exploring institutional what-if scenarios
-- Educators teaching legislative dynamics
+## Typical workflow
 
-## Core Ideas
-
-- **Policy space**: an n-dimensional representation of political positions.
-- **Ideal points**: positions of actors and bills in policy space.
-- **Decision layers**: composable influences that adjust voting probability.
-- **Aggregation strategy**: combines layer outputs into one final decision signal.
-- **Simulation engine**: executes repeated voting sessions with deterministic or stochastic behavior.
-
-## Next step
-
-If you are new to the project, start with [Getting Started](getting-started.md).
+1. Create an `IntegrationConfig` (directly or from a preset).
+2. Build an engine with `build_engine(config)`.
+3. Execute simulation with `engine.run()`.
+4. Read summary metrics such as pass rate and vote outcomes.

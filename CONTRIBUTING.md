@@ -1,10 +1,10 @@
 # Contributing to PolicyFlux
 
-Thank you for your interest in contributing to PolicyFlux! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to PolicyFlux. This guide describes the preferred contribution workflow.
 
 ## Code of Conduct
 
-This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+This project follows the [PolicyFlux Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
 
 ## How to Contribute
 
@@ -29,7 +29,7 @@ This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.
    ```
 3. Make your changes, following the code style guidelines below.
 4. Add or update tests for your changes.
-5. Run the test suite and linters (see below).
+5. Run tests, linting, and type checks (see below).
 6. Submit a pull request against the `main` branch.
 
 ## Development Setup
@@ -41,6 +41,12 @@ python -m venv .venv
 source .venv/bin/activate    # Linux/macOS
 .venv\Scripts\activate       # Windows
 pip install -e ".[dev]"
+```
+
+For PowerShell, you may need:
+
+```powershell
+.venv\Scripts\Activate.ps1
 ```
 
 ## Running Tests
@@ -58,6 +64,8 @@ pytest tests/unit/ -m unit
 # Run only smoke tests
 pytest tests/smoke/ -m smoke
 ```
+
+Use targeted test runs when touching a specific module, then run the full suite before opening a PR.
 
 ## Linting and Type Checking
 
@@ -94,6 +102,13 @@ Then follow [docs/release.md](docs/release.md) for the full GitHub/PyPI release 
 - Use type annotations for all public functions and methods.
 - Write docstrings in [Google style](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings).
 - Keep line length under 100 characters (enforced by ruff).
+
+## Commit and PR quality
+
+- Keep PRs focused and small when possible.
+- Update docs when behavior or public API changes.
+- Add changelog entries for user-visible changes.
+- Include migration notes when making breaking API changes.
 
 ## Project Structure
 

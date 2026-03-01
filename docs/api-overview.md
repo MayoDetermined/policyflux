@@ -1,6 +1,6 @@
 # API Overview
 
-This page summarizes the most commonly used public API entry points.
+This page summarizes the most common public entry points in the `policyflux` package.
 
 ## Primary imports
 
@@ -37,6 +37,12 @@ print(f"Rejected bills: {engine.rejected_bills}")
 ```
 
 For a custom setup, build an `IntegrationConfig` directly and pass it to `build_engine(config)`.
+
+## Preset vs custom configuration
+
+- Use presets (`create_*_config`) when comparing institutional systems quickly.
+- Use `IntegrationConfig(...)` when you want explicit control over each field.
+- Use `IntegrationConfig.from_flat(...)` or `with_flat(...)` for concise experiment scripts.
 
 ## Flat Configuration with defaults
 
@@ -90,6 +96,8 @@ Typical fields include:
 - `seed`
 - `layer_config`
 - `actors_config`
+- `aggregation_strategy`
+- `aggregation_weights`
 
 ### `LayerConfig`
 Controls layer inclusion and parameters, such as:
@@ -100,6 +108,7 @@ Controls layer inclusion and parameters, such as:
 - `include_media_pressure`
 - `include_party_discipline`
 - `include_government_agenda`
+- `include_neural`
 
 And corresponding strengths/intensities.
 
@@ -118,6 +127,15 @@ Constructs a fully configured simulation engine.
 - `create_semi_presidential_config(...)`
 
 These helpers produce ready-to-use `IntegrationConfig` setups for common institutional systems.
+
+### Low-level builders
+
+For finer control over composition, the integration layer also exposes:
+
+- `build_session(...)`
+- `build_bill(...)`
+- `build_congress(...)`
+- `build_layers(...)`
 
 ## Typical workflow
 

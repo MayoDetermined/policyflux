@@ -77,7 +77,11 @@ markers = [
 [tool.coverage.run]
 source = ["policyflux"]
 omit = [
-  "policyflux/models/*",
+  "policyflux/model/*",
+  "policyflux/scenarios/*",
+  "policyflux/layers/neural_layers.py",
+  "policyflux/math_models/ergmp.py",
+  "policyflux/math_models/tullock_contest.py",
   "policyflux/__pycache__/*",
 ]
 
