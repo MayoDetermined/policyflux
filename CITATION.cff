@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "PolicyFlux"
+version: 0.1.0
+date-released: "2026-02-26"
+authors:
+  - family-names: Pawelec
+    given-names: Piotr
+    orcid: "https://orcid.org/0009-0006-8691-6096"
+    affiliation: "Independent Researcher"
+repository-code: "https://github.com/MayoDetermined/policyflux"
+url: "https://policyflux-docs.github.io"
+license: MIT
+keywords:
+  - simulation
+  - legislative
+  - political-science
+  - monte-carlo
+  - agent-based-modeling
+  - computational-social-science
+  - python
+abstract: >-
+  PolicyFlux is a Python library for modeling and simulating legislative
+  voting processes under configurable political and institutional conditions.
+  It provides a composable architecture where decision layers representing
+  influences such as ideological preferences, public opinion, lobbying,
+  media pressure, party discipline, and government agenda control are combined
+  through pluggable aggregation strategies to determine legislator voting
+  behavior. The framework supports deterministic and Monte Carlo simulation
+  engines and ships with institutional presets for presidential, parliamentary,
+  and semi-presidential systems.
