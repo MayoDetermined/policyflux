@@ -5,9 +5,6 @@ on:
     types: [published]
   workflow_dispatch:
 
-permissions:
-  contents: read
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,8 +27,12 @@ jobs:
           path: dist/
 
   publish:
+    name: Upload release to PyPI
     needs: build
     runs-on: ubuntu-latest
+    environment:
+      name: release
+      url: https://pypi.org/p/policyflux
     permissions:
       id-token: write
     steps:
