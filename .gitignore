@@ -119,5 +119,4 @@ dmypy.json
 Thumbs.db
 
 # Project specific
-tmpclaude-*
 *.egg-info/
