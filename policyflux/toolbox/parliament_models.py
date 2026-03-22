@@ -320,9 +320,7 @@ class MultiChamberParliamentModel:
         if len(self._chambers) == 1:
             return self._unicameral_vote(bill, bill_position, **context)
 
-        upper_cfg = next(
-            (cfg for cfg in self._configs if cfg.role == ChamberRole.UPPER), None
-        )
+        upper_cfg = next((cfg for cfg in self._configs if cfg.role == ChamberRole.UPPER), None)
 
         if upper_cfg is not None and _is_money_bill(bill) and upper_cfg.budget_bill_exempt:
             # Money bill: upper chamber has no say - only lower chamber votes.
@@ -513,26 +511,52 @@ class MultiChamberParliamentModel:
 
         if upper_cfg.powers == UpperChamberPowers.FULL_VETO:
             return self._full_veto_path(
-                bill, bill_position, upper_ch, upper_cfg,
-                lower_votes_for, lower_votes_total, all_results, **context
+                bill,
+                bill_position,
+                upper_ch,
+                upper_cfg,
+                lower_votes_for,
+                lower_votes_total,
+                all_results,
+                **context,
             )
 
         if upper_cfg.powers == UpperChamberPowers.SUSPENSIVE_VETO:
             return self._suspensive_veto_path(
-                bill, bill_position, lower_ch, lower_cfg, upper_ch, upper_cfg,
-                all_results, **context
+                bill,
+                bill_position,
+                lower_ch,
+                lower_cfg,
+                upper_ch,
+                upper_cfg,
+                all_results,
+                **context,
             )
 
         if upper_cfg.powers == UpperChamberPowers.OVERRIDE_BY_LOWER:
             return self._override_by_lower_path(
-                bill, bill_position, lower_ch, lower_cfg, upper_ch, upper_cfg,
-                lower_votes_for, lower_votes_total, all_results, **context
+                bill,
+                bill_position,
+                lower_ch,
+                lower_cfg,
+                upper_ch,
+                upper_cfg,
+                lower_votes_for,
+                lower_votes_total,
+                all_results,
+                **context,
             )
 
         # Safety fallback
         return self._full_veto_path(
-            bill, bill_position, upper_ch, upper_cfg,
-            lower_votes_for, lower_votes_total, all_results, **context
+            bill,
+            bill_position,
+            upper_ch,
+            upper_cfg,
+            lower_votes_for,
+            lower_votes_total,
+            all_results,
+            **context,
         )
 
     def _full_veto_path(
@@ -570,7 +594,9 @@ class MultiChamberParliamentModel:
             upper_votes_total,
             "PASS" if upper_passed else "FAIL",
         )
-        notes = "Both chambers passed" if upper_passed else f"Failed in {upper_cfg.name} (full veto)"
+        notes = (
+            "Both chambers passed" if upper_passed else f"Failed in {upper_cfg.name} (full veto)"
+        )
         return ParliamentVoteResult(
             bill_id=bill.id,
             passed=upper_passed,
@@ -614,8 +640,11 @@ class MultiChamberParliamentModel:
             )
             logger.info(
                 "[%s] %s round %d: %d/%d (%s)",
-                self.name, upper_cfg.name, round_num,
-                upper_votes_for, upper_votes_total,
+                self.name,
+                upper_cfg.name,
+                round_num,
+                upper_votes_for,
+                upper_votes_total,
                 "PASS" if upper_passed else "FAIL",
             )
 
@@ -650,8 +679,11 @@ class MultiChamberParliamentModel:
                 )
                 logger.info(
                     "[%s] %s final override round %d: %d/%d (%s)",
-                    self.name, lower_cfg.name, round_num + 1,
-                    lower_votes_for, lower_votes_total,
+                    self.name,
+                    lower_cfg.name,
+                    round_num + 1,
+                    lower_votes_for,
+                    lower_votes_total,
                     "PASS" if lower_passed else "FAIL",
                 )
                 note = (
@@ -687,8 +719,12 @@ class MultiChamberParliamentModel:
             )
             logger.info(
                 "[%s] %s ping-pong round %d: %d/%d (%s)",
-                self.name, lower_cfg.name, round_num + 1,
-                lower_votes_for, lower_votes_total, "PASS" if lower_passed else "FAIL",
+                self.name,
+                lower_cfg.name,
+                round_num + 1,
+                lower_votes_for,
+                lower_votes_total,
+                "PASS" if lower_passed else "FAIL",
             )
             if not lower_passed:
                 return ParliamentVoteResult(
@@ -743,8 +779,10 @@ class MultiChamberParliamentModel:
         )
         logger.info(
             "[%s] %s: %d/%d (%s)",
-            self.name, upper_cfg.name,
-            upper_votes_for, upper_votes_total,
+            self.name,
+            upper_cfg.name,
+            upper_votes_for,
+            upper_votes_total,
             "PASS" if upper_passed else "FAIL",
         )
 
@@ -764,8 +802,11 @@ class MultiChamberParliamentModel:
         can_override = lower_votes_for >= override_votes_needed
         logger.info(
             "[%s] %s rejected; override check: %d/%d (need %.0f): %s",
-            self.name, upper_cfg.name,
-            lower_votes_for, lower_votes_total, override_votes_needed,
+            self.name,
+            upper_cfg.name,
+            lower_votes_for,
+            lower_votes_total,
+            override_votes_needed,
             "OVERRIDE" if can_override else "FAILED",
         )
         notes = (
@@ -811,7 +852,11 @@ class MultiChamberParliamentModel:
             )
             logger.info(
                 "[%s] %s: %d/%d (%s)",
-                self.name, cfg.name, votes_for, votes_total, "PASS" if passed else "FAIL",
+                self.name,
+                cfg.name,
+                votes_for,
+                votes_total,
+                "PASS" if passed else "FAIL",
             )
             if not passed:
                 return ParliamentVoteResult(

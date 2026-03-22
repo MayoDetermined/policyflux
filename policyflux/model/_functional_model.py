@@ -75,9 +75,7 @@ class Model(_ModelBase):
 
     def __init__(self, inputs: Input, outputs: _SymbolicNode) -> None:
         if not isinstance(inputs, Input):
-            raise TypeError(
-                f"'inputs' must be an Input node, got {type(inputs).__name__!r}."
-            )
+            raise TypeError(f"'inputs' must be an Input node, got {type(inputs).__name__!r}.")
         layer_specs = self._trace(inputs, outputs)
         super().__init__(
             num_actors=inputs.num_actors,
