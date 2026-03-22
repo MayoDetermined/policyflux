@@ -10,14 +10,22 @@ This project follows the [PolicyFlux Code of Conduct](CODE_OF_CONDUCT.md). By pa
 
 ### Reporting Bugs
 
+<<<<<<< HEAD
 - Use [GitHub Issues](https://github.com/MayoDetermined/policyflux/issues) to report bugs.
+=======
+- Use [GitHub Issues](https://github.com/piotrpawelec/policyflux/issues) to report bugs.
+>>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 - Include a minimal reproducible example when possible.
 - Describe the expected versus actual behavior.
 - Include your Python version and operating system.
 
 ### Suggesting Features
 
+<<<<<<< HEAD
 - Open a [GitHub Issue](https://github.com/MayoDetermined/policyflux/issues) with the "enhancement" label.
+=======
+- Open a [GitHub Issue](https://github.com/piotrpawelec/policyflux/issues) with the "enhancement" label.
+>>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 - Describe the use case and why the feature would be valuable.
 
 ### Submitting Pull Requests
@@ -35,7 +43,11 @@ This project follows the [PolicyFlux Code of Conduct](CODE_OF_CONDUCT.md). By pa
 ## Development Setup
 
 ```bash
+<<<<<<< HEAD
 git clone https://github.com/MayoDetermined/policyflux.git
+=======
+git clone https://github.com/piotrpawelec/policyflux.git
+>>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 cd policyflux
 python -m venv .venv
 source .venv/bin/activate    # Linux/macOS
@@ -114,6 +126,7 @@ Then follow [docs/release.md](docs/release.md) for the full GitHub/PyPI release 
 
 ```
 policyflux/
+<<<<<<< HEAD
   core/               # Base abstractions, typing, contexts, strategies, DI container
   layers/             # Decision layers (ideal point, public opinion, lobbying, media,
                       #   party discipline, government agenda, neural, ERGM lobbying)
@@ -131,6 +144,18 @@ policyflux/
 tests/
   unit/               # Unit tests
   smoke/              # Integration smoke tests
+=======
+  core/          # Base abstractions and strategies
+  layers/        # Decision layers (ideal point, lobbying, etc.)
+  engines/       # Simulation engines (Monte Carlo, deterministic)
+  integration/   # High-level config, builders, presets, fluent API
+  toolbox/       # Concrete implementations
+  data_processing/  # Text processing and encoders
+  utils/         # Reporting and utility helpers
+tests/
+  smoke/         # Integration smoke tests
+  unit/          # Unit tests
+>>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 ```
 
 ## Adding a Custom Layer
@@ -138,12 +163,19 @@ tests/
 To add a new decision layer:
 
 1. Create a new class in `policyflux/layers/` that inherits from `Layer`.
+<<<<<<< HEAD
 2. Implement the `call(bill_position, **kwargs) -> float` method (return value in [0, 1]).
 3. Implement the `compile()` method.
 4. Register it in `policyflux/integration/registry.py` with a factory function.
 5. Add a corresponding layer spec in `policyflux/model/layers.py` if you want Model API support.
 6. Export it from `policyflux/layers/__init__.py` and `policyflux/__init__.py`.
 7. Add tests in `tests/unit/`.
+=======
+2. Implement the `call()` and `compile()` methods.
+3. Register it in `policyflux/integration/registry.py` with a factory function.
+4. Add tests in `tests/unit/`.
+5. Export it from `policyflux/layers/__init__.py`.
+>>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 
 ## Questions?
 

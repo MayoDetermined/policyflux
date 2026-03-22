@@ -179,19 +179,27 @@ class _ModelBase:
         key = executive.lower().replace("-", "_")
         if key not in _EXECUTIVE_ALIASES:
             available = ", ".join(sorted(set(_EXECUTIVE_ALIASES.values())))
+<<<<<<< HEAD
             raise ValueError(
                 f"Unknown executive type {executive!r}. "
                 f"Available: {available}"
             )
+=======
+            raise ValueError(f"Unknown executive type {executive!r}. Available: {available}")
+>>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
         self._executive = _EXECUTIVE_ALIASES[key]
 
         # Validate aggregation
         agg_key = aggregation.lower()
         if agg_key not in _AGGREGATION_ALIASES:
             available = ", ".join(sorted(set(_AGGREGATION_ALIASES.values())))
+<<<<<<< HEAD
             raise ValueError(
                 f"Unknown aggregation {aggregation!r}. Available: {available}"
             )
+=======
+            raise ValueError(f"Unknown aggregation {aggregation!r}. Available: {available}")
+>>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
         self._aggregation = _AGGREGATION_ALIASES[agg_key]
 
         # Store executive kwargs (only non-None values)

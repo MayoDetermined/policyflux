@@ -143,10 +143,14 @@ def run(
     # --- Print summary ---
     print("Lobbying Intensity Sweep")
     print("=" * 58)
+<<<<<<< HEAD
     print(
         f"{'Intensity':>9} {'Avg votes':>9} {'Vote share':>10} "
         f"{'Passage':>9} {'Std':>7}"
     )
+=======
+    print(f"{'Intensity':>9} {'Avg votes':>9} {'Vote share':>10} {'Passage':>9} {'Std':>7}")
+>>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
     print("-" * 58)
     for p in results:
         bar = "#" * int(p.passage_rate * 20)

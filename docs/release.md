@@ -40,7 +40,11 @@ The `publish.yml` workflow should:
 ## 4) PyPI trusted publishing setup
 
 In PyPI project settings, ensure a trusted publisher exists for this repository:
+<<<<<<< HEAD
 - Owner/repo: `MayoDetermined/policyflux`
+=======
+- Owner/repo: `piotrpawelec/policyflux`
+>>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 - Workflow: `.github/workflows/publish.yml`
 - Environment (if used): `pypi`
 

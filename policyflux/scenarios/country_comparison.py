@@ -203,10 +203,14 @@ def run(
             f"{r.passage_rate:>7.1%} {r.avg_rounds:>8.2f}  {bar}"
         )
     print("-" * (col_w + 50))
+<<<<<<< HEAD
     print(
         f"Bills per parliament: {n_bills}  |  "
         f"Policy dim: {policy_dim}  |  Seed: {seed}"
     )
+=======
+    print(f"Bills per parliament: {n_bills}  |  Policy dim: {policy_dim}  |  Seed: {seed}")
+>>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 
     return results
 

@@ -194,9 +194,13 @@ class Sequential(_ModelBase):
                 raise ValueError("Layer dict missing 'class' key.")
             if class_name not in _LAYER_CLASS_MAP:
                 known = ", ".join(sorted(_LAYER_CLASS_MAP))
+<<<<<<< HEAD
                 raise ValueError(
                     f"Unknown layer class {class_name!r}. Known: {known}"
                 )
+=======
+                raise ValueError(f"Unknown layer class {class_name!r}. Known: {known}")
+>>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
             layer_cls = _LAYER_CLASS_MAP[class_name]
             obj.add(layer_cls(**layer_dict))
 

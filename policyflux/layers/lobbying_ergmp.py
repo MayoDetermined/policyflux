@@ -90,9 +90,13 @@ class LobbyingERGMPLayer(Layer):
         """Prepare layer for use."""
         pass
 
+<<<<<<< HEAD
     def _aggregate_lobbyist_pressure(
         self, connected_lobbyist_ids: list[int]
     ) -> float:
+=======
+    def _aggregate_lobbyist_pressure(self, connected_lobbyist_ids: list[int]) -> float:
+>>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
         """
         Aggregate pressure from lobbyists connected to a legislator.
 
