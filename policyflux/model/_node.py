@@ -1,11 +1,7 @@
 """Symbolic computation-graph nodes for the PolicyFlux functional API.
 
-<<<<<<< HEAD
 The functional API mirrors TensorFlow's ``keras.Input`` + ``keras.Model``
 pattern.  Users build a *computation graph* by:
-=======
-Users build a *computation graph* by:
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 
 1. Creating a root :class:`Input` node that fixes ``policy_dim`` and
    ``num_actors``.

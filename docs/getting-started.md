@@ -1,10 +1,6 @@
 # Getting Started
 
-<<<<<<< HEAD
 This guide walks through installation and progressively more advanced simulation examples.
-=======
-This guide walks through installation and a first end-to-end simulation run.
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 
 ## 1) Installation
 
@@ -17,11 +13,7 @@ pip install policyflux
 ### From source
 
 ```bash
-<<<<<<< HEAD
 git clone https://github.com/MayoDetermined/policyflux.git
-=======
-git clone https://github.com/piotrpawelec/policyflux.git
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 cd policyflux
 pip install -e .
 ```
@@ -29,24 +21,10 @@ pip install -e .
 ### Optional extras
 
 ```bash
-<<<<<<< HEAD
 pip install -e ".[torch]"           # Neural layers (PyTorch)
 pip install -e ".[text-encoders]"   # Sentence-transformers text encoding
 pip install -e ".[examples]"        # Jupyter notebook support
 pip install -e ".[dev]"             # Development tools (pytest, ruff, mypy)
-=======
-# Neural layers (PyTorch)
-pip install -e ".[torch]"
-
-# Text encoders
-pip install -e ".[text-encoders]"
-
-# Notebook/examples support
-pip install -e ".[examples]"
-
-# Development tools
-pip install -e ".[dev]"
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 ```
 
 ## 2) Verify installation
@@ -87,27 +65,8 @@ print(f"Accepted: {engine.accepted_bills}, Rejected: {engine.rejected_bills}")
 from policyflux import build_engine
 from policyflux import create_presidential_config, create_parliamentary_config
 
-<<<<<<< HEAD
 eng1 = build_engine(create_presidential_config(num_actors=100, iterations=200, seed=42))
 eng2 = build_engine(create_parliamentary_config(num_actors=100, iterations=200, seed=42))
-=======
-presidential = create_presidential_config(
-    num_actors=100,
-    policy_dim=2,
-    iterations=200,
-    seed=42,
-)
-
-parliamentary = create_parliamentary_config(
-    num_actors=100,
-    policy_dim=2,
-    iterations=200,
-    seed=42,
-)
-
-eng1 = build_engine(presidential)
-eng2 = build_engine(parliamentary)
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 
 eng1.run()
 eng2.run()
@@ -116,7 +75,6 @@ print(f"Presidential pass rate: {eng1.pass_rate:.1%}")
 print(f"Parliamentary pass rate: {eng2.pass_rate:.1%}")
 ```
 
-<<<<<<< HEAD
 ## 5) One-liner runners
 
 Skip config and engine construction entirely:
@@ -131,9 +89,6 @@ print(f"Pass rate: {result.pass_rate:.1%}")
 ## 6) Flat config
 
 Map all parameters across `IntegrationConfig`, `LayerConfig`, and `AdvancedActorsConfig` in a single flat call:
-=======
-## 5) Try flat config updates
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 
 ```python
 from policyflux import IntegrationConfig, build_engine
@@ -155,7 +110,6 @@ engine.run()
 print(engine.pass_rate)
 ```
 
-<<<<<<< HEAD
 ## 7) Fluent builder API
 
 ```python
@@ -313,9 +267,6 @@ engine = build_engine(config)
 ```
 
 ## 13) Development commands
-=======
-## 6) Development commands
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 
 ```bash
 pytest
@@ -338,8 +289,4 @@ python -c "import policyflux; print(policyflux.__file__)"
 
 ## Next step
 
-<<<<<<< HEAD
 Continue with [API Overview](api-overview.md) to explore the full public interface.
-=======
-Continue with [API Overview](api-overview.md) to explore the main public interfaces.
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9

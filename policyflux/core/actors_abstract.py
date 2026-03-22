@@ -22,10 +22,6 @@ class ComplexActor(ABC):
         """Return this actor's primary influence metric [0, 1]."""
         pass
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 class CongressMember(ABC):
     def __init__(self, id: int, yes_chance: float | None = None) -> None:
         self.id: int = id

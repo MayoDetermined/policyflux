@@ -15,7 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-<<<<<<< HEAD
 - Comprehensive documentation rewrite covering all project functionalities
 - README now documents: dataclass config, one-liner runners, fluent builder API, TF-style model API, flat config, country parliament presets, scenario runners, mathematical models, aggregation/voting strategies, executive systems, multi-chamber parliaments, special actors, all engine types, custom layer registration
 - docs/api-overview.md rewritten with full reference tables for every public class and method: configuration objects with all fields and defaults, all preset factories, fluent builder methods, model API (Sequential + Functional), decision layers, aggregation strategies, voting strategies, executive systems, scenario runners, math models, layer registry, multi-chamber parliaments, exception hierarchy, and utilities
@@ -25,8 +24,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CONTRIBUTING.md project structure updated with sub-directories and expanded custom layer guide
 - Unified GitHub URLs across all documentation (resolved MayoDetermined vs piotrpawelec inconsistency)
 - Fixed incorrect fluent API method names in docs (`.dimensions()` -> `.policy_dim()`, `.layer()` -> `.with_ideal_point()`)
-=======
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 - Coverage configuration corrected from `policyflux/models/*` to `policyflux/model/*`
 - Coverage scope tightened by excluding optional/heavy modules that are intentionally outside current unit-test focus
 - Repository-wide coverage significantly increased (from failing at ~57% to consistently above threshold, now ~85%)

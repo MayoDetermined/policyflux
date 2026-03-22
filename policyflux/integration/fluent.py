@@ -75,25 +75,17 @@ class LayerBuilder:
         self._cfg.include_ideal_point = enabled
         return self
 
-<<<<<<< HEAD
     def public_opinion(
         self, *, support: float | None = None, enabled: bool = True
     ) -> LayerBuilder:
-=======
-    def public_opinion(self, *, support: float | None = None, enabled: bool = True) -> LayerBuilder:
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
         self._cfg.include_public_opinion = enabled
         if support is not None:
             self._cfg.public_support = support
         return self
 
-<<<<<<< HEAD
     def lobbying(
         self, *, intensity: float | None = None, enabled: bool = True
     ) -> LayerBuilder:
-=======
-    def lobbying(self, *, intensity: float | None = None, enabled: bool = True) -> LayerBuilder:
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
         self._cfg.include_lobbying = enabled
         if intensity is not None:
             self._cfg.lobbying_intensity = intensity

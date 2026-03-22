@@ -105,7 +105,4 @@ class LobbyingLayer(Layer):
         lobbyist_pressure = self._aggregate_lobbyist_pressure()
         combined_pressure = max(-1.0, min(1.0, self.intensity + lobbyist_pressure))
         return self._apply_pressure(base_prob, combined_pressure)
-<<<<<<< HEAD
 
-=======
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9

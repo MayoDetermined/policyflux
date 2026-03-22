@@ -15,7 +15,6 @@
 
 PolicyFlux is in active early development. It is suitable for research workflows and prototyping, while parts of the API may still evolve between versions.
 
-<<<<<<< HEAD
 ## What PolicyFlux models
 
 PolicyFlux simulates legislative outcomes by combining:
@@ -33,52 +32,14 @@ PolicyFlux simulates legislative outcomes by combining:
 
 ## Installation
 
-=======
-Recommended usage:
-- ✅ Research and academic experiments
-- ✅ Scenario and policy prototyping
-- ⚠️ Workloads where occasional API changes are acceptable
-- ❌ Stable long-term production systems
-
-## What PolicyFlux models
-
-PolicyFlux simulates legislative outcomes by combining:
-- actors with preferences in an n-dimensional policy space,
-- bills represented in the same policy space,
-- composable influence layers (public opinion, lobbying, media, party discipline, agenda control),
-- institutional presets (presidential, parliamentary, semi-presidential),
-- deterministic and Monte Carlo execution engines.
-
-Typical users:
-- political scientists studying institutional dynamics,
-- data scientists running Monte Carlo experiments,
-- policy analysts exploring what-if scenarios,
-- educators teaching decision-making in political systems.
-
-## Installation
-
-Requirements:
-- Python 3.10+
-- `pip`
-
-Install from PyPI:
-
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 ```bash
 pip install policyflux
 ```
 
-<<<<<<< HEAD
 From source:
 
 ```bash
 git clone https://github.com/MayoDetermined/policyflux.git
-=======
-Install from source:
-
-```bash
-git clone https://github.com/piotrpawelec/policyflux.git
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 cd policyflux
 pip install -e .
 ```
@@ -86,42 +47,16 @@ pip install -e .
 Optional extras:
 
 ```bash
-<<<<<<< HEAD
 pip install -e ".[torch]"           # Neural layers (PyTorch)
 pip install -e ".[text-encoders]"   # Sentence-transformers text encoding
 pip install -e ".[examples]"        # Jupyter notebook support
 pip install -e ".[dev]"             # Development tools (pytest, ruff, mypy)
-=======
-# Neural layers (PyTorch)
-pip install -e ".[torch]"
-
-# Text encoders
-pip install -e ".[text-encoders]"
-
-# Notebook/examples support
-pip install -e ".[examples]"
-
-# Developer tooling
-pip install -e ".[dev]"
-
-# All common extras
-pip install -e ".[torch,text-encoders,examples,dev]"
-```
-
-Verify installation:
-
-```bash
-python -c "import policyflux; print(policyflux.__version__)"
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 ```
 
 ## Quick start
 
-<<<<<<< HEAD
 ### Dataclass-based configuration
 
-=======
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 ```python
 from policyflux import IntegrationConfig, LayerConfig, build_engine
 
@@ -146,7 +81,6 @@ print(f"Pass rate: {engine.pass_rate:.1%}")
 print(f"Accepted: {engine.accepted_bills}, Rejected: {engine.rejected_bills}")
 ```
 
-<<<<<<< HEAD
 ### One-liner runners
 
 Run a full simulation in a single call:
@@ -430,36 +364,6 @@ If you use PolicyFlux in your research, please cite:
 ```
 
 See also [CITATION.cff](CITATION.cff) for machine-readable citation metadata.
-=======
-## Main API entry points
-
-- `IntegrationConfig` – top-level simulation parameters.
-- `LayerConfig` – layer toggles and layer strengths/intensities.
-- `AdvancedActorsConfig` – lobbyists, whips, and executive-specific behavior.
-- `build_engine(config)` – build the configured simulation engine.
-- `create_presidential_config(...)`, `create_parliamentary_config(...)`, `create_semi_presidential_config(...)` – ready-to-run presets.
-
-## Architecture at a glance
-
-```text
-policyflux/
-├── core/            # abstractions, contexts, strategies
-├── layers/          # composable decision layers
-├── engines/         # deterministic + Monte Carlo execution
-├── integration/     # config, builders, presets, registry
-├── toolbox/         # concrete actor/bill/congress implementations
-├── data_processing/ # text and embedding helpers
-└── utils/           # reports and utility helpers
-```
-
-## Documentation
-
-- [Documentation index](docs/index.md)
-- [Getting started](docs/getting-started.md)
-- [API overview](docs/api-overview.md)
-- [Architecture](docs/architecture.md)
-- [Release guide](docs/release.md)
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 
 ## Development
 
@@ -470,11 +374,7 @@ ruff check policyflux/
 mypy policyflux/
 ```
 
-<<<<<<< HEAD
 For contribution workflow, see [CONTRIBUTING.md](CONTRIBUTING.md).
-=======
-For contribution workflow and standards, see [CONTRIBUTING.md](CONTRIBUTING.md).
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 
 ## License
 

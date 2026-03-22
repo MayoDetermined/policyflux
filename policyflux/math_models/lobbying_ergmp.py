@@ -54,7 +54,6 @@ class LobbyingERGMPModel:
         self.theta_homophily: float = theta_homophily
 
         # Bipartite adjacency matrix: lobbyists x legislators
-<<<<<<< HEAD
         self.adjacency: list[list[int]] = [
             [0] * n_legislators for _ in range(n_lobbyists)
         ]
@@ -78,21 +77,6 @@ class LobbyingERGMPModel:
     def set_legislator_attribute(
         self, legislator_id: int, attribute: str, value: Any
     ) -> None:
-=======
-        self.adjacency: list[list[int]] = [[0] * n_legislators for _ in range(n_lobbyists)]
-
-        # Node attributes
-        self.lobbyist_attributes: list[dict[str, Any]] = [{} for _ in range(n_lobbyists)]
-        self.legislator_attributes: list[dict[str, Any]] = [{} for _ in range(n_legislators)]
-
-    def set_lobbyist_attribute(self, lobbyist_id: int, attribute: str, value: Any) -> None:
-        """Set an attribute for a lobbyist (e.g., ideology, interest_type)."""
-        if not 0 <= lobbyist_id < self.n_lobbyists:
-            raise ValidationError(f"Lobbyist ID {lobbyist_id} out of range [0, {self.n_lobbyists})")
-        self.lobbyist_attributes[lobbyist_id][attribute] = value
-
-    def set_legislator_attribute(self, legislator_id: int, attribute: str, value: Any) -> None:
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
         """Set an attribute for a legislator (e.g., ideology, party)."""
         if not 0 <= legislator_id < self.n_legislators:
             raise ValidationError(
@@ -103,13 +87,9 @@ class LobbyingERGMPModel:
     def get_lobbyist_attribute(self, lobbyist_id: int, attribute: str) -> Any:
         """Get an attribute for a lobbyist."""
         if not 0 <= lobbyist_id < self.n_lobbyists:
-<<<<<<< HEAD
             raise ValidationError(
                 f"Lobbyist ID {lobbyist_id} out of range [0, {self.n_lobbyists})"
             )
-=======
-            raise ValidationError(f"Lobbyist ID {lobbyist_id} out of range [0, {self.n_lobbyists})")
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
         return self.lobbyist_attributes[lobbyist_id].get(attribute)
 
     def get_legislator_attribute(self, legislator_id: int, attribute: str) -> Any:
@@ -120,13 +100,9 @@ class LobbyingERGMPModel:
             )
         return self.legislator_attributes[legislator_id].get(attribute)
 
-<<<<<<< HEAD
     def _edge_probability(
         self, lobbyist_id: int, legislator_id: int
     ) -> float:
-=======
-    def _edge_probability(self, lobbyist_id: int, legislator_id: int) -> float:
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
         """
         Calculate the probability of edge (lobbyist, legislator).
 
@@ -138,12 +114,8 @@ class LobbyingERGMPModel:
         # Transitivity contribution - count common connections
         if self.theta_transitivity != 0:
             common_connections = sum(
-<<<<<<< HEAD
                 self.adjacency[lobbyist_id][k]
                 + self.adjacency[other_lobbyist][legislator_id]
-=======
-                self.adjacency[lobbyist_id][k] + self.adjacency[other_lobbyist][legislator_id]
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
                 for k in range(self.n_legislators)
                 for other_lobbyist in range(self.n_lobbyists)
                 if k != legislator_id and other_lobbyist != lobbyist_id
@@ -174,12 +146,8 @@ class LobbyingERGMPModel:
         shared_attrs = sum(
             1.0
             for attr in lobbyist_attrs
-<<<<<<< HEAD
             if attr in legislator_attrs
             and lobbyist_attrs[attr] == legislator_attrs[attr]
-=======
-            if attr in legislator_attrs and lobbyist_attrs[attr] == legislator_attrs[attr]
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
         )
 
         total_attrs = len(lobbyist_attrs)
@@ -199,13 +167,9 @@ class LobbyingERGMPModel:
             pfrandom.set_seed(seed)
 
         # Start with empty network
-<<<<<<< HEAD
         self.adjacency = [
             [0] * self.n_legislators for _ in range(self.n_lobbyists)
         ]
-=======
-        self.adjacency = [[0] * self.n_legislators for _ in range(self.n_lobbyists)]
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
 
         # Generate edges
         for i in range(self.n_lobbyists):
@@ -223,13 +187,9 @@ class LobbyingERGMPModel:
     def get_lobbyist_reach(self, lobbyist_id: int) -> list[int]:
         """Get list of legislator IDs that a lobbyist connects to."""
         if not 0 <= lobbyist_id < self.n_lobbyists:
-<<<<<<< HEAD
             raise ValidationError(
                 f"Lobbyist ID {lobbyist_id} out of range [0, {self.n_lobbyists})"
             )
-=======
-            raise ValidationError(f"Lobbyist ID {lobbyist_id} out of range [0, {self.n_lobbyists})")
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
         return [j for j in range(self.n_legislators) if self.adjacency[lobbyist_id][j]]
 
     def get_legislator_exposure(self, legislator_id: int) -> list[int]:
@@ -250,13 +210,9 @@ class LobbyingERGMPModel:
         """
         if is_lobbyist:
             if not 0 <= node_id < self.n_lobbyists:
-<<<<<<< HEAD
                 raise ValidationError(
                     f"Lobbyist ID {node_id} out of range [0, {self.n_lobbyists})"
                 )
-=======
-                raise ValidationError(f"Lobbyist ID {node_id} out of range [0, {self.n_lobbyists})")
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
             return sum(self.adjacency[node_id])
         else:
             if not 0 <= node_id < self.n_legislators:
@@ -291,10 +247,4 @@ class LobbyingERGMPModel:
         """Get average number of lobbyists per legislator."""
         if self.n_legislators == 0:
             return 0.0
-<<<<<<< HEAD
         return sum(self.get_degree(False, j) for j in range(self.n_legislators)) / self.n_legislators
-=======
-        return (
-            sum(self.get_degree(False, j) for j in range(self.n_legislators)) / self.n_legislators
-        )
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9

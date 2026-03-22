@@ -11,7 +11,6 @@ PolicyFlux is a Python package for simulating legislative decision-making under 
 
 ## Core concepts
 
-<<<<<<< HEAD
 - **Policy space** -- an n-dimensional space where each dimension represents a policy axis. Both actors and bills are positioned in this space.
 - **Actors** -- legislators (`CongressMember`), lobbyists, whips, speakers, and executives, each with an ideology in the policy space.
 - **Bills** -- legislative proposals positioned in the policy space. Each simulation iteration generates a random bill.
@@ -48,17 +47,3 @@ PolicyFlux is a Python package for simulating legislative decision-making under 
 2. Build an engine with `build_engine(config)` or `.build()`.
 3. Execute simulation with `engine.run()`.
 4. Read summary metrics: `engine.pass_rate`, `engine.accepted_bills`, `engine.rejected_bills`.
-=======
-- **Policy space**: an n-dimensional space used to represent policy positions.
-- **Actors and bills**: legislators and bills located in the same policy space.
-- **Decision layers**: composable influences that modify vote probabilities.
-- **Aggregation strategy**: method used to combine multiple layer outputs.
-- **Simulation engine**: deterministic or Monte Carlo runtime for voting sessions.
-
-## Typical workflow
-
-1. Create an `IntegrationConfig` (directly or from a preset).
-2. Build an engine with `build_engine(config)`.
-3. Execute simulation with `engine.run()`.
-4. Read summary metrics such as pass rate and vote outcomes.
->>>>>>> 28724a8eb17f6081daef9177c037673d899cf2a9
