@@ -53,10 +53,12 @@ config = IntegrationConfig(
 )
 
 engine = build_engine(config)
-engine.run()
+votes = engine.run()
 
-print(f"Pass rate: {engine.pass_rate:.1%}")
-print(f"Accepted: {engine.accepted_bills}, Rejected: {engine.rejected_bills}")
+num_actors = config.num_actors
+passed = sum(1 for v in votes if v > num_actors / 2)
+print(f"Pass rate: {passed / len(votes):.1%}")
+print(f"Accepted: {passed}, Rejected: {len(votes) - passed}")
 ```
 
 ## 4) Compare systems quickly
@@ -68,22 +70,23 @@ from policyflux import create_presidential_config, create_parliamentary_config
 eng1 = build_engine(create_presidential_config(num_actors=100, iterations=200, seed=42))
 eng2 = build_engine(create_parliamentary_config(num_actors=100, iterations=200, seed=42))
 
-eng1.run()
-eng2.run()
+votes1 = eng1.run()
+votes2 = eng2.run()
 
-print(f"Presidential pass rate: {eng1.pass_rate:.1%}")
-print(f"Parliamentary pass rate: {eng2.pass_rate:.1%}")
+print(f"Presidential pass rate: {sum(1 for v in votes1 if v > 50) / len(votes1):.1%}")
+print(f"Parliamentary pass rate: {sum(1 for v in votes2 if v > 50) / len(votes2):.1%}")
 ```
 
 ## 5) One-liner runners
 
-Skip config and engine construction entirely:
+Skip config and engine construction entirely. Returns `list[int]` of vote-for counts:
 
 ```python
 from policyflux import run_presidential, run_parliamentary, run_semi_presidential
 
-result = run_presidential(num_actors=100, policy_dim=2, iterations=200, seed=42)
-print(f"Pass rate: {result.pass_rate:.1%}")
+votes = run_presidential(num_actors=100, policy_dim=2, iterations=200, seed=42)
+passed = sum(1 for v in votes if v > 50)
+print(f"Pass rate: {passed / len(votes):.1%}")
 ```
 
 ## 6) Flat config
@@ -106,8 +109,9 @@ config = IntegrationConfig.from_flat(
 )
 
 engine = build_engine(config)
-engine.run()
-print(engine.pass_rate)
+votes = engine.run()
+passed = sum(1 for v in votes if v > 60)
+print(f"Passage rate: {passed / len(votes):.1%}")
 ```
 
 ## 7) Fluent builder API
@@ -129,8 +133,9 @@ engine = (
     .aggregation("average")
     .build()
 )
-engine.run()
-print(f"Pass rate: {engine.pass_rate:.1%}")
+votes = engine.run()
+passed = sum(1 for v in votes if v > 50)
+print(f"Pass rate: {passed / len(votes):.1%}")
 ```
 
 With sub-builders for grouped configuration:
@@ -201,14 +206,31 @@ results = model.run(iterations=200, seed=42)
 
 ## 9) Country-specific parliament presets
 
+These return `MultiChamberParliamentModel` instances for structural bicameral simulation:
+
 ```python
-from policyflux.integration.presets import create_uk_parliament, create_us_congress
+from policyflux.integration.presets.parliament_presets import (
+    create_uk_parliament, create_us_congress, list_presets, create_parliament,
+)
+from policyflux.toolbox import SequentialBill
 
 uk = create_uk_parliament()   # Commons (650) + Lords (800), suspensive veto
 us = create_us_congress()     # House (435) + Senate (100), full veto
+
+# Simulate a bill vote through a parliament
+bill = SequentialBill()
+bill.make_random_position(dim=2)
+result = uk.cast_votes(bill)
+print(f"Passed: {result.passed}, Rounds: {result.rounds}")
+
+# List all available presets
+print(list_presets())  # ['australia', 'canada', 'france', ...]
+
+# Create by name
+germany = create_parliament("germany", consent_law=True)
 ```
 
-Available presets: UK, US, Germany, France, Italy, Poland, Sweden, Spain, Australia, Canada.
+Available: UK, US, Germany, France, Italy, Poland, Sweden, Spain, Australia, Canada.
 
 ## 10) Built-in scenario runners
 

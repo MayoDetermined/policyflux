@@ -75,10 +75,12 @@ config = IntegrationConfig(
 )
 
 engine = build_engine(config)
-engine.run()
+votes = engine.run()
 
-print(f"Pass rate: {engine.pass_rate:.1%}")
-print(f"Accepted: {engine.accepted_bills}, Rejected: {engine.rejected_bills}")
+num_actors = config.num_actors
+passed = sum(1 for v in votes if v > num_actors / 2)
+print(f"Pass rate: {passed / len(votes):.1%}")
+print(f"Accepted: {passed}, Rejected: {len(votes) - passed}")
 ```
 
 ### One-liner runners
@@ -88,8 +90,9 @@ Run a full simulation in a single call:
 ```python
 from policyflux import run_presidential
 
-result = run_presidential(num_actors=100, policy_dim=2, iterations=200, seed=42)
-print(f"Pass rate: {result.pass_rate:.1%}")
+votes = run_presidential(num_actors=100, policy_dim=2, iterations=200, seed=42)
+passed = sum(1 for v in votes if v > 50)
+print(f"Pass rate: {passed / len(votes):.1%}")
 ```
 
 Available runners: `run_presidential`, `run_parliamentary`, `run_semi_presidential`.
@@ -111,8 +114,9 @@ engine = (
     .presidential(approval_rating=0.5)
     .build()
 )
-engine.run()
-print(f"Pass rate: {engine.pass_rate:.1%}")
+votes = engine.run()
+passed = sum(1 for v in votes if v > 50)
+print(f"Pass rate: {passed / len(votes):.1%}")
 ```
 
 ### TensorFlow-style model API
@@ -177,23 +181,34 @@ from policyflux import create_presidential_config, create_parliamentary_config
 eng1 = build_engine(create_presidential_config(num_actors=100, iterations=200, seed=42))
 eng2 = build_engine(create_parliamentary_config(num_actors=100, iterations=200, seed=42))
 
-eng1.run()
-eng2.run()
+votes1 = eng1.run()
+votes2 = eng2.run()
 
-print(f"Presidential pass rate: {eng1.pass_rate:.1%}")
-print(f"Parliamentary pass rate: {eng2.pass_rate:.1%}")
+print(f"Presidential pass rate: {sum(1 for v in votes1 if v > 50) / len(votes1):.1%}")
+print(f"Parliamentary pass rate: {sum(1 for v in votes2 if v > 50) / len(votes2):.1%}")
 ```
 
 ### Country-specific parliament presets
 
+These return `MultiChamberParliamentModel` instances for structural bicameral simulation:
+
 ```python
-from policyflux.integration.presets import create_uk_parliament, create_us_congress
+from policyflux.integration.presets.parliament_presets import (
+    create_uk_parliament, create_us_congress, list_presets,
+)
+from policyflux.toolbox import SequentialBill
 
 uk = create_uk_parliament()   # Commons (650) + Lords (800), suspensive veto
 us = create_us_congress()     # House (435) + Senate (100), full veto
+
+# Simulate a bill vote
+bill = SequentialBill()
+bill.make_random_position(dim=2)
+result = uk.cast_votes(bill)
+print(f"Passed: {result.passed}, Rounds: {result.rounds}")
 ```
 
-Available presets: UK, US, Germany, France, Italy, Poland, Sweden, Spain, Australia, Canada.
+Available: UK, US, Germany, France, Italy, Poland, Sweden, Spain, Australia, Canada. Use `list_presets()` to see all names.
 
 ### Built-in scenario runners
 
@@ -211,7 +226,7 @@ for p in points:
     print(f"Intensity {p.lobbying_intensity:.1f}: passage rate {p.passage_rate:.1%}")
 ```
 
-Available scenarios: `comparative_systems`, `lobbying_sweep`, `party_discipline_sweep`, `veto_player_sweep`.
+Available scenarios: `comparative_systems`, `lobbying_sweep`, `party_discipline_sweep`, `veto_player_sweep`, `country_comparison`.
 
 ### Mathematical models
 
@@ -333,8 +348,8 @@ policyflux/
 | `create_presidential_config(...)` | Presidential system preset |
 | `create_parliamentary_config(...)` | Parliamentary system preset |
 | `create_semi_presidential_config(...)` | Semi-presidential system preset |
-| `run_presidential(...)` / `run_parliamentary(...)` / `run_semi_presidential(...)` | One-liner: build + run + return engine |
-| `presidential_engine(...)` / `parliamentary_engine(...)` / `semi_presidential_engine(...)` | Build engine without running |
+| `run_presidential(...)` / `run_parliamentary(...)` / `run_semi_presidential(...)` | One-liner: build + run, returns `list[int]` of vote counts |
+| `presidential_engine(...)` / `parliamentary_engine(...)` / `semi_presidential_engine(...)` | Build engine without running it |
 | `PolicyFlux()` | Fluent builder API |
 | `Sequential` / `Model` / `Input` | TF-style model API |
 | `import_models()` | Lazy import of `math_models` (ERGM, Tullock) |
@@ -354,7 +369,7 @@ policyflux/
 If you use PolicyFlux in your research, please cite:
 
 ```bibtex
-@software{pawelec2026policyflux,
+@software{policyflux,
   author    = {Pawelec, Piotr},
   title     = {PolicyFlux},
   year      = {2026},

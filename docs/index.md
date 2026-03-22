@@ -37,7 +37,7 @@ PolicyFlux is a Python package for simulating legislative decision-making under 
 1. **Dataclass config** -- create `IntegrationConfig` with nested `LayerConfig` and `AdvancedActorsConfig`, then `build_engine(config)`.
 2. **Flat config** -- `IntegrationConfig.from_flat(...)` maps all parameters in a single flat call.
 3. **Preset factories** -- `create_presidential_config(...)`, `create_parliamentary_config(...)`, `create_semi_presidential_config(...)`.
-4. **One-liner runners** -- `run_presidential(...)` builds, runs, and returns the engine in one call.
+4. **One-liner runners** -- `run_presidential(...)` builds, runs, and returns `list[int]` of vote counts.
 5. **Fluent builder** -- `PolicyFlux().actors(100).policy_dim(2).with_ideal_point().build()`.
 6. **Model API** -- TensorFlow-style `Sequential` or functional `Model` with layer specs like `L.IdealPoint()`, `L.PublicOpinion(support=0.6)`.
 
@@ -45,5 +45,5 @@ PolicyFlux is a Python package for simulating legislative decision-making under 
 
 1. Create an `IntegrationConfig` (any of the methods above).
 2. Build an engine with `build_engine(config)` or `.build()`.
-3. Execute simulation with `engine.run()`.
-4. Read summary metrics: `engine.pass_rate`, `engine.accepted_bills`, `engine.rejected_bills`.
+3. Execute simulation with `votes = engine.run()` -- returns `list[int]` (vote-for counts per iteration).
+4. Compute metrics from results, e.g. `passage_rate = sum(1 for v in votes if v > num_actors / 2) / len(votes)`.

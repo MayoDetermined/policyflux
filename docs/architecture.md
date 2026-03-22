@@ -63,7 +63,7 @@ Simulation execution backends:
 | `SequentialMonteCarlo` | Runs `n` iterations sequentially, returns `list[int]` |
 | `ParallelMonteCarlo` | Multi-process Monte Carlo using `multiprocessing.dummy.Process` |
 
-All engines expose after `run()`: `pass_rate`, `accepted_bills`, `rejected_bills`, `get_pretty_votes()`.
+All engines expose after `run()`: `results` (raw vote counts), `n_simulations`, `congress_model`, `get_pretty_votes()`. Derived metrics (passage rate, vote share) are computed by callers from the raw `results` list.
 
 **Session management**: `Session` is a frozen dataclass holding `n` (iterations), `seed`, `bill`, `description`, and `congress_model`.
 
@@ -102,7 +102,7 @@ Layer registry with default entries for all built-in layers. Custom layers can b
 ### Presets (`presets/`)
 
 - **System presets**: `create_presidential_config()`, `create_parliamentary_config()`, `create_semi_presidential_config()`
-- **One-liner runners**: `run_presidential()`, `run_parliamentary()`, `run_semi_presidential()` (build + run + return engine)
+- **One-liner runners**: `run_presidential()`, `run_parliamentary()`, `run_semi_presidential()` (build + run + return `list[int]` of vote counts)
 - **Engine builders**: `presidential_engine()`, `parliamentary_engine()`, `semi_presidential_engine()` (build without running)
 - **Default constants**: `PRESIDENTIAL_DEFAULT`, `PARLIAMENTARY_DEFAULT`, `SEMI_PRESIDENTIAL_DEFAULT`
 - **Country presets**: 10 real-world parliament configurations (UK, US, Germany, France, Italy, Poland, Sweden, Spain, Australia, Canada)
@@ -199,7 +199,7 @@ A standard simulation run follows this sequence:
 4. Aggregate layer outputs with the selected aggregation strategy.
 5. Apply voting strategy (probabilistic, deterministic, or soft).
 6. Process executive actions (veto, confidence vote, cohabitation).
-7. Collect and expose aggregated outcome metrics (`pass_rate`, `accepted_bills`, `rejected_bills`).
+7. Return raw vote counts (`list[int]`) -- one integer per iteration representing votes in favour. Derived metrics (passage rate, vote share, std dev) are computed by callers or by scenario runners.
 
 ## Design principles
 

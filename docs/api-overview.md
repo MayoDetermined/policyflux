@@ -96,8 +96,10 @@ Each preset accepts `num_actors`, `policy_dim`, `iterations`, `seed`, plus syste
 
 ### Country-specific parliament presets
 
+These are **not** re-exported from `policyflux.integration.presets` -- import from the submodule directly:
+
 ```python
-from policyflux.integration.presets import (
+from policyflux.integration.presets.parliament_presets import (
     create_uk_parliament,
     create_us_congress,
     create_german_parliament,
@@ -110,16 +112,28 @@ from policyflux.integration.presets import (
     create_canadian_parliament,
     list_presets,
     create_parliament,
+    ParliamentPresetConfig,
 )
 
-# Create specific parliament
-uk = create_uk_parliament()  # Commons (650) + Lords (800), suspensive veto
+# Returns MultiChamberParliamentModel, NOT an engine
+uk = create_uk_parliament()
+
+# Simulate a bill vote
+from policyflux.toolbox import SequentialBill
+bill = SequentialBill()
+bill.make_random_position(dim=2)
+result = uk.cast_votes(bill)  # -> ParliamentVoteResult
+print(f"Passed: {result.passed}, Rounds: {result.rounds}")
 
 # List all available presets
-print(list_presets())  # ['uk', 'us', 'germany', ...]
+print(list_presets())  # ['australia', 'canada', 'france', ...]
 
-# Create by name
+# Create by name with extra kwargs
 parliament = create_parliament("germany", consent_law=True)
+
+# Customize chamber sizes via ParliamentPresetConfig
+config = ParliamentPresetConfig(policy_dim=3, lower_house_size=100, upper_house_size=50)
+small_uk = create_uk_parliament(config)
 ```
 
 | Country | Lower | Upper | Upper powers |
@@ -145,8 +159,9 @@ Main entry point. Creates all components and returns a configured engine.
 from policyflux import build_engine, IntegrationConfig
 
 engine = build_engine(IntegrationConfig(num_actors=50, iterations=100))
-engine.run()
-print(engine.pass_rate)
+votes = engine.run()  # list[int] -- vote-for counts per iteration
+passed = sum(1 for v in votes if v > 25)
+print(f"Passage rate: {passed / len(votes):.1%}")
 ```
 
 ### Low-level builders
@@ -163,13 +178,14 @@ For finer control:
 
 ## One-liner runners
 
-Build, run, and return the engine in a single call:
+Build and run a simulation in a single call. Returns `list[int]` (vote-for counts per iteration):
 
 ```python
 from policyflux import run_presidential, run_parliamentary, run_semi_presidential
 
-result = run_presidential(num_actors=100, policy_dim=2, iterations=200, seed=42)
-print(f"Pass rate: {result.pass_rate:.1%}")
+votes = run_presidential(num_actors=100, policy_dim=2, iterations=200, seed=42)
+passed = sum(1 for v in votes if v > 50)
+print(f"Passage rate: {passed / len(votes):.1%}")
 ```
 
 Engine-only variants (build without running):
@@ -178,7 +194,7 @@ Engine-only variants (build without running):
 from policyflux import presidential_engine, parliamentary_engine, semi_presidential_engine
 
 engine = presidential_engine(num_actors=100, iterations=200, seed=42)
-engine.run()  # run manually
+votes = engine.run()  # run manually
 ```
 
 Default config constants: `PRESIDENTIAL_DEFAULT`, `PARLIAMENTARY_DEFAULT`, `SEMI_PRESIDENTIAL_DEFAULT`.
@@ -205,7 +221,7 @@ engine = (
     .lobbyists(3, strength=0.6)
     .build()
 )
-engine.run()
+votes = engine.run()
 ```
 
 ### Simulation parameters
@@ -413,17 +429,25 @@ For deriving policy positions from text (requires `[text-encoders]` extra):
 | `SequentialMonteCarlo` | N iterations, returns list of vote counts |
 | `ParallelMonteCarlo` | Multi-process Monte Carlo |
 
-Engine properties after `run()`:
+Engine attributes after `run()`:
 
-- `pass_rate` -- fraction of iterations where majority voted yes
-- `accepted_bills` -- number of passed iterations
-- `rejected_bills` -- number of failed iterations
-- `results` -- raw list of vote counts per iteration
+- `results` -- `list[int]` (Monte Carlo engines) or `int` (deterministic engine) -- raw vote-for counts per iteration
+- `n_simulations` -- number of Monte Carlo iterations (on `SequentialMonteCarlo` / `ParallelMonteCarlo`)
+- `congress_model` -- the congress model used for voting
+- `get_pretty_votes()` -- render bar chart of results
+
+To compute passage rate from results:
+
+```python
+votes = engine.run()
+num_actors = config.num_actors
+passage_rate = sum(1 for v in votes if v > num_actors / 2) / len(votes)
+```
 
 ## Scenario runners
 
 ```python
-from policyflux.scenarios import comparative_systems, lobbying_sweep, party_discipline_sweep, veto_player_sweep
+from policyflux.scenarios import comparative_systems, lobbying_sweep, party_discipline_sweep, veto_player_sweep, country_comparison
 ```
 
 | Scenario | Returns | Sweeps |
